@@ -1,0 +1,25 @@
+{
+  "name": "claude-fulcrum",
+  "version": "2.0.0",
+  "description": "The ultimate AI agent harness Ã¢â‚¬â€ 25 agents, 108 skills, 57 commands, multi-agent orchestration, and cross-platform support",
+  "author": {
+    "name": "Shreyas Suvarna",
+    "url": "https://github.com/ORION2809"
+  },
+  "homepage": "https://github.com/ORION2809/claude-Fulcrum",
+  "repository": "https://github.com/ORION2809/claude-Fulcrum",
+  "license": "MIT",
+  "keywords": [
+    "claude-code",
+    "agents",
+    "skills",
+    "hooks",
+    "rules",
+    "tdd",
+    "code-review",
+    "security",
+    "workflow",
+    "automation",
+    "best-practices"
+  ]
+}

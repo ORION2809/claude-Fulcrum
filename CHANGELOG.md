@@ -1,35 +1,52 @@
 # Changelog
 
-All notable changes to this project will be documented in this file.
+## 2.0.0 - Claude Fulcrum (2026-03)
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+### Highlights
 
-## [3.0.0-alpha.154] - 2026-01-22
+- **Claude Fulcrum launch** â€” unified AI agent harness combining production-ready agents, skills, hooks, commands, rules, and multi-agent orchestration into a single project.
+- **Cross-platform support** â€” works across Claude Code, Codex CLI, Cursor, GitHub Copilot, and OpenCode.
+- **Multi-agent orchestration** â€” integrated claude-flow swarm coordination with 60+ agent types, vector memory, and consensus protocols.
+- **5 platform configs** â€” platform-specific configurations (.codex, .cursor, .opencode, .github, .vscode) ship with the repo.
 
-### Fixed
-- Memory delete command now properly supports `--key` and `--namespace` options (#980)
-- Added missing 'type' column to memory schema migration (#977)
-- Updated pnpm-lock.yaml for @claude-flow/browser dependencies
+---
 
-## [3.0.0-alpha.153] - 2026-01-22
+## 1.8.0 - 2026-03-04
 
-### Fixed
-- Added missing 'type' column to ensureSchemaColumns() for older databases
+### Highlights
 
-## [3.0.0-alpha.152] - 2026-01-22
+- Harness-first release focused on reliability, eval discipline, and autonomous loop operations.
+- Hook runtime now supports profile-based control and targeted hook disabling.
+- NanoClaw v2 adds model routing, skill hot-load, branching, search, compaction, export, and metrics.
 
-### Added
-- V3 CLI with 26 commands and 140+ subcommands
-- Domain-Driven Design architecture with 15 @claude-flow modules
-- HNSW-indexed vector search (150x-12,500x faster)
-- RuVector Intelligence System (SONA, MoE, Flash Attention)
-- 60+ agent types for swarm coordination
-- Queen-led Byzantine fault-tolerant consensus
-- 17 hooks + 12 background workers
+### Core
 
-### Changed
-- Restructured as monorepo with pnpm workspaces
-- Moved CLI to @claude-flow/cli package
+- Added new commands: `/harness-audit`, `/loop-start`, `/loop-status`, `/quality-gate`, `/model-route`.
+- Added new skills:
+  - `agent-harness-construction`
+  - `agentic-engineering`
+  - `ralphinho-rfc-pipeline`
+  - `ai-first-engineering`
+  - `enterprise-agent-ops`
+  - `nanoclaw-repl`
+  - `continuous-agent-loop`
+- Added new agents:
+  - `harness-optimizer`
+  - `loop-operator`
 
-For earlier versions, see the git history.
+### Hook Reliability
+
+- Fixed SessionStart root resolution with robust fallback search.
+- Moved session summary persistence to `Stop` where transcript payload is available.
+- Added quality-gate and cost-tracker hooks.
+- Replaced fragile inline hook one-liners with dedicated script files.
+- Added `ECC_HOOK_PROFILE` and `ECC_DISABLED_HOOKS` controls.
+
+### Cross-Platform
+
+- Improved Windows-safe path handling in doc warning logic.
+- Hardened observer loop behavior to avoid non-interactive hangs.
+
+### Notes
+
+- `autonomous-loops` is kept as a compatibility alias for one release; `continuous-agent-loop` is the canonical name.

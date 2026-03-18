@@ -1,634 +1,154 @@
-# Claude Flow V3 - Agent Guide
+# Claude Fulcrum â€” Agent Instructions
 
-> **For OpenAI Codex CLI** - Agentic AI Foundation standard
-> Skills: `$skill-name` | Config: `.agents/config.toml`
+This is a **production-ready AI agent harness** providing 25 specialized agents, 108 skills, 57 commands, and automated hook workflows for software development.
 
----
+## Core Principles
 
-## 📢 TL;DR - READ THIS FIRST
+1. **Agent-First** â€” Delegate to specialized agents for domain tasks
+2. **Test-Driven** â€” Write tests before implementation, 80%+ coverage required
+3. **Security-First** â€” Never compromise on security; validate all inputs
+4. **Immutability** â€” Always create new objects, never mutate existing ones
+5. **Plan Before Execute** â€” Plan complex features before writing code
+
+## Available Agents
+
+| Agent | Purpose | When to Use |
+|-------|---------|-------------|
+| planner | Implementation planning | Complex features, refactoring |
+| architect | System design and scalability | Architectural decisions |
+| tdd-guide | Test-driven development | New features, bug fixes |
+| code-reviewer | Code quality and maintainability | After writing/modifying code |
+| security-reviewer | Vulnerability detection | Before commits, sensitive code |
+| build-error-resolver | Fix build/type errors | When build fails |
+| e2e-runner | End-to-end Playwright testing | Critical user flows |
+| refactor-cleaner | Dead code cleanup | Code maintenance |
+| doc-updater | Documentation and codemaps | Updating docs |
+| go-reviewer | Go code review | Go projects |
+| go-build-resolver | Go build errors | Go build failures |
+| kotlin-reviewer | Kotlin code review | Kotlin/Android/KMP projects |
+| kotlin-build-resolver | Kotlin/Gradle build errors | Kotlin build failures |
+| database-reviewer | PostgreSQL/Supabase specialist | Schema design, query optimization |
+| python-reviewer | Python code review | Python projects |
+| java-reviewer | Java and Spring Boot code review | Java/Spring Boot projects |
+| java-build-resolver | Java/Maven/Gradle build errors | Java build failures |
+| chief-of-staff | Communication triage and drafts | Multi-channel email, Slack, LINE, Messenger |
+| loop-operator | Autonomous loop execution | Run loops safely, monitor stalls, intervene |
+| harness-optimizer | Harness config tuning | Reliability, cost, throughput |
+| rust-reviewer | Rust code review | Rust projects |
+| rust-build-resolver | Rust build errors | Rust build failures |
+
+## Agent Orchestration
+
+Use agents proactively without user prompt:
+- Complex feature requests â†’ **planner**
+- Code just written/modified â†’ **code-reviewer**
+- Bug fix or new feature â†’ **tdd-guide**
+- Architectural decision â†’ **architect**
+- Security-sensitive code â†’ **security-reviewer**
+- Multi-channel communication triage â†’ **chief-of-staff**
+- Autonomous loops / loop monitoring â†’ **loop-operator**
+- Harness config reliability and cost â†’ **harness-optimizer**
+
+Use parallel execution for independent operations â€” launch multiple agents simultaneously.
+
+## Security Guidelines
+
+**Before ANY commit:**
+- No hardcoded secrets (API keys, passwords, tokens)
+- All user inputs validated
+- SQL injection prevention (parameterized queries)
+- XSS prevention (sanitized HTML)
+- CSRF protection enabled
+- Authentication/authorization verified
+- Rate limiting on all endpoints
+- Error messages don't leak sensitive data
+
+**Secret management:** NEVER hardcode secrets. Use environment variables or a secret manager. Validate required secrets at startup. Rotate any exposed secrets immediately.
+
+**If security issue found:** STOP â†’ use security-reviewer agent â†’ fix CRITICAL issues â†’ rotate exposed secrets â†’ review codebase for similar issues.
+
+## Coding Style
+
+**Immutability (CRITICAL):** Always create new objects, never mutate. Return new copies with changes applied.
+
+**File organization:** Many small files over few large ones. 200-400 lines typical, 800 max. Organize by feature/domain, not by type. High cohesion, low coupling.
+
+**Error handling:** Handle errors at every level. Provide user-friendly messages in UI code. Log detailed context server-side. Never silently swallow errors.
+
+**Input validation:** Validate all user input at system boundaries. Use schema-based validation. Fail fast with clear messages. Never trust external data.
+
+**Code quality checklist:**
+- Functions small (<50 lines), files focused (<800 lines)
+- No deep nesting (>4 levels)
+- Proper error handling, no hardcoded values
+- Readable, well-named identifiers
+
+## Testing Requirements
+
+**Minimum coverage: 80%**
+
+Test types (all required):
+1. **Unit tests** â€” Individual functions, utilities, components
+2. **Integration tests** â€” API endpoints, database operations
+3. **E2E tests** â€” Critical user flows
+
+**TDD workflow (mandatory):**
+1. Write test first (RED) â€” test should FAIL
+2. Write minimal implementation (GREEN) â€” test should PASS
+3. Refactor (IMPROVE) â€” verify coverage 80%+
+
+Troubleshoot failures: check test isolation â†’ verify mocks â†’ fix implementation (not tests, unless tests are wrong).
+
+## Development Workflow
+
+1. **Plan** â€” Use planner agent, identify dependencies and risks, break into phases
+2. **TDD** â€” Use tdd-guide agent, write tests first, implement, refactor
+3. **Review** â€” Use code-reviewer agent immediately, address CRITICAL/HIGH issues
+4. **Capture knowledge in the right place**
+   - Personal debugging notes, preferences, and temporary context â†’ auto memory
+   - Team/project knowledge (architecture decisions, API changes, runbooks) â†’ the project's existing docs structure
+   - If the current task already produces the relevant docs or code comments, do not duplicate the same information elsewhere
+   - If there is no obvious project doc location, ask before creating a new top-level file
+5. **Commit** â€” Conventional commits format, comprehensive PR summaries
+
+## Git Workflow
+
+**Commit format:** `<type>: <description>` â€” Types: feat, fix, refactor, docs, test, chore, perf, ci
+
+**PR workflow:** Analyze full commit history â†’ draft comprehensive summary â†’ include test plan â†’ push with `-u` flag.
+
+## Architecture Patterns
+
+**API response format:** Consistent envelope with success indicator, data payload, error message, and pagination metadata.
+
+**Repository pattern:** Encapsulate data access behind standard interface (findAll, findById, create, update, delete). Business logic depends on abstract interface, not storage mechanism.
+
+**Skeleton projects:** Search for battle-tested templates, evaluate with parallel agents (security, extensibility, relevance), clone best match, iterate within proven structure.
+
+## Performance
+
+**Context management:** Avoid last 20% of context window for large refactoring and multi-file features. Lower-sensitivity tasks (single edits, docs, simple fixes) tolerate higher utilization.
+
+**Build troubleshooting:** Use build-error-resolver agent â†’ analyze errors â†’ fix incrementally â†’ verify after each fix.
+
+## Project Structure
 
 ```
-╔═══════════════════════════════════════════════════════════════════════════╗
-║  1. claude-flow = LEDGER (tracks state, stores memory, coordinates)       ║
-║  2. Codex = EXECUTOR (writes code, runs commands, creates files)          ║
-║  3. NEVER stop after calling claude-flow - IMMEDIATELY continue working   ║
-║  4. If you need something BUILT/EXECUTED, YOU do it, not claude-flow      ║
-║  5. ALWAYS search memory BEFORE starting: memory search --query "task"    ║
-║  6. ALWAYS store patterns AFTER success: memory store --namespace patterns║
-╚═══════════════════════════════════════════════════════════════════════════╝
+agents/          â€” 25 specialized subagents
+skills/          â€” 108 workflow skills and domain knowledge
+commands/        â€” 57 slash commands
+hooks/           â€” Trigger-based automations
+rules/           â€” Always-follow guidelines (common + per-language)
+scripts/         â€” Cross-platform Node.js utilities
+mcp-configs/     â€” MCP server configurations
+orchestration/   â€” Multi-agent swarm coordination
+tests/           â€” Test suite
 ```
 
-**Workflow (Use MCP Tools):**
-1. `memory_search(query="task keywords")` → LEARN from past patterns (score > 0.7 = use it)
-2. `swarm_init(topology="hierarchical")` → coordination record (instant)
-3. **YOU write the code / run the commands** ← THIS IS WHERE WORK HAPPENS
-4. `memory_store(key="pattern-x", value="what worked", namespace="patterns")` → REMEMBER for next time
-
----
-
-## 🚨 CRITICAL: CODEX DOES THE WORK, CLAUDE-FLOW ORCHESTRATES
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│  CLAUDE-FLOW = ORCHESTRATOR (tracks state, coordinates)     │
-│  CODEX = WORKER (writes code, runs commands, implements)    │
-└─────────────────────────────────────────────────────────────┘
-```
-
-### ❌ WRONG: Expecting claude-flow to execute tasks
-```bash
-npx claude-flow swarm start --objective "Build API"
-# WRONG: Waiting for claude-flow to build the API
-# Claude-flow does NOT execute code!
-```
-
-### ✅ CORRECT: Codex executes, claude-flow tracks
-```bash
-# 1. Tell claude-flow what you're doing (optional coordination)
-npx claude-flow swarm init --topology hierarchical --max-agents 1
-npx claude-flow agent spawn --type coder --name codex-worker
-
-# 2. YOU (CODEX) DO THE ACTUAL WORK:
-mkdir -p src
-cat > src/api.ts << 'EOF'
-export function hello() { return "Hello World"; }
-EOF
-
-# 3. Report to claude-flow what you did (optional)
-npx claude-flow memory store --key "api-created" --value "src/api.ts" --namespace results
-```
-
-### The Division of Labor
-
-| Component | Role | Examples |
-|-----------|------|----------|
-| **CODEX** | EXECUTES | Write files, run tests, create code, shell commands |
-| **claude-flow** | ORCHESTRATES | Track agents, store memory, coordinate tasks |
-
----
-
-## ⛔ DON'T STOP AFTER CALLING CLAUDE-FLOW
-
-```
-┌─────────────────────────────────────────────────────────────────────────┐
-│  ❌ WRONG: Call claude-flow → STOP → Wait for results                   │
-│  ✅ RIGHT: Call claude-flow → IMMEDIATELY continue → YOU do the work    │
-└─────────────────────────────────────────────────────────────────────────┘
-```
-
-### ❌ WRONG Pattern (Stopping)
-```bash
-npx claude-flow swarm init --topology hierarchical
-npx claude-flow agent spawn --type coder --name worker-1
-npx claude-flow swarm start --objective "Build hello world"
-# WRONG: Codex stops here and waits for something to happen
-# Nothing will happen! Claude-flow doesn't execute code!
-```
-
-### ✅ CORRECT Pattern (Continue Immediately)
-```bash
-# Step 1: Coordination (optional)
-npx claude-flow swarm init --topology hierarchical
-npx claude-flow agent spawn --type coder --name worker-1
-
-# Step 2: IMMEDIATELY DO THE WORK YOURSELF - DON'T WAIT!
-echo 'console.log("Hello World!");' > hello.js
-node hello.js
-
-# Step 3: Report what you did
-npx claude-flow memory store --key "result" --value "Hello World printed" --namespace results
-```
-
-### The Rule
-**After ANY claude-flow command, IMMEDIATELY continue with your own work.**
-
-Claude-flow commands return instantly. They create coordination RECORDS only.
-You must ALWAYS follow up with YOUR OWN execution.
-
-| After This... | IMMEDIATELY Do This... |
-|---------------|----------------------|
-| `swarm init` | Start writing code |
-| `agent spawn` | Continue implementation |
-| `task create` | Execute the task yourself |
-| `swarm start` | Begin actual work |
-
----
-
-### When to Use Claude-Flow Commands
-
-| Use Case | Claude-Flow Command | Then Codex Does |
-|----------|---------------------|-----------------|
-| Track progress | `memory store --key "step1" --value "done"` | Continue to next step |
-| Multi-step tasks | `task create --description "step 2"` | Execute step 2 |
-| Store results | `memory store --key "output" --value "..."` | Move on |
-| Coordinate | `swarm init` | Start working |
-
-### Hello World - Correct Pattern
-
-```bash
-# STEP 1: Optional - register with orchestrator
-npx claude-flow swarm init --topology mesh --max-agents 1
-
-# STEP 2: CODEX DOES THE WORK
-echo 'console.log("Hello World!");' > hello.js
-node hello.js
-
-# STEP 3: Optional - report completion
-npx claude-flow memory store --key "hello-result" --value "printed Hello World" --namespace results
-```
-
-**REMEMBER: If you need something DONE, YOU do it. Claude-flow just tracks.**
-
----
-
-## ⚡ QUICK COMMANDS (NO DISCOVERY NEEDED)
-
-### Spawn N-Agent Swarm (Copy-Paste Ready)
-
-```bash
-# 5-AGENT SWARM - Run these commands in sequence:
-npx claude-flow swarm init --topology hierarchical --max-agents 8
-npx claude-flow agent spawn --type coordinator --name coord-1
-npx claude-flow agent spawn --type coder --name coder-1
-npx claude-flow agent spawn --type coder --name coder-2
-npx claude-flow agent spawn --type tester --name tester-1
-npx claude-flow agent spawn --type reviewer --name reviewer-1
-npx claude-flow swarm start --objective "Your task here" --strategy development
-```
-
-### Common Swarm Patterns
-
-| Task | Exact Command |
-|------|---------------|
-| Init hierarchical swarm | `npx claude-flow swarm init --topology hierarchical --max-agents 8` |
-| Init mesh swarm | `npx claude-flow swarm init --topology mesh --max-agents 5` |
-| Init V3 mode (15 agents) | `npx claude-flow swarm init --v3-mode` |
-| Spawn coder | `npx claude-flow agent spawn --type coder --name coder-1` |
-| Spawn tester | `npx claude-flow agent spawn --type tester --name tester-1` |
-| Spawn coordinator | `npx claude-flow agent spawn --type coordinator --name coord-1` |
-| Spawn architect | `npx claude-flow agent spawn --type architect --name arch-1` |
-| Spawn reviewer | `npx claude-flow agent spawn --type reviewer --name rev-1` |
-| Spawn researcher | `npx claude-flow agent spawn --type researcher --name res-1` |
-| Start swarm | `npx claude-flow swarm start --objective "task" --strategy development` |
-| Check swarm status | `npx claude-flow swarm status` |
-| List agents | `npx claude-flow agent list` |
-| Stop swarm | `npx claude-flow swarm stop` |
-
-### Agent Types (Use with `--type`)
-
-| Type | Purpose |
-|------|---------|
-| `coordinator` | Orchestrates other agents |
-| `coder` | Writes code |
-| `tester` | Writes tests |
-| `reviewer` | Reviews code |
-| `architect` | Designs systems |
-| `researcher` | Analyzes requirements |
-| `security-architect` | Security design |
-| `performance-engineer` | Optimization |
-
-### Task Commands
-
-| Action | Command |
-|--------|---------|
-| Create task | `npx claude-flow task create --type implementation --description "desc"` |
-| List tasks | `npx claude-flow task list` |
-| Assign task | `npx claude-flow task assign TASK_ID --agent AGENT_NAME` |
-| Task status | `npx claude-flow task status TASK_ID` |
-| Cancel task | `npx claude-flow task cancel TASK_ID` |
-
-### Memory Commands
-
-| Action | Command |
-|--------|---------|
-| Store | `npx claude-flow memory store --key "key" --value "value" --namespace patterns` |
-| Search | `npx claude-flow memory search --query "search terms"` |
-| List | `npx claude-flow memory list --namespace patterns` |
-| Retrieve | `npx claude-flow memory retrieve --key "key"` |
-
----
-
-## 🚀 SWARM RECIPES
-
-### Recipe 1: Hello World Test (COMPLETE EXAMPLE)
-
-**Step 1: Setup coordination** (returns instantly - don't stop!)
-```bash
-npx claude-flow swarm init --topology mesh --max-agents 5
-npx claude-flow agent spawn --type coder --name hello-main
-# ⚠️ DON'T STOP HERE - CONTINUE IMMEDIATELY TO STEP 2
-```
-
-**Step 2: YOU (Codex) execute the task** (THIS IS THE REAL WORK)
-```bash
-# ✅ YOU create the file
-echo 'console.log("Hello World from Swarm!");' > /tmp/hello-swarm.js
-
-# ✅ YOU execute it
-node /tmp/hello-swarm.js
-# Output: Hello World from Swarm!
-```
-
-**Step 3: Report completion** (optional - store results)
-```bash
-npx claude-flow memory store --key "hello-world-result" --value "Executed: Hello World from Swarm!" --namespace results
-```
-
-### Recipe 1b: 5-Agent Concurrent Hello World (COMPLETE)
-```bash
-# COORDINATION (instant - creates records only)
-npx claude-flow swarm init --topology hierarchical --max-agents 5
-for i in 1 2 3 4 5; do
-  npx claude-flow agent spawn --type coder --name "worker-$i"
-done
-
-# ⚠️ NOW YOU DO THE ACTUAL CONCURRENT WORK:
-for i in 1 2 3 4 5; do
-  (echo "Worker $i: Hello World!" && sleep 0.$i) &
-done
-wait
-echo "All 5 workers completed!"
-
-# REPORT (optional)
-npx claude-flow memory store --key "concurrent-result" --value "5 workers completed" --namespace results
-```
-
-### Recipe 1b: Hello World (Single Command Block)
-```bash
-# All-in-one execution
-npx claude-flow swarm init --topology mesh --max-agents 5 && \
-npx claude-flow agent spawn --type coder --name hello-main && \
-npx claude-flow swarm start --objective "Print hello world" --strategy development && \
-echo 'console.log("Hello World from Swarm!");' > /tmp/hello-swarm.js && \
-node /tmp/hello-swarm.js && \
-npx claude-flow memory store --key "hello-world-result" --value "Success" --namespace results
-```
-
-### Recipe 2: Feature Implementation (6 Agents)
-```bash
-npx claude-flow swarm init --topology hierarchical --max-agents 8
-npx claude-flow agent spawn --type coordinator --name lead
-npx claude-flow agent spawn --type architect --name arch
-npx claude-flow agent spawn --type coder --name impl-1
-npx claude-flow agent spawn --type coder --name impl-2
-npx claude-flow agent spawn --type tester --name test
-npx claude-flow agent spawn --type reviewer --name review
-npx claude-flow swarm start --objective "Implement [feature]" --strategy development
-```
-
-### Recipe 3: Bug Fix (4 Agents)
-```bash
-npx claude-flow swarm init --topology hierarchical --max-agents 4
-npx claude-flow agent spawn --type coordinator --name lead
-npx claude-flow agent spawn --type researcher --name debug
-npx claude-flow agent spawn --type coder --name fix
-npx claude-flow agent spawn --type tester --name verify
-npx claude-flow swarm start --objective "Fix [bug]" --strategy development
-```
-
-### Recipe 4: Security Audit (3 Agents)
-```bash
-npx claude-flow swarm init --topology hierarchical --max-agents 4
-npx claude-flow agent spawn --type coordinator --name lead
-npx claude-flow agent spawn --type security-architect --name audit
-npx claude-flow agent spawn --type reviewer --name review
-npx claude-flow swarm start --objective "Security audit" --strategy development
-```
-
-### Recipe 5: V3 Full Coordination (15 Agents)
-```bash
-npx claude-flow swarm init --v3-mode
-npx claude-flow swarm coordinate --agents 15
-```
-
----
-
-## 📋 BEHAVIORAL RULES
-
-- **YOU (CODEX) execute tasks** - claude-flow only orchestrates
-- Do what is asked; nothing more, nothing less
-- NEVER create files unless absolutely necessary
-- ALWAYS prefer editing existing files
-- NEVER save to root folder
-- NEVER commit secrets or .env files
-- ALWAYS read a file before editing it
-- NEVER wait for claude-flow to "do work" - it doesn't execute, YOU do
-- Use claude-flow commands to TRACK progress, not to EXECUTE tasks
-
-## 📁 FILE ORGANIZATION
-
-| Directory | Purpose |
-|-----------|---------|
-| `/src` | Source code |
-| `/tests` | Test files |
-| `/docs` | Documentation |
-| `/config` | Configuration |
-| `/scripts` | Utility scripts |
-
-## 🎯 WHEN TO USE SWARMS
-
-**USE SWARM:**
-- Multiple files (3+)
-- New feature implementation
-- Cross-module refactoring
-- API changes with tests
-- Security-related changes
-- Performance optimization
-
-**SKIP SWARM:**
-- Single file edits
-- Simple bug fixes (1-2 lines)
-- Documentation updates
-- Configuration changes
-
----
-
-## 🔧 CLI REFERENCE
-
-### Swarm Commands
-```bash
-npx claude-flow swarm init [--topology TYPE] [--max-agents N] [--v3-mode]
-npx claude-flow swarm start --objective "task" --strategy [development|research]
-npx claude-flow swarm status [SWARM_ID]
-npx claude-flow swarm stop [SWARM_ID]
-npx claude-flow swarm scale --count N
-npx claude-flow swarm coordinate --agents N
-```
-
-### Agent Commands
-```bash
-npx claude-flow agent spawn --type TYPE --name NAME
-npx claude-flow agent list [--filter active|idle|busy]
-npx claude-flow agent status AGENT_ID
-npx claude-flow agent stop AGENT_ID
-npx claude-flow agent metrics [AGENT_ID]
-npx claude-flow agent health
-npx claude-flow agent logs AGENT_ID
-```
-
-### Task Commands
-```bash
-npx claude-flow task create --type TYPE --description "desc"
-npx claude-flow task list [--all]
-npx claude-flow task status TASK_ID
-npx claude-flow task assign TASK_ID --agent AGENT_NAME
-npx claude-flow task cancel TASK_ID
-npx claude-flow task retry TASK_ID
-```
-
-### Memory Commands
-```bash
-npx claude-flow memory store --key KEY --value VALUE [--namespace NS]
-npx claude-flow memory search --query "terms" [--namespace NS]
-npx claude-flow memory list [--namespace NS]
-npx claude-flow memory retrieve --key KEY [--namespace NS]
-npx claude-flow memory init [--force]
-```
-
-### Hooks Commands
-```bash
-npx claude-flow hooks pre-task --description "task"
-npx claude-flow hooks post-task --task-id ID --success true
-npx claude-flow hooks route --task "task"
-npx claude-flow hooks session-start --session-id ID
-npx claude-flow hooks session-end --export-metrics true
-npx claude-flow hooks worker list
-npx claude-flow hooks worker dispatch --trigger audit
-```
-
-### System Commands
-```bash
-npx claude-flow init [--wizard] [--codex] [--full]
-npx claude-flow daemon start
-npx claude-flow daemon stop
-npx claude-flow daemon status
-npx claude-flow doctor [--fix]
-npx claude-flow status
-npx claude-flow mcp start
-```
-
----
-
-## 🔌 TOPOLOGIES
-
-| Topology | Use Case | Command Flag |
-|----------|----------|--------------|
-| `hierarchical` | Coordinated teams, anti-drift | `--topology hierarchical` |
-| `mesh` | Peer-to-peer, equal agents | `--topology mesh` |
-| `hierarchical-mesh` | Hybrid (recommended for V3) | `--topology hierarchical-mesh` |
-| `ring` | Sequential processing | `--topology ring` |
-| `star` | Central coordinator | `--topology star` |
-| `adaptive` | Dynamic switching | `--topology adaptive` |
-
-## 🤖 AGENT TYPES
-
-### Core
-`coordinator`, `coder`, `tester`, `reviewer`, `architect`, `researcher`
-
-### Specialized
-`security-architect`, `security-auditor`, `memory-specialist`, `performance-engineer`
-
-### Swarm Coordination
-`hierarchical-coordinator`, `mesh-coordinator`, `adaptive-coordinator`
-
-### Consensus
-`byzantine-coordinator`, `raft-manager`, `gossip-coordinator`
-
----
-
-## ⚙️ CONFIGURATION
-
-### Default Swarm Config
-- Topology: `hierarchical`
-- Max Agents: 8
-- Strategy: `specialized`
-- Consensus: `raft`
-- Memory: `hybrid`
-
-### Environment Variables
-```bash
-CLAUDE_FLOW_CONFIG=./claude-flow.config.json
-CLAUDE_FLOW_LOG_LEVEL=info
-CLAUDE_FLOW_MEMORY_BACKEND=hybrid
-```
-
----
-
-## 🔗 SKILLS
-
-Invoke with `$skill-name`:
-
-| Skill | Purpose |
-|-------|---------|
-| `$swarm-orchestration` | Multi-agent coordination |
-| `$memory-management` | Pattern storage/retrieval |
-| `$sparc-methodology` | Structured development |
-| `$security-audit` | Security scanning |
-| `$performance-analysis` | Profiling |
-| `$github-automation` | CI/CD management |
-| `$hive-mind` | Byzantine consensus |
-| `$neural-training` | Pattern learning |
-
----
-
----
-
-## 🔌 MCP INTEGRATION (Learning & Coordination)
-
-Codex doesn't have native hooks like Claude Code, but uses **MCP (Model Context Protocol)** for learning and coordination.
-
-### MCP Auto-Registration
-
-When you run `npx claude-flow init --codex`, the MCP server is **automatically registered** with Codex.
-
-```bash
-# Verify MCP is registered:
-codex mcp list
-
-# Expected output:
-# Name         Command  Args                   Status
-# claude-flow  npx      claude-flow mcp start  enabled
-
-# If not present, add manually:
-codex mcp add claude-flow -- npx claude-flow mcp start
-```
-
-### Test MCP Connection
-```bash
-# Test MCP server starts correctly:
-npx claude-flow mcp start --test
-```
-
-### MCP Tools Available
-Once added, Codex can use these tools via MCP:
-
-**Coordination:**
-| Tool | Purpose |
-|------|---------|
-| `swarm_init` | Initialize swarm (topology, maxAgents) |
-| `swarm_status` | Check swarm state |
-| `agent_spawn` | Register agent roles |
-| `agent_status` | Check agent state |
-| `task_orchestrate` | Coordinate multi-agent tasks |
-
-**Learning & Memory (USE THESE!):**
-| Tool | Purpose | When |
-|------|---------|------|
-| `memory_search` | Semantic vector search | BEFORE every task |
-| `memory_store` | Store patterns with embeddings | AFTER success |
-| `memory_retrieve` | Get by exact key | When key is known |
-| `neural_train` | Train on patterns | Periodic improvement |
-| `neural_status` | Check learning state | Debugging |
-
-**Hive Mind (Advanced):**
-| Tool | Purpose |
-|------|---------|
-| `hive-mind_init` | Byzantine consensus swarm |
-| `hive-mind_spawn` | Spawn hive workers |
-| `hive-mind_broadcast` | Message all workers |
-
-### Self-Learning via MCP Tools (PREFERRED)
-
-Use MCP tools directly - faster than CLI commands:
-
-**BEFORE starting any task - SEARCH for patterns:**
-```
-Use tool: memory_search
-  query: "keywords related to your task"
-  namespace: "patterns"
-```
-
-**AFTER completing successfully - STORE the pattern:**
-```
-Use tool: memory_store
-  key: "pattern-[descriptive-name]"
-  value: "What worked: approach, code patterns, gotchas"
-  namespace: "patterns"
-```
-
-### MCP Learning Workflow (Use This!)
-
-```
-1. LEARN: memory_search(query="task keywords", namespace="patterns")
-   → If score > 0.7, USE that pattern
-
-2. COORDINATE: swarm_init(topology="hierarchical")
-   → agent_spawn(type="coder", name="worker-1")
-
-3. EXECUTE: YOU write the code, run commands, create files
-
-4. REMEMBER: memory_store(key="pattern-x", value="what worked", namespace="patterns")
-```
-
-### MCP Tools for Learning
-
-| Tool | Purpose | When to Use |
-|------|---------|-------------|
-| `memory_search` | Find similar past patterns | BEFORE starting any task |
-| `memory_store` | Save successful patterns | AFTER completing a task |
-| `memory_retrieve` | Get specific pattern by key | When you know the exact key |
-| `neural_train` | Train on successful patterns | After multiple successes |
-
-### Example: Learning-Enabled Task
-
-```
-STEP 1 - LEARN:
-Use tool: memory_search
-  query: "validation utility function"
-  namespace: "patterns"
-
-→ Found: pattern-email-validator (score: 0.82)
-→ Use this pattern as reference!
-
-STEP 2 - COORDINATE:
-Use tool: swarm_init with topology="hierarchical", maxAgents=3
-
-STEP 3 - EXECUTE:
-YOU create the files:
-  echo 'export function validate(x) { ... }' > /tmp/validator.js
-  node --test /tmp/validator.js
-
-STEP 4 - REMEMBER:
-Use tool: memory_store
-  key: "pattern-phone-validator"
-  value: "Phone validation: regex /^\+?[\d\s-]{10,}$/, normalize first, test edge cases"
-  namespace: "patterns"
-```
-
-### Vector Search Tips
-- Searches are SEMANTIC (meaning-based, not just keywords)
-- Score > 0.7 = strong match, use that pattern
-- Score 0.5-0.7 = partial match, adapt as needed
-- Store DETAILED values for better future retrieval
-
-### CLI Fallback (if MCP unavailable)
-```bash
-npx claude-flow memory search --query "keywords" --namespace patterns
-npx claude-flow memory store --key "pattern-x" --value "what worked" --namespace patterns
-```
-
-### Coordination via MCP
-
-When claude-flow is added as MCP server, Codex can call tools directly:
-```
-Use tool: swarm_init with topology="hierarchical"
-Use tool: memory_store with key="result" value="success"
-```
-
-### config.toml MCP Setup
-```toml
-# ~/.codex/config.toml
-[mcp_servers.claude-flow]
-command = "npx"
-args = ["claude-flow", "mcp", "start"]
-enabled = true
-```
-
----
-
-## 📚 SUPPORT
-
-- Docs: https://github.com/ruvnet/claude-flow
-- Issues: https://github.com/ruvnet/claude-flow/issues
-
-**Remember: Codex executes, claude-flow orchestrates!**
+## Success Metrics
+
+- All tests pass with 80%+ coverage
+- No security vulnerabilities
+- Code is readable and maintainable
+- Performance is acceptable
+- User requirements are met

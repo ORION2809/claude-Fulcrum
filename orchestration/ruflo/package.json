@@ -1,0 +1,38 @@
+{
+  "name": "claude-fulcrum-orchestration",
+  "version": "2.0.0",
+  "description": "Claude Fulcrum orchestration layer Ã¢â‚¬â€ multi-agent swarm coordination via claude-flow",
+  "main": "bin/Claude Fulcrum.js",
+  "type": "module",
+  "bin": {
+    "gc-orchestrate": "./bin/Claude Fulcrum.js"
+  },
+  "homepage": "https://github.com/ORION2809/claude-Fulcrum#readme",
+  "files": [
+    "bin/**",
+    "README.md"
+  ],
+  "dependencies": {
+    "@claude-flow/cli": ">=3.0.0-alpha.1"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ORION2809/claude-Fulcrum.git",
+    "directory": "orchestration/Claude Fulcrum"
+  },
+  "keywords": [
+    "claude-fulcrum",
+    "claude-flow",
+    "multi-agent",
+    "orchestration",
+    "swarm"
+  ],
+  "author": {
+    "name": "Shreyas Suvarna",
+    "url": "https://github.com/ORION2809"
+  },
+  "license": "MIT"
+}

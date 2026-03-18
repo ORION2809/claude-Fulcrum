@@ -1,0 +1,94 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "^(Write|Edit|MultiEdit)$",
+        "description": "Claude-Flow pre-edit hook for file modifications",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "npx claude-flow@alpha hooks pre-edit --file \"$TOOL_INPUT_file_path\"",
+            "timeout": 5000,
+            "continueOnError": true
+          }
+        ]
+      },
+      {
+        "matcher": "^Bash$",
+        "description": "Claude-Flow pre-command hook for bash execution",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "npx claude-flow@alpha hooks pre-command --command \"$TOOL_INPUT_command\"",
+            "timeout": 3000,
+            "continueOnError": true
+          }
+        ]
+      },
+      {
+        "matcher": "^Task$",
+        "description": "Claude-Flow pre-task hook for agent spawning",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "npx claude-flow@alpha hooks pre-task --description \"$TOOL_INPUT_prompt\"",
+            "timeout": 5000,
+            "continueOnError": true
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "^(Write|Edit|MultiEdit)$",
+        "description": "Claude-Flow post-edit hook for pattern learning",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "npx claude-flow@alpha hooks post-edit --file \"$TOOL_INPUT_file_path\" --success \"$TOOL_SUCCESS\" --train-patterns",
+            "timeout": 5000,
+            "continueOnError": true
+          }
+        ]
+      },
+      {
+        "matcher": "^Bash$",
+        "description": "Claude-Flow post-command hook for metrics",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "npx claude-flow@alpha hooks post-command --command \"$TOOL_INPUT_command\" --success \"$TOOL_SUCCESS\"",
+            "timeout": 3000,
+            "continueOnError": true
+          }
+        ]
+      },
+      {
+        "matcher": "^Task$",
+        "description": "Claude-Flow post-task hook for performance analysis",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "npx claude-flow@alpha hooks post-task --task-id \"$TOOL_RESULT_agent_id\" --success \"$TOOL_SUCCESS\"",
+            "timeout": 5000,
+            "continueOnError": true
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "*",
+        "description": "Claude-Flow session metrics on response end",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "npx claude-flow@alpha hooks session-end --export-metrics true",
+            "timeout": 5000,
+            "continueOnError": true
+          }
+        ]
+      }
+    ]
+  }
+}
