@@ -3,7 +3,7 @@
 ## Project Overview
 
 This is **Claude Fulcrum**, the ultimate AI agent harness for software development.
-It provides 25 specialized agents, 108 skills, 57 commands, multi-agent orchestration, and cross-platform support for Claude Code, Codex, Cursor, Copilot, and OpenCode.
+It provides 25 specialized agents, 112 skills, 62 commands, multi-agent orchestration, and cross-platform support for Claude Code, Codex, Cursor, Copilot, and OpenCode.
 
 ## Architecture
 

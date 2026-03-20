@@ -393,7 +393,7 @@ function runTests() {
       }
     }));
 
-    const result = runValidatorWithDir('validate-hooks', 'HOOKS_FILE', hooksFile);
+    const result = runValidatorWithDirs('validate-hooks', { HOOKS_FILE: hooksFile, HOOKS_SCHEMA_PATH: '/nonexistent/schema.json' });
     assert.strictEqual(result.code, 1, 'Should fail on invalid event type');
     assert.ok(result.stderr.includes('Invalid event type'), 'Should report invalid event type');
     cleanupTestDir(testDir);
@@ -1061,7 +1061,7 @@ function runTests() {
       hooks: { PreToolUse: 'not-an-array' }
     }));
 
-    const result = runValidatorWithDir('validate-hooks', 'HOOKS_FILE', hooksFile);
+    const result = runValidatorWithDirs('validate-hooks', { HOOKS_FILE: hooksFile, HOOKS_SCHEMA_PATH: '/nonexistent/schema.json' });
     assert.strictEqual(result.code, 1, 'Should fail on non-array event type value');
     assert.ok(result.stderr.includes('must be an array'), 'Should report must be an array');
     cleanupTestDir(testDir);
@@ -1074,7 +1074,7 @@ function runTests() {
       hooks: { PreToolUse: [null] }
     }));
 
-    const result = runValidatorWithDir('validate-hooks', 'HOOKS_FILE', hooksFile);
+    const result = runValidatorWithDirs('validate-hooks', { HOOKS_FILE: hooksFile, HOOKS_SCHEMA_PATH: '/nonexistent/schema.json' });
     assert.strictEqual(result.code, 1, 'Should fail on null matcher entry');
     assert.ok(result.stderr.includes('is not an object'), 'Should report not an object');
     cleanupTestDir(testDir);
@@ -1087,7 +1087,7 @@ function runTests() {
       hooks: { PreToolUse: ['just-a-string'] }
     }));
 
-    const result = runValidatorWithDir('validate-hooks', 'HOOKS_FILE', hooksFile);
+    const result = runValidatorWithDirs('validate-hooks', { HOOKS_FILE: hooksFile, HOOKS_SCHEMA_PATH: '/nonexistent/schema.json' });
     assert.strictEqual(result.code, 1, 'Should fail on string matcher entry');
     assert.ok(result.stderr.includes('is not an object'), 'Should report not an object');
     cleanupTestDir(testDir);
@@ -1098,7 +1098,7 @@ function runTests() {
     const hooksFile = path.join(testDir, 'hooks.json');
     fs.writeFileSync(hooksFile, '"just a string"');
 
-    const result = runValidatorWithDir('validate-hooks', 'HOOKS_FILE', hooksFile);
+    const result = runValidatorWithDirs('validate-hooks', { HOOKS_FILE: hooksFile, HOOKS_SCHEMA_PATH: '/nonexistent/schema.json' });
     assert.strictEqual(result.code, 1, 'Should fail on string data');
     assert.ok(result.stderr.includes('must be an object or array'), 'Should report must be object or array');
     cleanupTestDir(testDir);
@@ -1109,7 +1109,7 @@ function runTests() {
     const hooksFile = path.join(testDir, 'hooks.json');
     fs.writeFileSync(hooksFile, '42');
 
-    const result = runValidatorWithDir('validate-hooks', 'HOOKS_FILE', hooksFile);
+    const result = runValidatorWithDirs('validate-hooks', { HOOKS_FILE: hooksFile, HOOKS_SCHEMA_PATH: '/nonexistent/schema.json' });
     assert.strictEqual(result.code, 1, 'Should fail on numeric data');
     assert.ok(result.stderr.includes('must be an object or array'), 'Should report must be object or array');
     cleanupTestDir(testDir);
@@ -1212,7 +1212,7 @@ function runTests() {
       PreToolUse: [{ matcher: 'test', hooks: [{ type: 'command', command: 'echo ok' }] }]
     }));
 
-    const result = runValidatorWithDir('validate-hooks', 'HOOKS_FILE', hooksFile);
+    const result = runValidatorWithDirs('validate-hooks', { HOOKS_FILE: hooksFile, HOOKS_SCHEMA_PATH: '/nonexistent/schema.json' });
     assert.strictEqual(result.code, 0, 'Should accept object format without hooks wrapper');
     cleanupTestDir(testDir);
   })) passed++; else failed++;
@@ -1366,7 +1366,7 @@ function runTests() {
       }
     }));
 
-    const result = runValidatorWithDir('validate-hooks', 'HOOKS_FILE', hooksFile);
+    const result = runValidatorWithDirs('validate-hooks', { HOOKS_FILE: hooksFile, HOOKS_SCHEMA_PATH: '/nonexistent/schema.json' });
     assert.strictEqual(result.code, 1, 'Should fail on invalid hook at high index');
     assert.ok(result.stderr.includes('hooks[5]'), 'Should report correct hook index 5');
     cleanupTestDir(testDir);
@@ -2046,16 +2046,16 @@ function runTests() {
     const testDir = createTestDir();
     const hooksFile = path.join(testDir, 'hooks.json');
     fs.writeFileSync(hooksFile, JSON.stringify({
-      PreToolUse: [{
+      hooks: { PreToolUse: [{
         matcher: 'Write',
         hooks: [{
           type: 'command',
           command: 'echo test',
           async: 'yes'  // Should be boolean, not string
         }]
-      }]
+      }] }
     }));
-    const result = runValidatorWithDir('validate-hooks', 'HOOKS_FILE', hooksFile);
+    const result = runValidatorWithDirs('validate-hooks', { HOOKS_FILE: hooksFile, HOOKS_SCHEMA_PATH: '/nonexistent/schema.json' });
     assert.strictEqual(result.code, 1, 'Should fail on non-boolean async');
     assert.ok(result.stderr.includes('async'), 'Should mention async in error');
     assert.ok(result.stderr.includes('boolean'), 'Should mention boolean type');
@@ -2066,16 +2066,16 @@ function runTests() {
     const testDir = createTestDir();
     const hooksFile = path.join(testDir, 'hooks.json');
     fs.writeFileSync(hooksFile, JSON.stringify({
-      PostToolUse: [{
+      hooks: { PostToolUse: [{
         matcher: 'Edit',
         hooks: [{
           type: 'command',
           command: 'echo test',
           timeout: -5  // Must be non-negative
         }]
-      }]
+      }] }
     }));
-    const result = runValidatorWithDir('validate-hooks', 'HOOKS_FILE', hooksFile);
+    const result = runValidatorWithDirs('validate-hooks', { HOOKS_FILE: hooksFile, HOOKS_SCHEMA_PATH: '/nonexistent/schema.json' });
     assert.strictEqual(result.code, 1, 'Should fail on negative timeout');
     assert.ok(result.stderr.includes('timeout'), 'Should mention timeout in error');
     assert.ok(result.stderr.includes('non-negative'), 'Should mention non-negative');
@@ -2086,6 +2086,7 @@ function runTests() {
   console.log('\nRound 73: validate-commands.js (unreadable skill entry â€” statSync catch):');
 
   if (test('skips unreadable skill directory entries without error (broken symlink)', () => {
+    if (process.platform === 'win32') return; // symlinks require elevated privileges on Windows
     const testDir = createTestDir();
     const agentsDir = createTestDir();
     const skillsDir = createTestDir();
@@ -2193,7 +2194,7 @@ function runTests() {
     });
     fs.writeFileSync(path.join(testDir, 'hooks.json'), hooksJson);
 
-    const result = runValidatorWithDir('validate-hooks', 'HOOKS_FILE', path.join(testDir, 'hooks.json'));
+    const result = runValidatorWithDirs('validate-hooks', { HOOKS_FILE: path.join(testDir, 'hooks.json'), HOOKS_SCHEMA_PATH: '/nonexistent/schema.json' });
     assert.strictEqual(result.code, 0, 'Should pass on valid legacy array format');
     assert.ok(result.stdout.includes('Validated 1 hook'),
       `Should report 1 validated matcher, got: ${result.stdout}`);
@@ -2220,7 +2221,7 @@ function runTests() {
     });
     fs.writeFileSync(path.join(testDir, 'hooks.json'), hooksJson);
 
-    const result = runValidatorWithDir('validate-hooks', 'HOOKS_FILE', path.join(testDir, 'hooks.json'));
+    const result = runValidatorWithDirs('validate-hooks', { HOOKS_FILE: path.join(testDir, 'hooks.json'), HOOKS_SCHEMA_PATH: '/nonexistent/schema.json' });
     assert.strictEqual(result.code, 0, 'Should pass with Notification and SubagentStop events');
     assert.ok(result.stdout.includes('Validated 2 hook'),
       `Should report 2 validated matchers, got: ${result.stdout}`);

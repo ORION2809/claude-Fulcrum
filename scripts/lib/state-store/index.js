@@ -165,11 +165,14 @@ async function createStateStore(options = {}) {
   const dbPath = resolveStateStorePath(options);
   const SQL = await initSqlJs();
   const db = await openDatabase(SQL, dbPath);
-  const appliedMigrations = applyMigrations(db);
-  const queryApi = createQueryApi(db);
+  const migrationResult = applyMigrations(db);
+  const appliedMigrations = migrationResult.migrations;
+  const fts5Available = migrationResult.fts5Available;
+  const queryApi = createQueryApi(db, { fts5Available });
 
   return {
     dbPath,
+    fts5Available,
     close() {
       db.close();
     },

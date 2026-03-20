@@ -33,6 +33,16 @@
         "description": "Reminder before git push to review changes"
       },
       {
+        "matcher": "Edit|Write|NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/scripts/hooks/protect-configs.js\""
+          }
+        ],
+        "description": "Block edits to protected config and hook control-plane files"
+      },
+      {
         "matcher": "Write",
         "hooks": [
           {
@@ -86,9 +96,37 @@
           }
         ],
         "description": "Save state before context compaction"
+      },
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": [
+              "node",
+              "${CLAUDE_PLUGIN_ROOT}/scripts/hooks/session-lifecycle.js",
+              "summary_checkpoint"
+            ],
+            "async": true,
+            "timeout": 10
+          }
+        ],
+        "description": "Create a structured memory checkpoint before compaction"
       }
     ],
     "SessionStart": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/scripts/hooks/repo-hook-trust.js\"",
+            "async": true,
+            "timeout": 10
+          }
+        ],
+        "description": "Track trusted hook asset hashes and require reapproval on change"
+      },
       {
         "matcher": "*",
         "hooks": [
@@ -98,6 +136,40 @@
           }
         ],
         "description": "Load previous context and detect package manager on new session"
+      },
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": [
+              "node",
+              "${CLAUDE_PLUGIN_ROOT}/scripts/hooks/session-lifecycle.js",
+              "session_start"
+            ],
+            "async": true,
+            "timeout": 10
+          }
+        ],
+        "description": "Record a normalized session_start event in the SQLite control plane"
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": [
+              "node",
+              "${CLAUDE_PLUGIN_ROOT}/scripts/hooks/session-lifecycle.js",
+              "user_prompt_submit"
+            ],
+            "async": true,
+            "timeout": 10
+          }
+        ],
+        "description": "Sanitize and enqueue prompts for bounded memory capture"
       }
     ],
     "PostToolUse": [
@@ -176,6 +248,22 @@
           }
         ],
         "description": "Capture tool use results for continuous learning"
+      },
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": [
+              "node",
+              "${CLAUDE_PLUGIN_ROOT}/scripts/hooks/session-lifecycle.js",
+              "post_tool_use"
+            ],
+            "async": true,
+            "timeout": 10
+          }
+        ],
+        "description": "Capture sanitized tool results into the control-plane queue"
       }
     ],
     "Stop": [
@@ -185,6 +273,12 @@
           {
             "type": "command",
             "command": "node \"${CLAUDE_PLUGIN_ROOT}/scripts/hooks/run-with-flags.js\" \"stop:check-console-log\" \"scripts/hooks/check-console-log.js\" \"standard,strict\""
+          },
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/scripts/hooks/config-guardian-stop.js\"",
+            "async": true,
+            "timeout": 10
           }
         ],
         "description": "Check for console.log in modified files after each response"
@@ -238,6 +332,28 @@
           }
         ],
         "description": "Session end lifecycle marker (non-blocking)"
+      },
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": [
+              "node",
+              "${CLAUDE_PLUGIN_ROOT}/scripts/hooks/session-lifecycle.js",
+              "session_end"
+            ],
+            "async": true,
+            "timeout": 10
+          },
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/scripts/hooks/daily-memory-view.js\"",
+            "async": true,
+            "timeout": 30
+          }
+        ],
+        "description": "Finalize control-plane session records and governance logs"
       }
     ]
   }

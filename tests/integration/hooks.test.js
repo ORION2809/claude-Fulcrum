@@ -671,18 +671,20 @@ async function runTests() {
         for (const hook of hookDef.hooks) {
           assert.ok(hook.command, `Hook in ${hookType} should have command field`);
 
-          const isInline = hook.command.startsWith('node -e');
-          const isFilePath = hook.command.startsWith('node "');
+          // Handle both string and array command formats
+          const cmd = Array.isArray(hook.command) ? hook.command.join(' ') : hook.command;
+          const isInline = cmd.startsWith('node -e');
+          const isFilePath = cmd.startsWith('node "') || cmd.startsWith('node ');
           const isShellWrapper =
-            hook.command.startsWith('bash "') ||
-            hook.command.startsWith('sh "') ||
-            hook.command.startsWith('bash -lc ') ||
-            hook.command.startsWith('sh -c ');
-          const isShellScriptPath = hook.command.endsWith('.sh');
+            cmd.startsWith('bash "') ||
+            cmd.startsWith('sh "') ||
+            cmd.startsWith('bash -lc ') ||
+            cmd.startsWith('sh -c ');
+          const isShellScriptPath = cmd.endsWith('.sh');
 
           assert.ok(
             isInline || isFilePath || isShellWrapper || isShellScriptPath,
-            `Hook command in ${hookType} should be node -e, node script, or shell wrapper/script, got: ${hook.command.substring(0, 80)}`
+            `Hook command in ${hookType} should be node -e, node script, or shell wrapper/script, got: ${cmd.substring(0, 80)}`
           );
         }
       }

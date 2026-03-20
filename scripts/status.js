@@ -116,6 +116,62 @@ function printGovernance(section) {
   }
 }
 
+function printAttempts(section) {
+  console.log(`Attempts: ${section.totalCount}`);
+  console.log(`  Active: ${section.activeCount}`);
+  if (section.recent.length === 0) {
+    console.log('  Recent attempts: none');
+    return;
+  }
+
+  console.log('  Recent attempts:');
+  for (const attempt of section.recent.slice(0, 5)) {
+    console.log(`  - ${attempt.id} ${attempt.status}`);
+    console.log(`    Branch: ${attempt.branchName}`);
+    console.log(`    Worktree: ${attempt.worktreePath}`);
+  }
+}
+
+function printMemory(section) {
+  console.log(`Memory observations: ${section.observationsCount}`);
+  console.log(`  Memory notes: ${section.memoryNotesCount || 0}`);
+  console.log(`  Queue pending: ${section.queue.pending || 0}`);
+  console.log(`  Queue processing: ${section.queue.processing || 0}`);
+  console.log(`  Queue failed: ${section.queue.failed || 0}`);
+  if (section.recentObservations.length === 0) {
+    console.log('  Recent observations: none');
+    return;
+  }
+
+  console.log('  Recent observations:');
+  for (const observation of section.recentObservations.slice(0, 5)) {
+    console.log(`  - ${observation.id} ${observation.sourceEvent}`);
+    console.log(`    Title: ${observation.title}`);
+  }
+
+  if (section.recentNotes && section.recentNotes.length > 0) {
+    console.log('  Recent notes:');
+    for (const note of section.recentNotes.slice(0, 5)) {
+      console.log(`  - ${note.id} ${note.category}`);
+      console.log(`    Keywords: ${(note.keywords || []).join(', ') || '(none)'}`);
+    }
+  }
+}
+
+function printQuality(section) {
+  console.log(`Quality runs: ${section.totalCount}`);
+  if (section.recent.length === 0) {
+    console.log('  - none');
+    return;
+  }
+
+  for (const qualityRun of section.recent.slice(0, 5)) {
+    console.log(`  - ${qualityRun.id} iteration ${qualityRun.iteration}`);
+    console.log(`    Score: ${qualityRun.score}/${qualityRun.threshold} (${qualityRun.band})`);
+    console.log(`    Termination: ${qualityRun.terminationReason}`);
+  }
+}
+
 function printHuman(payload) {
   console.log('ECC status\n');
   console.log(`Database: ${payload.dbPath}\n`);
@@ -126,6 +182,12 @@ function printHuman(payload) {
   printInstallHealth(payload.installHealth);
   console.log();
   printGovernance(payload.governance);
+  console.log();
+  printAttempts(payload.attempts);
+  console.log();
+  printMemory(payload.memory);
+  console.log();
+  printQuality(payload.quality);
 }
 
 async function main() {

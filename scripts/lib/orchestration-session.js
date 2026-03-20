@@ -59,6 +59,8 @@ function parseWorkerStatus(content) {
   const status = {
     state: null,
     updated: null,
+    attemptGroup: null,
+    attemptId: null,
     branch: null,
     worktree: null,
     taskFile: null,
@@ -80,6 +82,8 @@ function parseWorkerStatus(content) {
 
     if (key === 'state') status.state = value;
     if (key === 'updated') status.updated = value;
+    if (key === 'attemptgroup') status.attemptGroup = value;
+    if (key === 'attempt') status.attemptId = value;
     if (key === 'branch') status.branch = value;
     if (key === 'worktree') status.worktree = value;
     if (key === 'taskfile') status.taskFile = value;
@@ -90,10 +94,30 @@ function parseWorkerStatus(content) {
 }
 
 function parseWorkerTask(content) {
-  return {
+  const task = {
     objective: parseSection(content, 'Objective'),
-    seedPaths: parseBullets(parseSection(content, 'Seeded Local Overlays'))
+    seedPaths: parseBullets(parseSection(content, 'Seeded Local Overlays')),
+    attemptGroup: null,
+    attemptId: null
   };
+
+  if (typeof content !== 'string' || content.length === 0) {
+    return task;
+  }
+
+  for (const line of content.split('\n')) {
+    const match = line.match(/^- ([A-Za-z ]+):\s*(.+)$/);
+    if (!match) {
+      continue;
+    }
+
+    const key = match[1].trim().toLowerCase().replace(/\s+/g, '');
+    const value = stripCodeTicks(match[2]);
+    if (key === 'attemptgroup') task.attemptGroup = value;
+    if (key === 'attempt') task.attemptId = value;
+  }
+
+  return task;
 }
 
 function parseWorkerHandoff(content) {

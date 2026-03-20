@@ -1,0 +1,63 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "ecc.confidence-gate.v1",
+  "type": "object",
+  "required": [
+    "score",
+    "blockers",
+    "recommendations",
+    "reflectionLog"
+  ],
+  "properties": {
+    "score": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "blockers": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "recommendations": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "reflectionLog": {
+      "type": "array",
+      "minItems": 3,
+      "items": {
+        "type": "object",
+        "required": [
+          "dimension",
+          "status",
+          "note"
+        ],
+        "properties": {
+          "dimension": {
+            "type": "string",
+            "enum": [
+              "requirement_clarity",
+              "prior_mistake_detection",
+              "context_readiness"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pass",
+              "warning",
+              "fail"
+            ]
+          },
+          "note": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

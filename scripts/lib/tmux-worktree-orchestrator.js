@@ -4,6 +4,10 @@ const fs = require('fs');
 const path = require('path');
 const { spawnSync } = require('child_process');
 
+function buildAttemptId(sessionName, workerSlug) {
+  return `attempt-${slugify(`${sessionName}-${workerSlug}`)}`;
+}
+
 function slugify(value, fallback = 'worker') {
   const normalized = String(value || '')
     .trim()
@@ -123,6 +127,8 @@ function buildWorkerArtifacts(workerPlan) {
           `# Worker Task: ${workerPlan.workerName}`,
           '',
           `- Session: \`${workerPlan.sessionName}\``,
+          `- Attempt group: \`${workerPlan.attemptGroupId}\``,
+          `- Attempt: \`${workerPlan.attemptId}\``,
           `- Repo root: \`${workerPlan.repoRoot}\``,
           `- Worktree: \`${workerPlan.worktreePath}\``,
           `- Branch: \`${workerPlan.branchName}\``,
@@ -164,6 +170,8 @@ function buildWorkerArtifacts(workerPlan) {
           `# Status: ${workerPlan.workerName}`,
           '',
           '- State: not started',
+          `- Attempt group: \`${workerPlan.attemptGroupId}\``,
+          `- Attempt: \`${workerPlan.attemptId}\``,
           `- Worktree: \`${workerPlan.worktreePath}\``,
           `- Branch: \`${workerPlan.branchName}\``
         ].join('\n')
@@ -178,6 +186,7 @@ function buildOrchestrationPlan(config = {}) {
   const workers = Array.isArray(config.workers) ? config.workers : [];
   const globalSeedPaths = normalizeSeedPaths(config.seedPaths, repoRoot);
   const sessionName = slugify(config.sessionName || repoName, 'session');
+  const attemptGroupId = `attempt-group-${sessionName}`;
   const worktreeRoot = path.resolve(config.worktreeRoot || path.dirname(repoRoot));
   const coordinationRoot = path.resolve(
     config.coordinationRoot || path.join(repoRoot, '.orchestration')
@@ -204,6 +213,7 @@ function buildOrchestrationPlan(config = {}) {
     seenWorkerSlugs.add(workerSlug);
     const branchName = `orchestrator-${sessionName}-${workerSlug}`;
     const worktreePath = path.join(worktreeRoot, `${repoName}-${sessionName}-${workerSlug}`);
+    const attemptId = buildAttemptId(sessionName, workerSlug);
     const workerCoordinationDir = path.join(coordinationDir, workerSlug);
     const taskFilePath = path.join(workerCoordinationDir, 'task.md');
     const handoffFilePath = path.join(workerCoordinationDir, 'handoff.md');
@@ -218,6 +228,8 @@ function buildOrchestrationPlan(config = {}) {
       session_name: sessionName,
       status_file: statusFilePath,
       task_file: taskFilePath,
+      attempt_group_id: attemptGroupId,
+      attempt_id: attemptId,
       worker_name: workerName,
       worker_slug: workerSlug,
       worktree_path: worktreePath
@@ -231,6 +243,8 @@ function buildOrchestrationPlan(config = {}) {
 
     return {
       branchName,
+      attemptGroupId,
+      attemptId,
       coordinationDir: workerCoordinationDir,
       gitArgs,
       gitCommand: formatCommand('git', gitArgs),
@@ -301,6 +315,7 @@ function buildOrchestrationPlan(config = {}) {
   return {
     baseRef,
     coordinationDir,
+    attemptGroupId,
     replaceExisting: Boolean(config.replaceExisting),
     repoRoot,
     sessionName,

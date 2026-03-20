@@ -40,6 +40,42 @@
       "items": {
         "$ref": "#/$defs/governanceEvent"
       }
+    },
+    "attempts": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/attempt"
+      }
+    },
+    "pendingMessages": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/pendingMessage"
+      }
+    },
+    "observations": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/observation"
+      }
+    },
+    "memoryNotes": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/memoryNote"
+      }
+    },
+    "memoryLinks": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/memoryLink"
+      }
+    },
+    "qualityRuns": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/qualityRun"
+      }
     }
   },
   "$defs": {
@@ -306,6 +342,316 @@
         },
         "resolution": {
           "$ref": "#/$defs/nullableString"
+        },
+        "createdAt": {
+          "$ref": "#/$defs/nonEmptyString"
+        }
+      }
+    },
+    "attempt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "sessionId",
+        "parentAttemptId",
+        "branchName",
+        "worktreePath",
+        "status",
+        "metadata",
+        "createdAt",
+        "updatedAt"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "sessionId": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "parentAttemptId": {
+          "$ref": "#/$defs/nullableString"
+        },
+        "branchName": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "worktreePath": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "status": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "metadata": {
+          "type": [
+            "object",
+            "array"
+          ]
+        },
+        "createdAt": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "updatedAt": {
+          "$ref": "#/$defs/nonEmptyString"
+        }
+      }
+    },
+    "pendingMessage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "sessionId",
+        "attemptId",
+        "sourceEvent",
+        "payload",
+        "contentHash",
+        "status",
+        "error",
+        "claimedAt",
+        "processedAt",
+        "createdAt"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "sessionId": {
+          "$ref": "#/$defs/nullableString"
+        },
+        "attemptId": {
+          "$ref": "#/$defs/nullableString"
+        },
+        "sourceEvent": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "payload": {
+          "$ref": "#/$defs/jsonValue"
+        },
+        "contentHash": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "status": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "error": {
+          "$ref": "#/$defs/nullableString"
+        },
+        "claimedAt": {
+          "$ref": "#/$defs/nullableString"
+        },
+        "processedAt": {
+          "$ref": "#/$defs/nullableString"
+        },
+        "createdAt": {
+          "$ref": "#/$defs/nonEmptyString"
+        }
+      }
+    },
+    "observation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "sessionId",
+        "attemptId",
+        "sourceEvent",
+        "title",
+        "summary",
+        "contentHash",
+        "anchorRef",
+        "tags",
+        "metadata",
+        "createdAt",
+        "lastAccessedAt"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "sessionId": {
+          "$ref": "#/$defs/nullableString"
+        },
+        "attemptId": {
+          "$ref": "#/$defs/nullableString"
+        },
+        "sourceEvent": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "title": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "summary": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "contentHash": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "anchorRef": {
+          "$ref": "#/$defs/nullableString"
+        },
+        "tags": {
+          "$ref": "#/$defs/jsonArray"
+        },
+        "metadata": {
+          "$ref": "#/$defs/jsonValue"
+        },
+        "createdAt": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "lastAccessedAt": {
+          "$ref": "#/$defs/nullableString"
+        }
+      }
+    },
+    "memoryNote": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "sessionId",
+        "attemptId",
+        "category",
+        "content",
+        "summary",
+        "tags",
+        "keywords",
+        "links",
+        "retrievalMetadata",
+        "evolutionHistory",
+        "createdAt",
+        "accessedAt"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "sessionId": {
+          "$ref": "#/$defs/nullableString"
+        },
+        "attemptId": {
+          "$ref": "#/$defs/nullableString"
+        },
+        "category": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "content": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "summary": {
+          "$ref": "#/$defs/nullableString"
+        },
+        "tags": {
+          "$ref": "#/$defs/jsonArray"
+        },
+        "keywords": {
+          "$ref": "#/$defs/jsonArray"
+        },
+        "links": {
+          "$ref": "#/$defs/jsonArray"
+        },
+        "retrievalMetadata": {
+          "$ref": "#/$defs/jsonValue"
+        },
+        "evolutionHistory": {
+          "$ref": "#/$defs/jsonArray"
+        },
+        "createdAt": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "accessedAt": {
+          "$ref": "#/$defs/nullableString"
+        }
+      }
+    },
+    "memoryLink": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "fromNoteId",
+        "toNoteId",
+        "linkType",
+        "weight",
+        "metadata",
+        "createdAt"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "fromNoteId": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "toNoteId": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "linkType": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "weight": {
+          "type": "number"
+        },
+        "metadata": {
+          "$ref": "#/$defs/jsonValue"
+        },
+        "createdAt": {
+          "$ref": "#/$defs/nonEmptyString"
+        }
+      }
+    },
+    "qualityRun": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "sessionId",
+        "attemptId",
+        "iteration",
+        "score",
+        "band",
+        "threshold",
+        "passed",
+        "terminationReason",
+        "evidence",
+        "findings",
+        "createdAt"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "sessionId": {
+          "$ref": "#/$defs/nullableString"
+        },
+        "attemptId": {
+          "$ref": "#/$defs/nullableString"
+        },
+        "iteration": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "score": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "band": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "threshold": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "passed": {
+          "type": "boolean"
+        },
+        "terminationReason": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "evidence": {
+          "$ref": "#/$defs/jsonValue"
+        },
+        "findings": {
+          "$ref": "#/$defs/jsonArray"
         },
         "createdAt": {
           "$ref": "#/$defs/nonEmptyString"

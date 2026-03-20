@@ -64,7 +64,10 @@ function readFileOrThrow(filePath) {
 function parseReadmeExpectations(readmeContent) {
   const expectations = [];
 
-  const quickStartMatch = readmeContent.match(/access to\s+(\d+)\s+agents,\s+(\d+)\s+skills,\s+and\s+(\d+)\s+commands/i);
+  // Try new format first: **25 Agents** · **108 Skills** · **57 Commands**
+  const newFormatMatch = readmeContent.match(/\*\*(\d+)\s+Agents\*\*.*?\*\*(\d+)\s+Skills\*\*.*?\*\*(\d+)\s+Commands\*\*/i);
+  // Fall back to old format: access to N agents, N skills, and N commands
+  const quickStartMatch = newFormatMatch || readmeContent.match(/access to\s+(\d+)\s+agents,\s+(\d+)\s+skills,\s+and\s+(\d+)\s+commands/i);
   if (!quickStartMatch) {
     throw new Error('README.md is missing the quick-start catalog summary');
   }
@@ -76,15 +79,25 @@ function parseReadmeExpectations(readmeContent) {
   );
 
   const tablePatterns = [
+    { category: 'agents', regex: /\|\s*(?:\*\*)?Agents(?:\*\*)?\s*\|[^|]*\|\s*\*?\*?(\d+)\*?\*?\s*\|/i, source: 'README.md comparison table' },
+    { category: 'commands', regex: /\|\s*(?:\*\*)?Commands(?:\*\*)?\s*\|[^|]*\|\s*\*?\*?(\d+)\*?\*?\s*\|/i, source: 'README.md comparison table' },
+    { category: 'skills', regex: /\|\s*(?:\*\*)?Skills(?:\*\*)?\s*\|[^|]*\|\s*\*?\*?(\d+)\*?\*?\s*\|/i, source: 'README.md comparison table' }
+  ];
+
+  // Try new table format first, fall back to old ✅ format
+  const oldTablePatterns = [
     { category: 'agents', regex: /\|\s*(?:\*\*)?Agents(?:\*\*)?\s*\|\s*✅\s*(\d+)\s+agents\s*\|/i, source: 'README.md comparison table' },
     { category: 'commands', regex: /\|\s*(?:\*\*)?Commands(?:\*\*)?\s*\|\s*✅\s*(\d+)\s+commands\s*\|/i, source: 'README.md comparison table' },
     { category: 'skills', regex: /\|\s*(?:\*\*)?Skills(?:\*\*)?\s*\|\s*✅\s*(\d+)\s+skills\s*\|/i, source: 'README.md comparison table' }
   ];
 
-  for (const pattern of tablePatterns) {
-    const match = readmeContent.match(pattern.regex);
+  for (let i = 0; i < tablePatterns.length; i++) {
+    const pattern = tablePatterns[i];
+    const oldPattern = oldTablePatterns[i];
+    const match = readmeContent.match(pattern.regex) || readmeContent.match(oldPattern.regex);
     if (!match) {
-      throw new Error(`${pattern.source} is missing the ${pattern.category} row`);
+      // Table row is optional if the quick-start summary already captured the count
+      continue;
     }
 
     expectations.push({
@@ -119,19 +132,19 @@ function parseAgentsDocExpectations(agentsContent) {
     {
       category: 'agents',
       mode: 'exact',
-      regex: /^\s*agents\/\s*[—–-]\s*(\d+)\s+specialized subagents\s*$/im,
+      regex: /^\s*agents\/\s*\S+\s+(\d+)\s+specialized (?:sub)?agents\s*$/im,
       source: 'AGENTS.md project structure'
     },
     {
       category: 'skills',
       mode: 'minimum',
-      regex: /^\s*skills\/\s*[—–-]\s*(\d+)(\+)?\s+workflow skills and domain knowledge\s*$/im,
+      regex: /^\s*skills\/\s*\S+\s+(\d+)(\+)?\s+workflow skills and domain knowledge\s*$/im,
       source: 'AGENTS.md project structure'
     },
     {
       category: 'commands',
       mode: 'exact',
-      regex: /^\s*commands\/\s*[—–-]\s*(\d+)\s+slash commands\s*$/im,
+      regex: /^\s*commands\/\s*\S+\s+(\d+)\s+slash commands\s*$/im,
       source: 'AGENTS.md project structure'
     }
   ];

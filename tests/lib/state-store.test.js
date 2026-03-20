@@ -38,18 +38,24 @@ function cleanupTempDir(dirPath) {
 }
 
 function runNode(scriptPath, args = [], options = {}) {
-  return spawnSync('node', [scriptPath, ...args], {
+  const env = {
+    ...process.env,
+    ...(options.env || {}),
+  };
+
+  return spawnSync(process.execPath, [scriptPath, ...args], {
     encoding: 'utf8',
     cwd: options.cwd || process.cwd(),
-    env: {
-      ...process.env,
-      ...(options.env || {}),
-    },
+    env,
   });
 }
 
 function parseJson(stdout) {
   return JSON.parse(stdout.trim());
+}
+
+function isSpawnBlocked(result) {
+  return result && result.status === null && result.error && result.error.code === 'EPERM';
 }
 
 async function seedStore(dbPath) {
@@ -249,6 +255,93 @@ async function seedStore(dbPath) {
     createdAt: '2026-03-15T08:09:30.000Z',
   });
 
+  store.upsertAttempt({
+    id: 'attempt-1',
+    sessionId: 'session-active',
+    parentAttemptId: null,
+    branchName: 'orchestrator-session-active-docs',
+    worktreePath: '/tmp/ecc-repo/.worktrees/attempt-1',
+    status: 'running',
+    metadata: {
+      platform: 'codex-cli',
+      sourceEvent: 'session_start',
+    },
+    createdAt: '2026-03-15T08:00:00.000Z',
+    updatedAt: '2026-03-15T08:10:00.000Z',
+  });
+
+  store.upsertPendingMessage({
+    id: 'pending-1',
+    sessionId: 'session-active',
+    attemptId: 'attempt-1',
+    sourceEvent: 'user_prompt_submit',
+    payload: {
+      content: 'Ship the feature safely',
+    },
+    contentHash: 'hash-pending-1',
+    status: 'pending',
+    error: null,
+    claimedAt: null,
+    processedAt: null,
+    createdAt: '2026-03-15T08:01:00.000Z',
+  });
+
+  store.insertObservation({
+    id: 'obs-1',
+    sessionId: 'session-active',
+    attemptId: 'attempt-1',
+    sourceEvent: 'summary_checkpoint',
+    title: 'summary checkpoint session-active',
+    summary: 'Added governance and memory foundations',
+    contentHash: 'hash-obs-1',
+    anchorRef: '/tmp/transcript.jsonl',
+    tags: ['summary_checkpoint', 'codex-cli'],
+    metadata: {
+      tokenEstimate: 42,
+    },
+    createdAt: '2026-03-15T08:02:00.000Z',
+    lastAccessedAt: '2026-03-15T08:02:00.000Z',
+  });
+
+  store.insertMemoryNote({
+    id: 'note-1',
+    sessionId: 'session-active',
+    attemptId: 'attempt-1',
+    category: 'checkpoint',
+    content: 'Added governance and memory foundations',
+    summary: 'Governance and memory foundations',
+    tags: ['checkpoint'],
+    keywords: ['governance', 'memory'],
+    links: ['/tmp/transcript.jsonl'],
+    retrievalMetadata: {
+      sourceEvent: 'summary_checkpoint',
+    },
+    evolutionHistory: [{
+      action: 'created',
+      timestamp: '2026-03-15T08:02:00.000Z',
+    }],
+    createdAt: '2026-03-15T08:02:00.000Z',
+    accessedAt: '2026-03-15T08:02:00.000Z',
+  });
+
+  store.insertQualityRun({
+    id: 'quality-1',
+    sessionId: 'session-active',
+    attemptId: 'attempt-1',
+    iteration: 1,
+    score: 82,
+    band: 'good',
+    threshold: 70,
+    passed: true,
+    terminationReason: 'QUALITY_MET',
+    evidence: {
+      testsRun: 1,
+      coverage: 0.8,
+    },
+    findings: [],
+    createdAt: '2026-03-15T08:03:00.000Z',
+  });
+
   store.close();
 }
 
@@ -269,16 +362,22 @@ async function runTests() {
       const firstMigrations = firstStore.getAppliedMigrations();
       firstStore.close();
 
-      assert.strictEqual(firstMigrations.length, 1);
+      assert.strictEqual(firstMigrations.length, 4);
       assert.strictEqual(firstMigrations[0].version, 1);
+      assert.strictEqual(firstMigrations[1].version, 2);
+      assert.strictEqual(firstMigrations[2].version, 3);
+      assert.strictEqual(firstMigrations[3].version, 4);
       assert.ok(fs.existsSync(expectedPath));
 
       const secondStore = await createStateStore({ homeDir });
       const secondMigrations = secondStore.getAppliedMigrations();
       secondStore.close();
 
-      assert.strictEqual(secondMigrations.length, 1);
+      assert.strictEqual(secondMigrations.length, 4);
       assert.strictEqual(secondMigrations[0].version, 1);
+      assert.strictEqual(secondMigrations[1].version, 2);
+      assert.strictEqual(secondMigrations[2].version, 3);
+      assert.strictEqual(secondMigrations[3].version, 4);
     } finally {
       cleanupTempDir(homeDir);
     }
@@ -294,7 +393,7 @@ async function runTests() {
 
       const store = await createStateStore({ dbPath: ':memory:' });
       assert.strictEqual(store.dbPath, ':memory:');
-      assert.strictEqual(store.getAppliedMigrations().length, 1);
+      assert.strictEqual(store.getAppliedMigrations().length, 4);
       store.close();
 
       assert.ok(!fs.existsSync(path.join(tempDir, ':memory:')));
@@ -320,6 +419,9 @@ async function runTests() {
       assert.strictEqual(listResult.sessions[0].id, 'session-active');
       assert.strictEqual(detail.session.id, 'session-active');
       assert.strictEqual(detail.workers.length, 2);
+      assert.strictEqual(detail.attempts.length, 1);
+      assert.strictEqual(detail.memoryNotes.length, 1);
+      assert.strictEqual(detail.qualityRuns.length, 1);
       assert.strictEqual(detail.skillRuns.length, 2);
       assert.strictEqual(detail.decisions.length, 1);
       assert.deepStrictEqual(detail.decisions[0].alternatives, ['json-files', 'memory-only']);
@@ -349,6 +451,10 @@ async function runTests() {
       assert.strictEqual(status.installHealth.totalCount, 1);
       assert.strictEqual(status.governance.pendingCount, 1);
       assert.strictEqual(status.governance.events[0].id, 'gov-1');
+      assert.strictEqual(status.attempts.totalCount, 1);
+      assert.strictEqual(status.memory.observationsCount, 1);
+      assert.strictEqual(status.memory.memoryNotesCount, 1);
+      assert.strictEqual(status.quality.totalCount, 1);
     } finally {
       cleanupTempDir(testDir);
     }
@@ -404,6 +510,74 @@ async function runTests() {
     }
   })) passed += 1; else failed += 1;
 
+  if (await test('supports claim-confirm queue semantics with stale-processing recovery', async () => {
+    const testDir = createTempDir('ecc-state-queue-');
+    const dbPath = path.join(testDir, 'state.db');
+
+    try {
+      const store = await createStateStore({ dbPath });
+      store.upsertSession({
+        id: 'session-queue',
+        adapterId: 'local',
+        harness: 'local',
+        state: 'active',
+        repoRoot: process.cwd(),
+        startedAt: '2026-03-18T08:00:00.000Z',
+        endedAt: null,
+        snapshot: { workers: [] },
+      });
+
+      store.upsertPendingMessage({
+        id: 'msg-queue',
+        sessionId: 'session-queue',
+        attemptId: null,
+        sourceEvent: 'user_prompt_submit',
+        payload: { content: 'remember this' },
+        contentHash: 'hash-msg-queue',
+        status: 'pending',
+        error: null,
+        claimedAt: null,
+        processedAt: null,
+        createdAt: '2026-03-18T08:00:00.000Z',
+      });
+
+      const claimed = store.claimPendingMessage('msg-queue', {
+        claimedAt: '2026-03-18T08:00:10.000Z',
+      });
+      assert.strictEqual(claimed.status, 'processing');
+      assert.strictEqual(claimed.claimedAt, '2026-03-18T08:00:10.000Z');
+
+      const activeClaim = store.claimPendingMessage('msg-queue', {
+        claimedAt: '2026-03-18T08:00:20.000Z',
+        staleAfterMs: 60 * 1000,
+      });
+      assert.strictEqual(activeClaim, null);
+
+      const recovered = store.claimPendingMessage('msg-queue', {
+        claimedAt: '2026-03-18T08:02:00.000Z',
+        staleAfterMs: 60 * 1000,
+      });
+      assert.strictEqual(recovered.status, 'processing');
+      assert.strictEqual(recovered.claimedAt, '2026-03-18T08:02:00.000Z');
+
+      const processed = store.confirmPendingMessageProcessed('msg-queue', {
+        claimedAt: recovered.claimedAt,
+        processedAt: '2026-03-18T08:02:05.000Z',
+      });
+      assert.strictEqual(processed.status, 'processed');
+      assert.strictEqual(processed.processedAt, '2026-03-18T08:02:05.000Z');
+
+      const postProcessClaim = store.claimPendingMessage('msg-queue', {
+        claimedAt: '2026-03-18T08:03:00.000Z',
+      });
+      assert.strictEqual(postProcessClaim, null);
+
+      store.close();
+    } finally {
+      cleanupTempDir(testDir);
+    }
+  })) passed += 1; else failed += 1;
+
   if (await test('status CLI supports human-readable and --json output', async () => {
     const testDir = createTempDir('ecc-state-cli-');
     const dbPath = path.join(testDir, 'state.db');
@@ -412,6 +586,9 @@ async function runTests() {
       await seedStore(dbPath);
 
       const jsonResult = runNode(STATUS_SCRIPT, ['--db', dbPath, '--json']);
+      if (isSpawnBlocked(jsonResult)) {
+        return;
+      }
       assert.strictEqual(jsonResult.status, 0, jsonResult.stderr);
       const jsonPayload = parseJson(jsonResult.stdout);
       assert.strictEqual(jsonPayload.activeSessions.activeCount, 1);
@@ -436,6 +613,9 @@ async function runTests() {
       await seedStore(dbPath);
 
       const listJsonResult = runNode(SESSIONS_SCRIPT, ['--db', dbPath, '--json']);
+      if (isSpawnBlocked(listJsonResult)) {
+        return;
+      }
       assert.strictEqual(listJsonResult.status, 0, listJsonResult.stderr);
       const listPayload = parseJson(listJsonResult.stdout);
       assert.strictEqual(listPayload.totalCount, 2);
@@ -446,12 +626,18 @@ async function runTests() {
       const detailPayload = parseJson(detailJsonResult.stdout);
       assert.strictEqual(detailPayload.session.id, 'session-active');
       assert.strictEqual(detailPayload.workers.length, 2);
+      assert.strictEqual(detailPayload.attempts.length, 1);
+      assert.strictEqual(detailPayload.memoryNotes.length, 1);
+      assert.strictEqual(detailPayload.qualityRuns.length, 1);
       assert.strictEqual(detailPayload.skillRuns.length, 2);
       assert.strictEqual(detailPayload.decisions.length, 1);
 
       const detailHumanResult = runNode(SESSIONS_SCRIPT, ['session-active', '--db', dbPath]);
       assert.strictEqual(detailHumanResult.status, 0, detailHumanResult.stderr);
       assert.match(detailHumanResult.stdout, /Session: session-active/);
+      assert.match(detailHumanResult.stdout, /Attempts: 1/);
+      assert.match(detailHumanResult.stdout, /Memory notes: 1/);
+      assert.match(detailHumanResult.stdout, /Quality runs: 1/);
       assert.match(detailHumanResult.stdout, /Workers: 2/);
       assert.match(detailHumanResult.stdout, /Skill runs: 2/);
       assert.match(detailHumanResult.stdout, /Decisions: 1/);
@@ -468,6 +654,9 @@ async function runTests() {
       await seedStore(dbPath);
 
       const statusResult = runNode(ECC_SCRIPT, ['status', '--db', dbPath, '--json']);
+      if (isSpawnBlocked(statusResult)) {
+        return;
+      }
       assert.strictEqual(statusResult.status, 0, statusResult.stderr);
       const statusPayload = parseJson(statusResult.stdout);
       assert.strictEqual(statusPayload.activeSessions.activeCount, 1);

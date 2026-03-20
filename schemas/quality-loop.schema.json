@@ -1,0 +1,62 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "ecc.quality-loop.v1",
+  "type": "object",
+  "required": [
+    "config",
+    "iterations",
+    "result"
+  ],
+  "properties": {
+    "config": {
+      "type": "object",
+      "required": [
+        "threshold",
+        "maxIterations",
+        "timeoutMs"
+      ],
+      "properties": {
+        "threshold": { "type": "number" },
+        "maxIterations": { "type": "integer", "minimum": 1 },
+        "timeoutMs": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "iterations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "score",
+          "band"
+        ],
+        "properties": {
+          "score": { "type": "number" },
+          "band": { "type": "string" },
+          "feedback": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    },
+    "result": {
+      "type": "object",
+      "required": [
+        "terminationReason",
+        "passed"
+      ],
+      "properties": {
+        "terminationReason": {
+          "type": "string",
+          "enum": [
+            "QUALITY_MET",
+            "MAX_ITERATIONS",
+            "TIMEOUT",
+            "OSCILLATION",
+            "STAGNATION",
+            "USER_CANCELLED",
+            "ERROR"
+          ]
+        },
+        "passed": { "type": "boolean" }
+      }
+    }
+  }
+}

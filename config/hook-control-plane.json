@@ -1,0 +1,37 @@
+{
+  "version": "3.1.0",
+  "protectedPaths": [
+    ".eslintrc",
+    ".eslintrc.js",
+    ".eslintrc.cjs",
+    ".prettierrc",
+    "biome.json",
+    ".ruff.toml",
+    "tsconfig.json",
+    ".claude/settings.json",
+    ".claude/hooks/*",
+    "hooks/hooks.json",
+    "config/hook-control-plane.json"
+  ],
+  "policyBundles": {
+    "configProtection": "required",
+    "qualityLoop": "required",
+    "memoryLifecycle": "required"
+  },
+  "governance": {
+    "logDir": ".claude/ecc/governance"
+  },
+  "memory": {
+    "viewDir": ".claude/memory",
+    "parentTokenBudget": 500
+  },
+  "contextBudget": {
+    "warningThreshold": 0.7,
+    "aggressiveThreshold": 0.85
+  },
+  "qualityLoop": {
+    "threshold": 70,
+    "maxIterations": 5,
+    "timeoutMs": 300000
+  }
+}

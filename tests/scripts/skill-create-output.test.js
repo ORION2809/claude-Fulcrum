@@ -327,7 +327,7 @@ function runTests() {
     const logs = captureLog(() => output.header());
     // Find the border and subtitle lines
     const lines = logs.map(l => stripAnsi(l));
-    const borderLine = lines.find(l => l.includes('â•â•â•'));
+    const borderLine = lines.find(l => l.includes('═══'));
     const subtitleLine = lines.find(l => l.includes('Extracting patterns'));
     assert.ok(borderLine, 'Should find border line');
     assert.ok(subtitleLine, 'Should find subtitle line');
@@ -339,7 +339,7 @@ function runTests() {
   if (test('header all lines have consistent width for short repo name', () => {
     const output = new SkillCreateOutput('abc');
     const logs = captureLog(() => output.header());
-    const lines = logs.map(l => stripAnsi(l)).filter(l => l.includes('â•‘') || l.includes('â•”') || l.includes('â•š'));
+    const lines = logs.map(l => stripAnsi(l)).filter(l => l.includes('║') || l.includes('╔') || l.includes('╚'));
     assert.ok(lines.length >= 4, 'Should have at least 4 box lines');
     const widths = lines.map(l => l.length);
     const first = widths[0];

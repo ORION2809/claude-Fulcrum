@@ -11,6 +11,7 @@ const {
 } = require('../../scripts/lib/session-adapters/canonical-session');
 const { createClaudeHistoryAdapter } = require('../../scripts/lib/session-adapters/claude-history');
 const { createDmuxTmuxAdapter } = require('../../scripts/lib/session-adapters/dmux-tmux');
+const { createMemoryRetrievalAdapter } = require('../../scripts/lib/session-adapters/memory-retrieval');
 const {
   createAdapterRegistry,
   inspectSessionTarget
@@ -374,6 +375,7 @@ test('adapter registry routes plan files to dmux and explicit claude targets to 
               workers: []
             })
           }),
+          createMemoryRetrievalAdapter(),
           createClaudeHistoryAdapter()
         ]
       });
@@ -425,6 +427,7 @@ test('adapter registry resolves structured target types into the correct adapter
               workers: []
             })
           }),
+          createMemoryRetrievalAdapter(),
           createClaudeHistoryAdapter()
         ]
       });
@@ -486,6 +489,7 @@ test('adapter registry lists adapter metadata and target types', () => {
 
   assert.ok(ids.includes('claude-history'));
   assert.ok(ids.includes('dmux-tmux'));
+  assert.ok(ids.includes('memory-retrieval'));
   assert.ok(
     adapters.some(adapter => adapter.id === 'claude-history' && adapter.targetTypes.includes('claude-history')),
     'claude-history should advertise its canonical target type'
@@ -494,6 +498,71 @@ test('adapter registry lists adapter metadata and target types', () => {
     adapters.some(adapter => adapter.id === 'dmux-tmux' && adapter.targetTypes.includes('plan')),
     'dmux-tmux should advertise plan targets'
   );
+  assert.ok(
+    adapters.some(adapter => adapter.id === 'memory-retrieval' && adapter.targetTypes.includes('memory-retrieval')),
+    'memory-retrieval should advertise retrieval targets'
+  );
+});
+
+test('memory retrieval adapter normalizes coordination artifacts into canonical form', () => {
+  const recordingDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ecc-session-recordings-'));
+
+  try {
+    const adapter = createMemoryRetrievalAdapter({
+      collectMemoryRetrievalSnapshotImpl: () => ({
+        sessionName: 'retrieval-abc123',
+        coordinationDir: '/tmp/.orchestration/memory-retrieval/retrieval-abc123',
+        repoRoot: '/tmp/repo',
+        targetType: 'memory-retrieval',
+        sourceTarget: {
+          type: 'memory-retrieval',
+          value: 'retrieval-abc123'
+        },
+        sessionActive: false,
+        paneCount: 0,
+        workerCount: 1,
+        workerStates: { completed: 1 },
+        panes: [],
+        workers: [{
+          workerSlug: 'retrieval-abc123',
+          workerDir: '/tmp/.orchestration/memory-retrieval/retrieval-abc123',
+          status: {
+            state: 'completed',
+            updated: '2026-03-18T00:10:00Z',
+            branch: null,
+            worktree: null,
+            taskFile: '/tmp/task.md',
+            handoffFile: '/tmp/handoff.md'
+          },
+          task: {
+            objective: 'retrieval envelope',
+            seedPaths: []
+          },
+          handoff: {
+            summary: ['Retrieved bounded memory summary'],
+            validation: ['Execution kind: isolated_subprocess'],
+            remainingRisks: []
+          },
+          files: {
+            status: '/tmp/status.md',
+            task: '/tmp/task.md',
+            handoff: '/tmp/handoff.md'
+          },
+          pane: null
+        }]
+      }),
+      recordingDir
+    });
+
+    const snapshot = adapter.open('memory:retrieval-abc123').getSnapshot();
+
+    assert.strictEqual(snapshot.adapterId, 'memory-retrieval');
+    assert.strictEqual(snapshot.session.kind, 'retrieval');
+    assert.strictEqual(snapshot.session.sourceTarget.type, 'memory-retrieval');
+    assert.strictEqual(snapshot.workers[0].outputs.summary[0], 'Retrieved bounded memory summary');
+  } finally {
+    fs.rmSync(recordingDir, { recursive: true, force: true });
+  }
 });
 
 test('persistence only falls back when the state-store module is missing', () => {

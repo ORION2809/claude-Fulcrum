@@ -1,6 +1,6 @@
 # Claude Fulcrum â€” Agent Instructions
 
-This is a **production-ready AI agent harness** providing 25 specialized agents, 108 skills, 57 commands, and automated hook workflows for software development.
+This is a **production-ready AI agent harness** providing 25 specialized agents, 112 skills, 62 commands, and automated hook workflows for software development.
 
 ## Core Principles
 
@@ -135,8 +135,8 @@ Troubleshoot failures: check test isolation â†’ verify mocks â†’ fix i
 
 ```
 agents/          â€” 25 specialized subagents
-skills/          â€” 108 workflow skills and domain knowledge
-commands/        â€” 57 slash commands
+skills/          â€" 112 workflow skills and domain knowledge
+commands/        â€" 62 slash commands
 hooks/           â€” Trigger-based automations
 rules/           â€” Always-follow guidelines (common + per-language)
 scripts/         â€” Cross-platform Node.js utilities

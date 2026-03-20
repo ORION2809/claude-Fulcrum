@@ -371,7 +371,9 @@ function persistCanonicalSnapshot(snapshot, options = {}) {
   return writeFallbackSessionRecording(snapshot, options);
 }
 
-function normalizeDmuxSnapshot(snapshot, sourceTarget) {
+function normalizeArtifactSessionSnapshot(snapshot, sourceTarget, options = {}) {
+  const adapterId = options.adapterId || 'dmux-tmux';
+  const sessionKind = options.sessionKind || 'orchestrated';
   const workers = (snapshot.workers || []).map(worker => ({
     id: worker.workerSlug,
     label: worker.workerSlug,
@@ -403,16 +405,23 @@ function normalizeDmuxSnapshot(snapshot, sourceTarget) {
 
   return validateCanonicalSnapshot({
     schemaVersion: SESSION_SCHEMA_VERSION,
-    adapterId: 'dmux-tmux',
+    adapterId,
     session: {
       id: snapshot.sessionName,
-      kind: 'orchestrated',
+      kind: sessionKind,
       state: deriveDmuxSessionState(snapshot),
       repoRoot: snapshot.repoRoot || null,
       sourceTarget
     },
     workers,
     aggregates: buildAggregates(workers)
+  });
+}
+
+function normalizeDmuxSnapshot(snapshot, sourceTarget) {
+  return normalizeArtifactSessionSnapshot(snapshot, sourceTarget, {
+    adapterId: 'dmux-tmux',
+    sessionKind: 'orchestrated'
   });
 }
 
@@ -476,6 +485,7 @@ module.exports = {
   SESSION_SCHEMA_VERSION,
   buildAggregates,
   getFallbackSessionRecordingPath,
+  normalizeArtifactSessionSnapshot,
   normalizeClaudeHistorySession,
   normalizeDmuxSnapshot,
   persistCanonicalSnapshot,

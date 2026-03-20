@@ -107,6 +107,46 @@ function printDecisions(decisions) {
   }
 }
 
+function printAttempts(attempts) {
+  console.log(`Attempts: ${attempts.length}`);
+  if (attempts.length === 0) {
+    console.log('  - none');
+    return;
+  }
+
+  for (const attempt of attempts) {
+    console.log(`  - ${attempt.id} ${attempt.status}`);
+    console.log(`    Branch: ${attempt.branchName}`);
+    console.log(`    Worktree: ${attempt.worktreePath}`);
+  }
+}
+
+function printMemoryNotes(memoryNotes) {
+  console.log(`Memory notes: ${memoryNotes.length}`);
+  if (memoryNotes.length === 0) {
+    console.log('  - none');
+    return;
+  }
+
+  for (const note of memoryNotes.slice(0, 5)) {
+    console.log(`  - ${note.id} ${note.category}`);
+    console.log(`    Keywords: ${(note.keywords || []).join(', ') || '(none)'}`);
+  }
+}
+
+function printQualityRuns(qualityRuns) {
+  console.log(`Quality runs: ${qualityRuns.length}`);
+  if (qualityRuns.length === 0) {
+    console.log('  - none');
+    return;
+  }
+
+  for (const qualityRun of qualityRuns.slice(0, 5)) {
+    console.log(`  - ${qualityRun.id} iteration ${qualityRun.iteration}`);
+    console.log(`    Score: ${qualityRun.score}/${qualityRun.threshold} (${qualityRun.band})`);
+  }
+}
+
 function printSessionDetail(payload) {
   console.log(`Session: ${payload.session.id}`);
   console.log(`Harness: ${payload.session.harness}`);
@@ -115,6 +155,12 @@ function printSessionDetail(payload) {
   console.log(`Repo: ${payload.session.repoRoot || '(unknown)'}`);
   console.log(`Started: ${payload.session.startedAt || '(unknown)'}`);
   console.log(`Ended: ${payload.session.endedAt || '(active)'}`);
+  console.log();
+  printAttempts(payload.attempts || []);
+  console.log();
+  printMemoryNotes(payload.memoryNotes || []);
+  console.log();
+  printQualityRuns(payload.qualityRuns || []);
   console.log();
   printWorkers(payload.workers);
   console.log();

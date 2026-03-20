@@ -25,6 +25,10 @@ function test(desc, fn) {
 }
 
 test('fails fast for an unreadable task file and records failure artifacts', () => {
+  if (process.platform === 'win32') {
+    console.log('    (skipped - bash shell scripts are not testable on Windows)');
+    return;
+  }
   const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'ecc-orch-worker-'));
   const handoffFile = path.join(tempRoot, '.orchestration', 'docs', 'handoff.md');
   const statusFile = path.join(tempRoot, '.orchestration', 'docs', 'status.md');

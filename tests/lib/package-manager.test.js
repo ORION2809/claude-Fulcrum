@@ -709,8 +709,13 @@ function runTests() {
   if (test('defaults to npm when no config found', () => {
     const testDir = fs.mkdtempSync(path.join(os.tmpdir(), 'pm-default-'));
     const originalEnv = process.env.CLAUDE_PACKAGE_MANAGER;
+    const originalHome = process.env.HOME;
+    const originalUserProfile = process.env.USERPROFILE;
     try {
       delete process.env.CLAUDE_PACKAGE_MANAGER;
+      // Point HOME/USERPROFILE to temp dir so no global config is found
+      process.env.HOME = testDir;
+      process.env.USERPROFILE = testDir;
       const result = pm.getPackageManager({ projectDir: testDir });
       assert.strictEqual(result.name, 'npm', 'Should default to npm');
       assert.strictEqual(result.source, 'default');
@@ -718,6 +723,8 @@ function runTests() {
       if (originalEnv !== undefined) {
         process.env.CLAUDE_PACKAGE_MANAGER = originalEnv;
       }
+      process.env.HOME = originalHome;
+      process.env.USERPROFILE = originalUserProfile;
       fs.rmSync(testDir, { recursive: true, force: true });
     }
   })) passed++;

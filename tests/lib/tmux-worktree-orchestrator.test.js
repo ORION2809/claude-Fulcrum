@@ -66,9 +66,11 @@ test('buildOrchestrationPlan creates worktrees, branches, and tmux commands', ()
   });
 
   assert.strictEqual(plan.sessionName, 'skill-audit');
+  assert.strictEqual(plan.attemptGroupId, 'attempt-group-skill-audit');
   assert.strictEqual(plan.workerPlans.length, 2);
   assert.strictEqual(plan.workerPlans[0].branchName, 'orchestrator-skill-audit-docs-a');
   assert.strictEqual(plan.workerPlans[1].branchName, 'orchestrator-skill-audit-docs-b');
+  assert.strictEqual(plan.workerPlans[0].attemptId, 'attempt-skill-audit-docs-a');
   assert.deepStrictEqual(
     plan.workerPlans[0].gitArgs.slice(0, 4),
     ['worktree', 'add', '-b', 'orchestrator-skill-audit-docs-a'],
@@ -222,6 +224,14 @@ test('materializePlan keeps worker instructions inside the worktree boundary', (
     assert.ok(
       taskFile.includes('Report results in your final response.'),
       'Task file should tell the worker to report in stdout'
+    );
+    assert.ok(
+      taskFile.includes('Attempt group'),
+      'Task file should include attempt-group metadata'
+    );
+    assert.ok(
+      taskFile.includes('Attempt:'),
+      'Task file should include attempt metadata'
     );
     assert.ok(
       taskFile.includes('Do not spawn subagents or external agents for this task.'),

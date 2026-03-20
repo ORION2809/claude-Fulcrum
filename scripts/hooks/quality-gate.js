@@ -19,6 +19,9 @@ const path = require('path');
 const { spawnSync } = require('child_process');
 
 const { findProjectRoot, detectFormatter, resolveFormatterBin } = require('../lib/resolve-formatter');
+const { collectEvidence } = require('../quality/evidence-collector');
+const { computeDeterministicScore } = require('../quality/scorer');
+const { writeQualityTelemetry } = require('../quality/telemetry-writer');
 
 const MAX_STDIN = 1024 * 1024;
 
@@ -142,6 +145,26 @@ function run(rawInput) {
     const input = JSON.parse(rawInput);
     const filePath = String(input.tool_input?.file_path || '');
     maybeRunQualityGate(filePath);
+
+    const evidence = collectEvidence({
+      meaningfulFileChanges: filePath ? 1 : 0,
+      testsRun: false,
+      testsTotal: 0,
+      testsFailed: 0,
+      coverage: 0,
+      errors: 0,
+      buildBroken: false,
+      securityCriticalCount: 0,
+    });
+    const score = computeDeterministicScore(evidence);
+    writeQualityTelemetry({
+      timestamp: new Date().toISOString(),
+      filePath,
+      score: score.score,
+      band: score.band,
+      passed: score.passed,
+      hardCaps: score.hardCaps,
+    });
   } catch {
     // Ignore parse errors.
   }

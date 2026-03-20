@@ -22,18 +22,18 @@ const chalk = {
 
 // Box drawing characters
 const BOX = {
-  topLeft: 'Ã¢â€¢Â­',
-  topRight: 'Ã¢â€¢Â®',
-  bottomLeft: 'Ã¢â€¢Â°',
-  bottomRight: 'Ã¢â€¢Â¯',
-  horizontal: 'Ã¢â€â‚¬',
-  vertical: 'Ã¢â€â€š',
-  verticalRight: 'Ã¢â€Å“',
-  verticalLeft: 'Ã¢â€Â¤',
+  topLeft: '\u256D',
+  topRight: '\u256E',
+  bottomLeft: '\u2570',
+  bottomRight: '\u256F',
+  horizontal: '\u2500',
+  vertical: '\u2502',
+  verticalRight: '\u251C',
+  verticalLeft: '\u2524',
 };
 
 // Progress spinner frames
-const SPINNER = ['Ã¢Â â€¹', 'Ã¢Â â„¢', 'Ã¢Â Â¹', 'Ã¢Â Â¸', 'Ã¢Â Â¼', 'Ã¢Â Â´', 'Ã¢Â Â¦', 'Ã¢Â Â§', 'Ã¢Â â€¡', 'Ã¢Â Â'];
+const SPINNER = ['\u280B', '\u2819', '\u2839', '\u2838', '\u283C', '\u2834', '\u2826', '\u2827', '\u2807', '\u280F'];
 
 // Helper functions
 function box(title, content, width = 60) {
@@ -86,13 +86,13 @@ class SkillCreateOutput {
   }
 
   header() {
-    const subtitle = `Extracting patterns from ${chalk.cyan(this.repoName)}`;
+    const subtitle = 'Extracting patterns from ' + chalk.cyan(this.repoName);
 
     console.log('\n');
-    console.log(chalk.bold(chalk.magenta('Ã¢â€¢â€Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢â€”')));
-    console.log(chalk.bold(chalk.magenta('Ã¢â€¢â€˜')) + chalk.bold('  Ã°Å¸â€Â® ECC Skill Creator                                          ') + chalk.bold(chalk.magenta('Ã¢â€¢â€˜')));
-    console.log(chalk.bold(chalk.magenta('Ã¢â€¢â€˜')) + `     ${subtitle}${' '.repeat(Math.max(0, 59 - stripAnsi(subtitle).length))}` + chalk.bold(chalk.magenta('Ã¢â€¢â€˜')));
-    console.log(chalk.bold(chalk.magenta('Ã¢â€¢Å¡Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â')));
+    console.log(chalk.bold(chalk.magenta('\u2554' + '\u2550'.repeat(64) + '\u2557')));
+    console.log(chalk.bold(chalk.magenta('\u2551')) + chalk.bold('  \uD83C\uDFAE ECC Skill Creator                                          ') + chalk.bold(chalk.magenta('\u2551')));
+    console.log(chalk.bold(chalk.magenta('\u2551')) + '     ' + subtitle + ' '.repeat(Math.max(0, 59 - stripAnsi(subtitle).length)) + chalk.bold(chalk.magenta('\u2551')));
+    console.log(chalk.bold(chalk.magenta('\u255A' + '\u2550'.repeat(64) + '\u255D')));
     console.log('');
   }
 
@@ -122,7 +122,7 @@ ${chalk.bold('Files Tracked:')}    ${chalk.green(data.files)}
   patterns(patterns) {
     console.log('\n');
     console.log(chalk.bold(chalk.cyan('Ã°Å¸â€Â Key Patterns Discovered:')));
-    console.log(chalk.gray('Ã¢â€â‚¬'.repeat(50)));
+    console.log(chalk.gray('\u2500'.repeat(50)));
 
     patterns.forEach((pattern, i) => {
       const confidence = pattern.confidence ?? 0.8;
@@ -145,7 +145,7 @@ ${chalk.bold('Files Tracked:')}    ${chalk.green(data.files)}
   output(skillPath, instinctsPath) {
     console.log('\n');
     console.log(chalk.bold(chalk.green('Ã¢Å“Â¨ Generation Complete!')));
-    console.log(chalk.gray('Ã¢â€â‚¬'.repeat(50)));
+    console.log(chalk.gray('\u2500'.repeat(50)));
     console.log(`
   ${chalk.green('Ã°Å¸â€œâ€ž')} ${chalk.bold('Skill File:')}
      ${chalk.cyan(skillPath)}
@@ -166,7 +166,7 @@ ${chalk.yellow('4.')} Evolve into skills: ${chalk.cyan('/evolve')}
   }
 
   footer() {
-    console.log(chalk.gray('Ã¢â€â‚¬'.repeat(60)));
+    console.log(chalk.gray('\u2500'.repeat(60)));
     console.log(chalk.dim(`  Powered by Claude Fulcrum Ã¢â‚¬Â¢ ecc.tools`));
     console.log(chalk.dim(`  GitHub App: github.com/apps/skill-creator`));
     console.log('\n');

@@ -1,162 +1,131 @@
+# ===========================
+# Claude Fulcrum .gitignore
+# ===========================
 
-!/memory/agents/README.md
-!/memory/sessions/README.md
-!bin/claude-flow
-!v3/@claude-flow/
-# Binaries
-# Build outputs
-
-# Claude-Flow specific
 # Dependencies
-# Development
-# Dot folders to ignore (except .claude, .claude-plugin, .git, .github, .githooks)
+node_modules/
+
+# Build outputs
+build/
+dist/
+dist-cjs/
+out/
+output/
+coverage/
+*.tsbuildinfo
+
 # Environment
-# Exclude @claude-flow module directories from ignore patterns
-# IDE
-# Logs
-# MCP/Swarm
+.env
+.env.local
+.env.*.local
+
 # OS
-# Python
-# Removed Windows wrapper files
-# SPARC/Roo files (not used)
-# SQLite Database Files
-# Temp files
-# Temporary files
-# Test artifacts
-# Test outputs
-# Testing
-# memory/
-# sessions/
-*$py.class
-*.db
-*.db-journal
-*.db-wal
-*.egg
-*.egg-info/
-*.exe
-*.lcov
+.DS_Store
+Thumbs.db
+*~
+
+# IDE
+.idea/
+.vscode/*.log
+
+# Logs
 *.log
 *.pid
 *.pid.lock
-*.py[cod]
 *.seed
+*.lcov
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+.pnpm-debug.log*
+mcp-server.log
+swarm-debug.log
+init-output.log
+ui_*.log
+logs/
+
+# Temp files
+*.tmp
+*.temp
+*.swo
+*.swp
+tmp/
+
+# Python
+*.py[cod]
+*$py.class
+*.egg
+*.egg-info/
 *.so
+.Python
+__pycache__/
+
+# SQLite databases
+*.db
+*.db-journal
+*.db-wal
 *.sqlite
 *.sqlite-journal
 *.sqlite-wal
-*.swo
-*.swp
-*.temp
-*.tmp
-*.tsbuildinfo
-*~
-./claude/checkpoints/
-.DS_Store
-.Python
-.agentic-flow/
-.cache/
-.claude-flow/
-.claude/settings.local.json
-.deno/
-.env
-.env.*.local
-.env.local
-.hive-mind/
-.hive-mind/hive.db*
-.idea/
-.mcp.json
-.nyc_output/
-.pnpm-debug.log*
-.research/
-.roo/
-.roomodes
-.ruv-swarm/
-.swarm/
-.swarm/memory.db*
-.turbo/
-.vscode/*.log
-/coordination/
-/memory/
-/memory/agents/*
-/memory/claude-flow-data.json
-/memory/sessions/*
-Thumbs.db
-__pycache__/
-analyzing
-api-project/
-bin/claude-flow-*
-build/
-claude-flow
-claude-flow-mcp-wrapper
-claude-flow.config.json
 claude-flow.db
-coordination/memory_bank/*
-coordination/orchestration/*
-coordination/subtasks/*
-coverage/
-dist-cjs/
-dist/
-hive-mind-prompt-*.txt
-init-output.log
-lerna-debug.log*
-logs/
-mcp-server.log
-memory/backups/
-node_modules/
-npm-debug.log*
-out/
-output/
-package
-pnpm-debug.log*
-swarm-debug.log
-swarm-runs
-test-full-init
-test-init
+
+# Test artifacts
 test-output/
 test-reports/
 tests/logs/
 tests/results/
-the
-tmp/
-ui_*.log
-yarn-debug.log*
-yarn-error.log*
+.nyc_output/
 
-# Claude Flow generated files
-.claude/settings.local.json
-.mcp.json
-claude-flow.config.json
+# Claude Flow runtime
+.claude-flow/
+.agentic-flow/
 .swarm/
 .hive-mind/
-.claude-flow/
-/memory/
-/coordination/
-/memory/claude-flow-data.json
-/memory/sessions/*
-!/memory/sessions/README.md
-/memory/agents/*
-!/memory/agents/README.md
-/coordination/memory_bank/*
-/coordination/subtasks/*
-/coordination/orchestration/*
-*.db
-*.db-journal
-*.db-wal
-*.sqlite
-*.sqlite-journal
-*.sqlite-wal
+.ruv-swarm/
+.mcp.json
 claude-flow
-# Removed Windows wrapper files per user request
+claude-flow-mcp-wrapper
+claude-flow.config.json
 hive-mind-prompt-*.txt
+swarm-runs
+
+# Memory & coordination (runtime state)
+/memory/
+!/memory/agents/README.md
+!/memory/sessions/README.md
+/coordination/
+memory/backups/
+
+# SPARC/Roo (not used)
+.roo/
+.roomodes
+.research/
+
+# Runtime state directories
+.orchestration/
+.claude/ecc/
+.claude/settings.local.json
+./claude/checkpoints/
+undefined/
 
 # Codex local configuration
 .codex/
 
-# Claude Flow runtime data
-.claude-flow/data/
-.claude-flow/logs/
+# Executables
+*.exe
+bin/claude-flow-*
+!bin/claude-flow
 
-# Environment variables
-.env
-.env.local
-.env.*.local
+# Misc generated
+.cache/
+.deno/
+.turbo/
+api-project/
+package
+upgrade-research/
+upgrade_plan.txt
+
+# Preserved paths
+!v3/@claude-flow/

@@ -21,6 +21,8 @@ const {
 const { getPackageManager, getSelectionPrompt } = require('../lib/package-manager');
 const { listAliases } = require('../lib/session-aliases');
 const { detectProjectType } = require('../lib/project-detect');
+const { createStateStore } = require('../lib/state-store');
+const { buildAwarenessHint } = require('../memory/search-orchestrator');
 
 async function main() {
   const sessionsDir = getSessionsDir();
@@ -86,6 +88,38 @@ async function main() {
     output(`Project type: ${JSON.stringify(projectInfo)}`);
   } else {
     log('[SessionStart] No specific project type detected');
+  }
+
+  const store = await createStateStore({
+    homeDir: process.env.HOME,
+  });
+
+  try {
+    const recentNotes = store.listRecentMemoryNotes({ limit: 2 }).map(note => ({
+      kind: 'note',
+      id: note.id,
+      title: note.category,
+      summary: note.summary,
+      relationship: 'seed',
+      score: 2,
+    }));
+    const recentObservations = store.listRecentObservations({ limit: 2 }).map(observation => ({
+      kind: 'observation',
+      id: observation.id,
+      title: observation.title,
+      summary: observation.summary,
+      relationship: 'seed',
+      score: 1,
+    }));
+    const awarenessHint = buildAwarenessHint([...recentNotes, ...recentObservations], {
+      parentTokenBudget: 30,
+    });
+
+    if (awarenessHint) {
+      output(awarenessHint);
+    }
+  } finally {
+    store.close();
   }
 
   process.exit(0);

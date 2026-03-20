@@ -46,6 +46,8 @@ test('parseWorkerStatus extracts structured status fields', () => {
   assert.deepStrictEqual(status, {
     state: 'completed',
     updated: '2026-03-12T14:09:15Z',
+    attemptGroup: null,
+    attemptId: null,
     branch: 'feature-branch',
     worktree: '/tmp/worktree',
     taskFile: null,
@@ -56,6 +58,9 @@ test('parseWorkerStatus extracts structured status fields', () => {
 test('parseWorkerTask extracts objective and seeded overlays', () => {
   const task = parseWorkerTask([
     '# Worker Task',
+    '',
+    '- Attempt group: `attempt-group-seeded`',
+    '- Attempt: `attempt-seeded-docs`',
     '',
     '## Seeded Local Overlays',
     '- `scripts/orchestrate-worktrees.js`',
@@ -69,6 +74,8 @@ test('parseWorkerTask extracts objective and seeded overlays', () => {
     'scripts/orchestrate-worktrees.js',
     'commands/orchestrate.md'
   ]);
+  assert.strictEqual(task.attemptGroup, 'attempt-group-seeded');
+  assert.strictEqual(task.attemptId, 'attempt-seeded-docs');
   assert.strictEqual(task.objective, 'Verify seeded files and summarize status.');
 });
 
