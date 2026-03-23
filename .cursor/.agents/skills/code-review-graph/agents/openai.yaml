@@ -1,0 +1,7 @@
+interface:
+  display_name: "Code Review Graph"
+  short_description: "Tree-sitter knowledge graph for token-efficient code reviews with blast-radius analysis"
+  brand_color: "#8B5CF6"
+  default_prompt: "Build or update the code review knowledge graph for this repository"
+policy:
+  allow_implicit_invocation: true

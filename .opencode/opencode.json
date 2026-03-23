@@ -17,7 +17,10 @@
     "skills/verification-loop/SKILL.md",
     "skills/api-design/SKILL.md",
     "skills/strategic-compact/SKILL.md",
-    "skills/eval-harness/SKILL.md"
+    "skills/eval-harness/SKILL.md",
+    "skills/code-review-graph/SKILL.md",
+    "skills/review-delta/SKILL.md",
+    "skills/review-pr/SKILL.md"
   ],
   "plugin": [
     "./plugins"
@@ -177,6 +180,18 @@
         "edit": true,
         "bash": true
       }
+    },
+    "code-graph-reviewer": {
+      "description": "Knowledge-graph-powered code reviewer. Uses Tree-sitter AST parsing and persistent SQLite graph for token-efficient reviews with blast-radius analysis across 14 languages.",
+      "mode": "subagent",
+      "model": "anthropic/claude-opus-4-5",
+      "prompt": "{file:prompts/agents/code-graph-reviewer.txt}",
+      "tools": {
+        "read": true,
+        "bash": true,
+        "write": false,
+        "edit": false
+      }
     }
   },
   "command": {
@@ -311,6 +326,24 @@
     "projects": {
       "description": "List known projects and instinct stats",
       "template": "{file:commands/projects.md}\n\n$ARGUMENTS"
+    },
+    "code-graph-build": {
+      "description": "Build or update the code review knowledge graph",
+      "template": "{file:commands/code-graph-build.md}\n\n$ARGUMENTS",
+      "agent": "code-graph-reviewer",
+      "subtask": true
+    },
+    "code-graph-review": {
+      "description": "Token-efficient delta review using knowledge graph",
+      "template": "{file:commands/code-graph-review.md}\n\n$ARGUMENTS",
+      "agent": "code-graph-reviewer",
+      "subtask": true
+    },
+    "code-graph-impact": {
+      "description": "Analyze blast radius of code changes",
+      "template": "{file:commands/code-graph-impact.md}\n\n$ARGUMENTS",
+      "agent": "code-graph-reviewer",
+      "subtask": true
     }
   },
   "permission": {

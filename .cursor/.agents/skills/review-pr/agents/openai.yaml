@@ -1,0 +1,7 @@
+interface:
+  display_name: "Review PR"
+  short_description: "Knowledge-graph-powered PR review with blast-radius analysis"
+  brand_color: "#10B981"
+  default_prompt: "Review the current PR using the knowledge graph for structural analysis"
+policy:
+  allow_implicit_invocation: true

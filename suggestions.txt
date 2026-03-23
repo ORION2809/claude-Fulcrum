@@ -1,0 +1,51 @@
+What's Still Not Fixed
+The Attribution Section Is Still Missing
+This is the fourth version I've reviewed. This is the one thing I've flagged every single time. It is still not there.
+I am going to be completely direct: push this without attribution and the first comment on Hacker News or Reddit will be "this looks like a fork of ECC." You will spend your launch defending your originality instead of celebrating your work. That is avoidable in five minutes.
+Add this before Contributing. Right now. Before anything else:
+markdown## 🙏 Built On
+
+Claude Fulcrum extends and integrates:
+- [everything-claude-code](https://github.com/affaan-m/everything-claude-code)
+  by @affaan-m — the foundational harness architecture
+- [claude-flow/ruflo](https://github.com/ruvnet/claude-flow)
+  by @ruvnet — swarm orchestration and AgentDB layer
+
+The unified memory layer, 4-signal hybrid search, knowledge graph,
+quality enforcement system, 33-hook lifecycle, Copilot shared memory
+integration, institutional memory concept, and UI/UX design
+intelligence suite are original work in this repo.
+
+The Platform Count Is Still Inconsistent
+Header says 6 Platforms. Platform table shows 5. By the Numbers says 6. Roadmap says "25 agents across 6 platforms."
+Antigravity appears in the skill installer destination table but not in the Supported Platforms section. Either add it properly or change every 6 to 5. Right now it's inconsistent in four places.
+
+The Why Fulcrum Section Still Opens Weakly
+The section starts with:
+
+"Most AI coding setups are one tool, one config, one context window."
+
+This is the fourth version with this same opening sentence. The Institutional Memory section lower down has a much stronger opening. The Why Fulcrum section should steal from it.
+The strongest sentence in your entire README is buried at the very bottom of the Institutional Memory section:
+
+"The codebase remembers. So you don't have to."
+
+You actually put this in your footer tagline now, which is great. But the Why Fulcrum section still opens generically. Swap the opening:
+markdown## Why Fulcrum?
+
+**Claude Code knows what you did in Claude Code.**
+**Cursor knows what you did in Cursor.**
+**Copilot knows nothing.**
+
+None of them share memory. None of them learn from each other.
+Every session, every tool, starts from zero.
+
+Fulcrum fixes this with one shared memory layer — FTS5 + vector 
+embeddings + knowledge graph — that all 5 platforms read from 
+and write to simultaneously. Patterns learned yesterday are 
+available today. Plans made in one tool execute in another.
+
+**The codebase remembers. So you don't have to.**
+
+One Small Inconsistency in the Comparison Table
+The comparison table still says Platforms: 5 in ECC vs 5 in Fulcrum column. But your By the Numbers says 6. And the Supported Platforms table shows 5. The comparison table should match whichever count you decide is correct after fixing the platform count inconsistency above.

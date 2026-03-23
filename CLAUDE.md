@@ -37,6 +37,9 @@ The project is organized into several core components:
 - `/plan` - Implementation planning
 - `/e2e` - Generate and run E2E tests
 - `/code-review` - Quality review
+- `/code-graph-build` - Build/update Tree-sitter knowledge graph
+- `/code-graph-review` - Token-efficient delta review with blast-radius
+- `/code-graph-impact` - Blast radius impact analysis
 - `/build-fix` - Fix build errors
 - `/learn` - Extract patterns from sessions
 - `/skill-create` - Generate skills from git history

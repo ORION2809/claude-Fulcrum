@@ -264,6 +264,18 @@
           }
         ],
         "description": "Capture sanitized tool results into the control-plane queue"
+      },
+      {
+        "matcher": "Write|Edit|MultiEdit|Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "code-review-graph update 2>/dev/null || true",
+            "async": true,
+            "timeout": 10
+          }
+        ],
+        "description": "Incrementally update the code-review-graph knowledge graph after file edits or shell commands"
       }
     ],
     "Stop": [

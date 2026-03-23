@@ -1,6 +1,6 @@
 # Claude Fulcrum â€” Agent Instructions
 
-This is a **production-ready AI agent harness** providing 25 specialized agents, 119 skills, 62 commands, and automated hook workflows for software development.
+This is a **production-ready AI agent harness** providing 26 specialized agents, 122 skills, 65 commands, and automated hook workflows for software development.
 
 ## Core Principles
 
@@ -36,13 +36,13 @@ This is a **production-ready AI agent harness** providing 25 specialized agents,
 | harness-optimizer | Harness config tuning | Reliability, cost, throughput |
 | rust-reviewer | Rust code review | Rust projects |
 | rust-build-resolver | Rust build errors | Rust build failures |
+| code-graph-reviewer | Knowledge-graph-powered code review | Blast-radius analysis, structural reviews, 14 languages |
 
 ## Agent Orchestration
 
 Use agents proactively without user prompt:
 - Complex feature requests â†’ **planner**
-- Code just written/modified â†’ **code-reviewer**
-- Bug fix or new feature â†’ **tdd-guide**
+- Code just written/modified â†’ **code-reviewer**- Code review with blast-radius â†' **code-graph-reviewer**- Bug fix or new feature â†’ **tdd-guide**
 - Architectural decision â†’ **architect**
 - Security-sensitive code â†’ **security-reviewer**
 - Multi-channel communication triage â†’ **chief-of-staff**

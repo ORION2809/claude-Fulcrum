@@ -7,6 +7,9 @@ This document lists each slash command and the primary agent(s) or skills it inv
 | `/plan` | planner | Implementation planning before code |
 | `/tdd` | tdd-guide | Test-driven development |
 | `/code-review` | code-reviewer | Quality and security review |
+| `/code-graph-build` | code-graph-reviewer | Build/update Tree-sitter knowledge graph |
+| `/code-graph-review` | code-graph-reviewer | Token-efficient delta review with blast-radius |
+| `/code-graph-impact` | code-graph-reviewer | Blast radius impact analysis |
 | `/build-fix` | build-error-resolver | Fix build/type errors |
 | `/e2e` | e2e-runner | Playwright E2E tests |
 | `/refactor-clean` | refactor-cleaner | Dead code removal |

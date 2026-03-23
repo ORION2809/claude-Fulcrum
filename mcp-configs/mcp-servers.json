@@ -142,6 +142,11 @@
         "CONFLUENCE_API_TOKEN": "YOUR_CONFLUENCE_TOKEN_HERE"
       },
       "description": "Confluence Cloud integration — search pages, retrieve content, explore spaces"
+    },
+    "code-review-graph": {
+      "command": "uvx",
+      "args": ["code-review-graph", "serve"],
+      "description": "Tree-sitter knowledge graph for token-efficient code reviews — 9 MCP tools: build/update graph, blast-radius analysis, structural queries (callers_of, callees_of, tests_for, etc.), semantic search, large function detection. 14 languages, <2s incremental updates. Install: pip install code-review-graph"
     }
   },
   "_comments": {

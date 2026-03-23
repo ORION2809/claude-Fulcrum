@@ -8,7 +8,7 @@
 
 <br>
 
-**26 Agents** · **122 Skills** · **65 Commands** · **9 Language Rulesets** · **1,536 Tests** · **6 Platforms**
+**25 Agents** · **119 Skills** · **62 Commands** · **9 Language Rulesets** · **1,536 Tests** · **6 Platforms**
 
 One harness. Every AI coding tool. Unified memory. Swarm orchestration. Neural search. Design intelligence.
 
@@ -38,13 +38,9 @@ One harness. Every AI coding tool. Unified memory. Swarm orchestration. Neural s
 
 ## Why Fulcrum?
 
-**Claude Code knows what you did in Claude Code.**
-**Cursor knows what you did in Cursor.**
-**Copilot knows nothing.**
+Most AI coding setups are **one tool, one config, one context window.**
 
-None of them share memory. None of them learn from each other. Every session, every tool, starts from zero.
-
-Fulcrum fixes this with one shared memory layer — FTS5 + vector embeddings + knowledge graph — that all 6 platforms read from and write to simultaneously. Patterns learned yesterday are available today. Plans made in one tool execute in another.
+Fulcrum is different. It gives every AI tool you use the same memory, the same agents, and the same quality standards — then coordinates them like a team.
 
 ```
 You write code in Cursor  →  Fulcrum's agents review it automatically
@@ -55,7 +51,7 @@ You fix a tricky bug  →  The knowledge graph remembers the pattern forever
 You need a design system  →  7 design skills generate tokens, palettes, and typography instantly
 ```
 
-**The codebase remembers. So you don't have to.**
+**The result:** Your AI tools stop being isolated autocomplete engines and start functioning as a coordinated engineering team with shared memory and institutional knowledge.
 
 ---
 
@@ -173,7 +169,7 @@ graph TB
         RRF["RRF Fusion<br/>4-signal ranking"]
     end
 
-    subgraph AGENTS["🤖 26 Agents"]
+    subgraph AGENTS["🤖 25 Agents"]
         DEV["Development<br/>planner · architect · tdd"]
         REV["Reviewers<br/>code · security · 6 languages"]
         OPS["Operations<br/>chief-of-staff · loop-operator"]
@@ -242,17 +238,6 @@ Automatic entity extraction and relationship mapping across your entire developm
 - **Multi-hop Reasoning**: "Find all files depending on module X that were modified this week"
 - **Time-aware Traversal**: BFS + DFS with temporal decay (recent relationships weighted higher)
 - **Auto-sync**: Hooks extract entities from every session interaction
-
-#### Code Review Graph (Tree-sitter AST)
-
-Powered by [code-review-graph](https://github.com/tirth8205/code-review-graph), Fulcrum includes a **persistent AST-level knowledge graph** parsed via Tree-sitter:
-
-- **14 Languages**: Python, TypeScript, JavaScript, Vue, Go, Rust, Java, C#, Ruby, Kotlin, Swift, PHP, Solidity, C/C++
-- **9 MCP Tools**: build graph, blast-radius analysis, structural queries, semantic search, large function detection
-- **Blast-Radius Analysis**: Know exactly which files and functions are impacted by any code change
-- **6.8x Token Reduction**: Reviews only changed code + 2-hop neighbors instead of entire files
-- **<2s Incremental Updates**: Git-diff-based change detection, only re-parses modified files
-- **Auto-Update Hooks**: Graph updates automatically on every file write/edit via PostToolUse hooks
 
 ### 3. Quality Enforcement Loop
 
@@ -461,7 +446,7 @@ When a bug appears — the evolution history shows what changed.
 
 ## 🤖 Agent Catalog
 
-26 specialized agents that activate **automatically** based on context — no manual invocation needed. Each agent is a Markdown file with YAML frontmatter defining its name, description, tools, and model tier (Opus for deep reasoning, Sonnet for most tasks, Haiku for lightweight ops).
+25 specialized agents that activate **automatically** based on context — no manual invocation needed. Each agent is a Markdown file with YAML frontmatter defining its name, description, tools, and model tier (Opus for deep reasoning, Sonnet for most tasks, Haiku for lightweight ops).
 
 > **Design skills** also activate automatically when editing HTML, CSS, SCSS, TSX, JSX, Vue, or Svelte files. See [UI/UX Design Intelligence](#7-uiux-design-intelligence) above.
 
@@ -510,7 +495,6 @@ When a bug appears — the evolution history shows what changed.
 | `loop-operator` | Sonnet | Autonomous agent loop monitoring, stall detection & intervention |
 | `harness-optimizer` | Sonnet | Harness configuration tuning (cost, reliability, throughput) |
 | `docs-lookup` | Sonnet | Live documentation lookup via Context7 MCP (not training data) |
-| `code-graph-reviewer` | Sonnet | Knowledge-graph-powered code review — Tree-sitter AST parsing, blast-radius analysis, 14 languages, 6.8x token reduction |
 
 ---
 
@@ -539,7 +523,6 @@ What are you doing?
 │   └── C++ / CMake error ──────────────────────→ cpp-build-resolver
 │
 ├── Reviewing code?
-│   ├── With blast-radius analysis ───────────────→ code-graph-reviewer
 │   ├── TypeScript/JavaScript ───────────────────→ code-reviewer
 │   ├── Python/Django ───────────────────────────→ python-reviewer
 │   ├── Go ──────────────────────────────────────→ go-reviewer
@@ -564,7 +547,7 @@ What are you doing?
 
 ---
 
-## 📚 122 Workflow Skills
+## 📚 119 Workflow Skills
 
 Skills are **deep domain knowledge** that agents draw from — patterns, idioms, testing strategies, design systems, and best practices in Markdown with clear sections (When to Use, How It Works, Examples). They activate contextually — you never need to invoke them manually.
 
@@ -750,7 +733,7 @@ Skills are **deep domain knowledge** that agents draw from — patterns, idioms,
 Commands are the primary interface — type `/command` and the right agent activates with the right skills loaded.
 
 <details>
-<summary><b>Full command reference (65 commands)</b></summary>
+<summary><b>Full command reference (62 commands)</b></summary>
 
 ### Planning & Architecture (5)
 ```
@@ -761,14 +744,11 @@ Commands are the primary interface — type `/command` and the right agent activ
 /projects            — Multi-project management and context switching
 ```
 
-### Development (10)
+### Development (7)
 ```
 /tdd                 — Test-driven development cycle (RED → GREEN → REFACTOR)
 /build-fix           — Fix build errors automatically with minimal diffs
 /code-review         — Comprehensive quality + security review via git diff
-/code-graph-build    — Build/update Tree-sitter knowledge graph (14 languages)
-/code-graph-review   — Token-efficient delta review with blast-radius analysis
-/code-graph-impact   — Blast radius impact analysis via knowledge graph
 /refactor-clean      — Dead code removal (knip, depcheck, ts-prune)
 /quality-loop        — Iterative quality improvement (max 5 iterations)
 /quality-gate        — Enforce quality standards before commit
@@ -897,7 +877,7 @@ Each rule set covers: **coding style**, **testing requirements**, **security pra
 | **Agents** | 21 | **25** |
 | **Skills** | ~80 | **119** (includes 7 UI/UX design intelligence skills) |
 | **Commands** | ~40 | **62** |
-| **Platforms** | 4 | **6** (Claude Code, Codex, Cursor, Copilot, OpenCode, Antigravity) |
+| **Platforms** | 4 | **5** (+ full Copilot with 11 agents, 30 prompts) |
 | **Design Intelligence** | None | **7 skills** — 67 styles, 96 palettes, 57 font pairings, BM25 search |
 | **Language Rules** | 5 | **9** (each with 5 files: style, testing, security, patterns, hooks) |
 | **Memory** | Per-platform | **Unified hybrid** (FTS5 + vector + knowledge graph + 50+ API methods) |
@@ -922,7 +902,7 @@ The four directions dominating AI tooling in 2026:
 | Direction | What It Means | How Fulcrum Addresses It |
 |-----------|--------------|--------------------------|
 | **Agentic execution** | AI that acts autonomously, not just suggests | 25 auto-activating agents, quality loop, autonomous loops |
-| **Workflow orchestration** | Coordinating multiple AI tools and models | 6-platform unified layer, swarm coordination, 3-tier routing |
+| **Workflow orchestration** | Coordinating multiple AI tools and models | 5-platform unified layer, swarm coordination, 3-tier routing |
 | **Data and context** | AI that remembers and learns from your history | 4-signal hybrid memory, knowledge graph, institutional memory |
 | **Multimodal generation** | Code + design + content in one flow | 7 design skills, BM25 search, 96 palettes, 57 font pairings |
 
@@ -934,12 +914,11 @@ Fulcrum is the only developer harness that addresses all four simultaneously.
 
 | Platform | Config Location | Components | Best For |
 |----------|----------------|------------|----------|
-| **Claude Code** | `~/.claude/` | Full 26 agents, 122 skills, 9 rulesets, 33 hooks | Deep workflows, TDD, planning, security |
+| **Claude Code** | `~/.claude/` | Full 25 agents, 119 skills, 9 rulesets, 33 hooks | Deep workflows, TDD, planning, security |
 | **Codex CLI** | `~/.codex/` | Core agents + rules | Fast parallel execution, batch tasks |
 | **Cursor** | `.cursor/` | 11 agents, full rules | Visual IDE, real-time coding |
 | **GitHub Copilot** | `.github/` | 11 agents, 30 prompts, 8 language instructions | Inline completions, chat |
 | **OpenCode** | `.opencode/` | Core agents + skills | Open-source, extensible |
-| **Antigravity** | `.agent/` | Agents, skills, flattened rules | Workflow-native agent IDE |
 
 **Shared context:** All platforms read from and write to the same memory layer. Patterns learned in Claude Code are available in Copilot completions. Plans created in one tool execute in another.
 
@@ -971,7 +950,7 @@ Swarm architecture: Coordinator spawns one `worker_threads` worker per platform.
 | Guide | Description |
 |-------|-------------|
 | [**Complete Architecture**](docs/ARCHITECTURE.md) | Full technical reference for every subsystem — memory, quality, hooks, orchestration, install |
-| [**Cross-Platform Integration**](docs/CROSS_PLATFORM_INTEGRATION.md) | How all 6 platforms share one orchestration layer |
+| [**Cross-Platform Integration**](docs/CROSS_PLATFORM_INTEGRATION.md) | How all 5 platforms share one orchestration layer |
 | [**Extreme Dev Playbook**](docs/EXTREME_DEV_PLAYBOOK.md) | Daily workflow for all platforms working together |
 | [**Shortform Guide**](docs/the-shortform-guide.md) | Setup, foundations, philosophy |
 | [**Longform Guide**](docs/the-longform-guide.md) | Token optimization, memory persistence, evals |
@@ -988,7 +967,7 @@ Swarm architecture: Coordinator spawns one `worker_threads` worker per platform.
 
 ```
 claude-fulcrum/
-├── agents/              # 26 specialized agents (YAML frontmatter + Markdown)
+├── agents/              # 25 specialized agents (YAML frontmatter + Markdown)
 ├── skills/              # 119 workflow skills (domain knowledge modules)
 │   ├── ui-ux-pro-max/  #   Design engine: 67 styles, BM25 search, 13 stack databases
 │   ├── design/          #   Logos, CIP, icons, banners, social photos
@@ -1235,10 +1214,10 @@ SessionEnd hooks fire (2)
 
 ### Now — v3.1 (Current)
 - ✅ 4-signal hybrid memory (FTS5 + vector + graph + recency)
-- ✅ 26 agents across 6 platforms
+- ✅ 25 agents across 6 platforms
 - ✅ 7 UI/UX design intelligence skills with BM25 search
 - ✅ 33 lifecycle hooks across 7 phases
-- ✅ 122 skills, 65 commands, 9 language rulesets
+- ✅ 119 skills, 62 commands, 9 language rulesets
 - ✅ 1,536 tests passing
 - ✅ Cross-platform skill installer with swarm mode
 
@@ -1255,18 +1234,6 @@ SessionEnd hooks fire (2)
 - 🔮 IDE-native dashboard (VS Code extension)
 
 > Star this repo to follow progress. Open an issue to influence the roadmap.
-
----
-
-## 🙏 Built On
-
-Claude Fulcrum extends and integrates:
-
-- [**everything-claude-code**](https://github.com/affaan-m/everything-claude-code) by [@affaan-m](https://github.com/affaan-m) — the foundational harness architecture
-- [**claude-flow / ruflo**](https://github.com/ruvnet/claude-flow) by [@ruvnet](https://github.com/ruvnet) — swarm orchestration and AgentDB layer
-- [**code-review-graph**](https://github.com/tirth8205/code-review-graph) by [@tirth8205](https://github.com/tirth8205) — Tree-sitter AST knowledge graph for token-efficient code reviews
-
-The unified memory layer, 4-signal hybrid search, knowledge graph, quality enforcement system, 33-hook lifecycle, Copilot shared memory integration, institutional memory concept, UI/UX design intelligence suite, and code-review-graph platform integration are original work in this repo.
 
 ---
 
@@ -1303,9 +1270,9 @@ npm test                              # all 1,536 tests must pass
 
 | Metric | Count |
 |--------|------:|
-| Specialized Agents | **26** |
-| Workflow Skills | **122** |
-| Slash Commands | **65** |
+| Specialized Agents | **25** |
+| Workflow Skills | **119** |
+| Slash Commands | **62** |
 | Language Rule Sets | **9** |
 | Rule Files (total) | **~50** |
 | Supported Platforms | **6** |
@@ -1326,10 +1293,10 @@ npm test                              # all 1,536 tests must pass
 | Font Pairings | **57** |
 | UX Guidelines | **99** |
 | Tech Stack Databases | **13** |
-| Copilot Agents | **12** |
-| Copilot Prompts | **34** |
+| Copilot Agents | **11** |
+| Copilot Prompts | **30** |
 | Install Profiles | **5** |
-| MCP Servers | **9** |
+| MCP Servers | **8** |
 
 ---
 

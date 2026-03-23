@@ -1,6 +1,6 @@
 # Claude Fulcrum â€” Agent Instructions
 
-This is a **production-ready AI agent harness** providing 25 specialized agents, 112 skills, 62 commands, and automated hook workflows for software development.
+This is a **production-ready AI agent harness** providing 26 specialized agents, 122 skills, 65 commands, and automated hook workflows for software development.
 
 ## Core Principles
 

@@ -1,0 +1,7 @@
+interface:
+  display_name: "Review Delta"
+  short_description: "Token-efficient delta review with blast-radius analysis"
+  brand_color: "#3B82F6"
+  default_prompt: "Review recent changes using the knowledge graph for blast-radius analysis"
+policy:
+  allow_implicit_invocation: true
