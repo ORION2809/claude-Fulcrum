@@ -1,0 +1,8 @@
+interface:
+  display_name: "Design System"
+  short_description: "Token architecture, component specs, and strategic slide creation"
+  brand_color: "#14B8A6"
+  default_prompt: "Build and maintain design tokens — primitive, semantic, and component layers with CSS variables"
+
+policy:
+  allow_implicit_invocation: true

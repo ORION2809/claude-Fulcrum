@@ -23,7 +23,8 @@
         "workflow-quality",
         "framework-language",
         "database",
-        "orchestration"
+        "orchestration",
+        "ui-design"
       ]
     },
     "security": {
@@ -73,7 +74,8 @@
         "agentic-patterns",
         "devops-infra",
         "supply-chain-domain",
-        "document-processing"
+        "document-processing",
+        "ui-design"
       ]
     }
   }

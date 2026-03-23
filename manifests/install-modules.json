@@ -491,6 +491,34 @@
       "defaultInstall": false,
       "cost": "medium",
       "stability": "stable"
+    },
+    {
+      "id": "ui-design",
+      "kind": "skills",
+      "description": "UI/UX design intelligence, design systems, brand identity, banner design, slides, and styling skills.",
+      "paths": [
+        "skills/ui-ux-pro-max",
+        "skills/banner-design",
+        "skills/brand",
+        "skills/design",
+        "skills/design-system",
+        "skills/slides",
+        "skills/ui-styling"
+      ],
+      "targets": [
+        "claude",
+        "cursor",
+        "antigravity",
+        "codex",
+        "opencode",
+        "copilot"
+      ],
+      "dependencies": [
+        "platform-configs"
+      ],
+      "defaultInstall": false,
+      "cost": "heavy",
+      "stability": "stable"
     }
   ]
 }

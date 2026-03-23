@@ -1,0 +1,8 @@
+interface:
+  display_name: "UI/UX Pro Max"
+  short_description: "Design intelligence with 67 styles, 96 palettes, 57 font pairings, 25 charts, and 13 tech stacks"
+  brand_color: "#E11D48"
+  default_prompt: "Apply UI/UX design intelligence — analyze requirements, generate design system, and implement with accessibility-first approach"
+
+policy:
+  allow_implicit_invocation: true

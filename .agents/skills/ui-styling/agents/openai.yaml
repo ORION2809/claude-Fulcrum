@@ -1,0 +1,8 @@
+interface:
+  display_name: "UI Styling"
+  short_description: "shadcn/ui components, Tailwind CSS styling, and canvas-based visual designs"
+  brand_color: "#0EA5E9"
+  default_prompt: "Build beautiful accessible UIs with shadcn/ui, Tailwind CSS, and design system tokens"
+
+policy:
+  allow_implicit_invocation: true

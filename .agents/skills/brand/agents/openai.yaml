@@ -1,0 +1,8 @@
+interface:
+  display_name: "Brand Identity"
+  short_description: "Brand voice, visual identity, messaging frameworks, and consistency management"
+  brand_color: "#6366F1"
+  default_prompt: "Manage brand identity — voice, visual elements, messaging, and asset consistency"
+
+policy:
+  allow_implicit_invocation: true

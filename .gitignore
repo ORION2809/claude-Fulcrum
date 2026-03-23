@@ -48,6 +48,7 @@ logs/
 
 # Temp files
 *.tmp
+.tmp-validator-*
 *.temp
 *.swo
 *.swp
@@ -76,6 +77,13 @@ test-output/
 test-reports/
 test-project/
 test-project-swarm/
+test-ui-deploy/
+testout.txt
+ci-test.txt
+sr-test.txt
+sd-test.txt
+si-test.txt
+skill-list.txt
 tests/logs/
 tests/results/
 .nyc_output/

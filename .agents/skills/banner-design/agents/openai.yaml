@@ -1,0 +1,8 @@
+interface:
+  display_name: "Banner Design"
+  short_description: "Multi-format banner design for social media, ads, website heroes, and print"
+  brand_color: "#F59E0B"
+  default_prompt: "Design banners with proper dimensions, safe zones, and platform-specific requirements"
+
+policy:
+  allow_implicit_invocation: true

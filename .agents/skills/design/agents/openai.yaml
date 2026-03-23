@@ -1,0 +1,8 @@
+interface:
+  display_name: "Design"
+  short_description: "Logo generation, corporate identity, presentations, banners, icons, and social photos"
+  brand_color: "#EC4899"
+  default_prompt: "Create design assets — logos, CIP materials, presentations, banners, icons, and social images"
+
+policy:
+  allow_implicit_invocation: true

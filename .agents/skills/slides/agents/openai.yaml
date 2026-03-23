@@ -1,0 +1,8 @@
+interface:
+  display_name: "Slides"
+  short_description: "Strategic HTML presentations with Chart.js and design tokens"
+  brand_color: "#8B5CF6"
+  default_prompt: "Create strategic presentations with responsive layouts, Chart.js, and copywriting formulas"
+
+policy:
+  allow_implicit_invocation: true
