@@ -74,6 +74,8 @@ claude-flow.db
 # Test artifacts
 test-output/
 test-reports/
+test-project/
+test-project-swarm/
 tests/logs/
 tests/results/
 .nyc_output/
