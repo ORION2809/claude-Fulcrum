@@ -38,9 +38,13 @@ One harness. Every AI coding tool. Unified memory. Swarm orchestration. Neural s
 
 ## Why Fulcrum?
 
-Most AI coding setups are **one tool, one config, one context window.**
+**Claude Code knows what you did in Claude Code.**
+**Cursor knows what you did in Cursor.**
+**Copilot knows nothing.**
 
-Fulcrum is different. It gives every AI tool you use the same memory, the same agents, and the same quality standards — then coordinates them like a team.
+None of them share memory. None of them learn from each other. Every session, every tool, starts from zero.
+
+Fulcrum fixes this with one shared memory layer — FTS5 + vector embeddings + knowledge graph — that all 6 platforms read from and write to simultaneously. Patterns learned yesterday are available today. Plans made in one tool execute in another.
 
 ```
 You write code in Cursor  →  Fulcrum's agents review it automatically
@@ -51,7 +55,7 @@ You fix a tricky bug  →  The knowledge graph remembers the pattern forever
 You need a design system  →  7 design skills generate tokens, palettes, and typography instantly
 ```
 
-**The result:** Your AI tools stop being isolated autocomplete engines and start functioning as a coordinated engineering team with shared memory and institutional knowledge.
+**The codebase remembers. So you don't have to.**
 
 ---
 
@@ -877,7 +881,7 @@ Each rule set covers: **coding style**, **testing requirements**, **security pra
 | **Agents** | 21 | **25** |
 | **Skills** | ~80 | **119** (includes 7 UI/UX design intelligence skills) |
 | **Commands** | ~40 | **62** |
-| **Platforms** | 4 | **5** (+ full Copilot with 11 agents, 30 prompts) |
+| **Platforms** | 4 | **6** (Claude Code, Codex, Cursor, Copilot, OpenCode, Antigravity) |
 | **Design Intelligence** | None | **7 skills** — 67 styles, 96 palettes, 57 font pairings, BM25 search |
 | **Language Rules** | 5 | **9** (each with 5 files: style, testing, security, patterns, hooks) |
 | **Memory** | Per-platform | **Unified hybrid** (FTS5 + vector + knowledge graph + 50+ API methods) |
@@ -902,7 +906,7 @@ The four directions dominating AI tooling in 2026:
 | Direction | What It Means | How Fulcrum Addresses It |
 |-----------|--------------|--------------------------|
 | **Agentic execution** | AI that acts autonomously, not just suggests | 25 auto-activating agents, quality loop, autonomous loops |
-| **Workflow orchestration** | Coordinating multiple AI tools and models | 5-platform unified layer, swarm coordination, 3-tier routing |
+| **Workflow orchestration** | Coordinating multiple AI tools and models | 6-platform unified layer, swarm coordination, 3-tier routing |
 | **Data and context** | AI that remembers and learns from your history | 4-signal hybrid memory, knowledge graph, institutional memory |
 | **Multimodal generation** | Code + design + content in one flow | 7 design skills, BM25 search, 96 palettes, 57 font pairings |
 
@@ -919,6 +923,7 @@ Fulcrum is the only developer harness that addresses all four simultaneously.
 | **Cursor** | `.cursor/` | 11 agents, full rules | Visual IDE, real-time coding |
 | **GitHub Copilot** | `.github/` | 11 agents, 30 prompts, 8 language instructions | Inline completions, chat |
 | **OpenCode** | `.opencode/` | Core agents + skills | Open-source, extensible |
+| **Antigravity** | `.agent/` | Agents, skills, flattened rules | Workflow-native agent IDE |
 
 **Shared context:** All platforms read from and write to the same memory layer. Patterns learned in Claude Code are available in Copilot completions. Plans created in one tool execute in another.
 
@@ -950,7 +955,7 @@ Swarm architecture: Coordinator spawns one `worker_threads` worker per platform.
 | Guide | Description |
 |-------|-------------|
 | [**Complete Architecture**](docs/ARCHITECTURE.md) | Full technical reference for every subsystem — memory, quality, hooks, orchestration, install |
-| [**Cross-Platform Integration**](docs/CROSS_PLATFORM_INTEGRATION.md) | How all 5 platforms share one orchestration layer |
+| [**Cross-Platform Integration**](docs/CROSS_PLATFORM_INTEGRATION.md) | How all 6 platforms share one orchestration layer |
 | [**Extreme Dev Playbook**](docs/EXTREME_DEV_PLAYBOOK.md) | Daily workflow for all platforms working together |
 | [**Shortform Guide**](docs/the-shortform-guide.md) | Setup, foundations, philosophy |
 | [**Longform Guide**](docs/the-longform-guide.md) | Token optimization, memory persistence, evals |
@@ -1234,6 +1239,17 @@ SessionEnd hooks fire (2)
 - 🔮 IDE-native dashboard (VS Code extension)
 
 > Star this repo to follow progress. Open an issue to influence the roadmap.
+
+---
+
+## 🙏 Built On
+
+Claude Fulcrum extends and integrates:
+
+- [**everything-claude-code**](https://github.com/affaan-m/everything-claude-code) by [@affaan-m](https://github.com/affaan-m) — the foundational harness architecture
+- [**claude-flow / ruflo**](https://github.com/ruvnet/claude-flow) by [@ruvnet](https://github.com/ruvnet) — swarm orchestration and AgentDB layer
+
+The unified memory layer, 4-signal hybrid search, knowledge graph, quality enforcement system, 33-hook lifecycle, Copilot shared memory integration, institutional memory concept, and UI/UX design intelligence suite are original work in this repo.
 
 ---
 
