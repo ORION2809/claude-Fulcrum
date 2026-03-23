@@ -8,7 +8,7 @@
 
 <br>
 
-**25 Agents** · **112 Skills** · **62 Commands** · **9 Language Rulesets** · **1,536 Tests** · **5 Platforms**
+**25 Agents** · **112 Skills** · **62 Commands** · **9 Language Rulesets** · **1,536 Tests** · **6 Platforms**
 
 One harness. Every AI coding tool. Unified memory. Swarm orchestration. Neural search.
 
@@ -94,6 +94,36 @@ npx claude-fulcrum typescript
 ```
 
 </details>
+
+### Cross-Platform Skill Installer
+
+Install any skill (or all of them) to any platform — sequentially or in parallel via swarm:
+
+```bash
+# Install all skills to all 6 platforms (sequential)
+npx claude-fulcrum skill-install --all --platform all
+
+# Install specific skills to specific platforms
+npx claude-fulcrum skill-install --skills tdd-workflow,api-design --platform claude,copilot
+
+# Parallel swarm mode — one worker per platform
+npx claude-fulcrum skill-swarm --all --platform all
+
+# Preview what would be installed (dry run)
+npx claude-fulcrum skill-install --dry-run --all --platform all
+
+# List all available skills
+npx claude-fulcrum skill-install --list
+```
+
+| Platform | Scope | Destination |
+|----------|-------|-------------|
+| Claude | Home | `~/.claude/skills/` |
+| Cursor | Project | `.cursor/skills/` |
+| Codex | Home | `~/.codex/skills/` |
+| OpenCode | Home | `~/.opencode/skills/` |
+| Antigravity | Project | `.agent/skills/` |
+| Copilot | Project | `.agents/skills/` + `.github/` scaffold |
 
 ---
 
@@ -641,6 +671,27 @@ Each rule set covers: **coding style**, **testing requirements**, **security pra
 
 **Shared context:** All platforms read from and write to the same memory layer. Patterns learned in Claude Code are available in Copilot completions. Plans created in one tool execute in another.
 
+### Cross-Platform Skill Deployment
+
+Deploy skills to any platform individually or in bulk using the skill installer CLI:
+
+```bash
+# Sequential — installs one skill at a time per platform
+cf-skill-install --all --platform all
+cf-skill-install --skills tdd-workflow,security-review --platform claude,copilot
+
+# Swarm mode — one worker thread per platform, all run in parallel
+cf-skill-swarm --all --platform all
+cf-skill-swarm --skills api-design --platform claude,cursor,codex
+
+# Inspect available skills and platforms
+cf-skill-install --list
+cf-skill-install --list-platforms
+cf-skill-install --dry-run --all --platform all --json
+```
+
+Swarm architecture: Coordinator spawns one `worker_threads` worker per platform. Each worker deploys all requested skills independently. Results are aggregated when all workers complete.
+
 ---
 
 ## 📖 Guides
@@ -654,8 +705,7 @@ Each rule set covers: **coding style**, **testing requirements**, **security pra
 | [**Longform Guide**](docs/the-longform-guide.md) | Token optimization, memory persistence, evals |
 | [**Security Guide**](docs/the-security-guide.md) | Scanning, secret management, OWASP patterns |
 | [**Copilot Integration**](docs/GITHUB_COPILOT_INTEGRATION.md) | GitHub Copilot agent, prompt, and instruction setup |
-| [**Selective Install Design**](docs/SELECTIVE-INSTALL-DESIGN.md) | Profile-based installation (core, developer, security, research, full) |
-| [**Session Adapter Contract**](docs/SESSION-ADAPTER-CONTRACT.md) | Canonical session schema and adapter protocol |
+| [**Selective Install Design**](docs/SELECTIVE-INSTALL-DESIGN.md) | Profile-based installation (core, developer, security, research, full) || [**Skill Installer CLI**](#cross-platform-skill-installer) | Install any/all skills to any/all platforms (sequential + swarm) || [**Session Adapter Contract**](docs/SESSION-ADAPTER-CONTRACT.md) | Canonical session schema and adapter protocol |
 | [**Troubleshooting**](TROUBLESHOOTING.md) | Common issues and fixes |
 
 ---
@@ -678,7 +728,7 @@ claude-fulcrum/
 │   ├── perl/            #   Perl 5.36+ (strict/warnings, Test2)
 │   ├── php/             #   PHP/Laravel (PSR-12, Composer)
 │   └── swift/           #   Swift 6.2 (concurrency, actors, SwiftLint)
-├── scripts/             # 142 scripts
+├── scripts/             # 144 scripts
 │   ├── hooks/           #   33 hook scripts (session, quality, security, formatting)
 │   ├── lib/             #   Core libraries
 │   │   ├── state-store/ #     SQLite state store (sql.js WASM, 4 migrations)
@@ -937,10 +987,10 @@ npm test                              # all 1,536 tests must pass
 | Slash Commands | **62** |
 | Language Rule Sets | **9** |
 | Rule Files (total) | **~50** |
-| Supported Platforms | **5** |
+| Supported Platforms | **6** |
 | Lifecycle Hooks | **33** |
 | Hook Phases | **7** |
-| Utility Scripts | **142** |
+| Utility Scripts | **144** |
 | Quality Modules | **8** |
 | Memory Modules | **7** |
 | CI Validators | **8** |

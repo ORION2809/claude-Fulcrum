@@ -45,6 +45,14 @@ const COMMANDS = {
     script: 'uninstall.js',
     description: 'Remove ECC-managed files recorded in install-state',
   },
+  'skill-install': {
+    script: 'skill-install.js',
+    description: 'Install specific or all skills to any platform (sequential)',
+  },
+  'skill-swarm': {
+    script: 'skill-install-swarm.js',
+    description: 'Install skills across platforms in parallel (swarm mode)',
+  },
 };
 
 const PRIMARY_COMMANDS = [
@@ -57,6 +65,8 @@ const PRIMARY_COMMANDS = [
   'sessions',
   'session-inspect',
   'uninstall',
+  'skill-install',
+  'skill-swarm',
 ];
 
 function showHelp(exitCode = 0) {

@@ -72,7 +72,9 @@
   ],
   "bin": {
     "claude-fulcrum": "scripts/ecc.js",
-    "cf-install": "scripts/install-apply.js"
+    "cf-install": "scripts/install-apply.js",
+    "cf-skill-install": "scripts/skill-install.js",
+    "cf-skill-swarm": "scripts/skill-install-swarm.js"
   },
   "scripts": {
     "postinstall": "echo '\\n  Claude Fulcrum installed!\\n  Run: npx claude-fulcrum typescript\\n  Docs: https://github.com/ORION2809/claude-Fulcrum\\n'",
