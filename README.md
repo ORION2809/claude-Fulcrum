@@ -8,9 +8,9 @@
 
 <br>
 
-**25 Agents** · **112 Skills** · **62 Commands** · **9 Language Rulesets** · **1,536 Tests** · **6 Platforms**
+**25 Agents** · **119 Skills** · **62 Commands** · **9 Language Rulesets** · **1,536 Tests** · **6 Platforms**
 
-One harness. Every AI coding tool. Unified memory. Swarm orchestration. Neural search.
+One harness. Every AI coding tool. Unified memory. Swarm orchestration. Neural search. Design intelligence.
 
 <br>
 
@@ -32,7 +32,7 @@ One harness. Every AI coding tool. Unified memory. Swarm orchestration. Neural s
 
 </div>
 
-> **What is this?** Claude Fulcrum is a production-grade agent harness that unifies **Claude Code, Codex CLI, Cursor, GitHub Copilot, and OpenCode** into a single development environment — with shared vector memory, 4-signal neural search, knowledge graphs, swarm orchestration, 33 lifecycle hooks, and 25 specialized AI agents that activate automatically based on what you're doing.
+> **What is this?** Claude Fulcrum is a production-grade agent harness that unifies **Claude Code, Codex CLI, Cursor, GitHub Copilot, and OpenCode** into a single development environment — with shared vector memory, 4-signal neural search, knowledge graphs, swarm orchestration, 33 lifecycle hooks, 25 specialized AI agents, and a **full UI/UX design intelligence suite** that activate automatically based on what you're doing.
 
 <br>
 
@@ -48,6 +48,7 @@ You plan a feature in Claude Code  →  Codex workers execute the plan in parall
 Copilot suggests a completion  →  It already knows your team's patterns from memory
 A build fails in any tool  →  The build-error-resolver agent fixes it
 You fix a tricky bug  →  The knowledge graph remembers the pattern forever
+You need a design system  →  7 design skills generate tokens, palettes, and typography instantly
 ```
 
 **The result:** Your AI tools stop being isolated autocomplete engines and start functioning as a coordinated engineering team with shared memory and institutional knowledge.
@@ -134,7 +135,7 @@ npx claude-fulcrum skill-install --list
 │                        CLAUDE FULCRUM                                │
 │                                                                     │
 │  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────────────┐   │
-│  │ 25 Agents│  │112 Skills│  │62 Commands│  │ 9 Language Rules │   │
+│  │ 25 Agents│  │119 Skills│  │62 Commands│  │ 9 Language Rules │   │
 │  └────┬─────┘  └────┬─────┘  └────┬─────┘  └───────┬──────────┘   │
 │       │              │             │                 │              │
 │  ┌────▼──────────────▼─────────────▼─────────────────▼──────────┐  │
@@ -291,11 +292,107 @@ Sessions persist across restarts with full context recovery:
 - **Privacy gate**: Configurable filtering strips secrets before anything is persisted
 - **Config protection**: Critical files (.eslintrc, tsconfig.json, hooks.json) are backed up before any modification
 
+### 7. UI/UX Design Intelligence
+
+<div align="center">
+
+**7 specialized design skills** · **67 visual styles** · **96 color palettes** · **57 font pairings** · **25 chart types** · **99 UX guidelines** · **13 tech stacks**
+
+</div>
+
+A complete design intelligence suite that transforms any AI coding tool into a full-stack design partner. Every design decision — from color palettes to component tokens to responsive layouts — is backed by searchable databases with **BM25-ranked retrieval** and stack-specific guidelines.
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                    UI/UX DESIGN INTELLIGENCE                        │
+│                                                                     │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────────────────┐  │
+│  │ ui-ux-pro-max│  │    design    │  │      design-system       │  │
+│  │ Core Engine  │  │ Logos · CIP  │  │  Tokens · Slides · CSS   │  │
+│  │ 67 styles    │  │ Icons · SVG  │  │  Primitive → Semantic    │  │
+│  │ BM25 search  │  │ 55 logo      │  │  → Component layers      │  │
+│  │ 13 stacks    │  │ styles       │  │                          │  │
+│  └──────┬───────┘  └──────┬───────┘  └────────────┬─────────────┘  │
+│         │                 │                        │               │
+│  ┌──────▼───────┐  ┌──────▼───────┐  ┌────────────▼─────────────┐  │
+│  │   ui-styling │  │    brand     │  │         slides           │  │
+│  │ shadcn/ui +  │  │ Voice · Logo │  │  HTML presentations      │  │
+│  │ Tailwind CSS │  │ Guidelines   │  │  Chart.js · Copywriting  │  │
+│  │ 65+ fonts    │  │ Asset mgmt   │  │  Layout strategies       │  │
+│  └──────────────┘  └──────┬───────┘  └──────────────────────────┘  │
+│                           │                                        │
+│                    ┌──────▼───────┐                                 │
+│                    │banner-design │                                 │
+│                    │ 22 art styles│                                 │
+│                    │ Multi-format │                                 │
+│                    └──────────────┘                                 │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+#### The 7 Design Skills
+
+| Skill | What It Does | Key Assets |
+|-------|-------------|------------|
+| **`ui-ux-pro-max`** | Core design intelligence engine — searchable databases with BM25 ranking, design system generation, and priority-based recommendations | 67 styles, 96 palettes, 57 font pairings, 25 chart types, 99 UX guidelines, 13 stack-specific CSV databases, Python BM25 search engine |
+| **`design`** | Comprehensive visual design — logos, corporate identity programs, presentations, banners, icons, social photos | 55 logo styles, 50 CIP deliverables, 15 icon styles, 8 CSV data files, Python generators for logos/CIP/icons |
+| **`design-system`** | Three-layer token architecture (primitive → semantic → component) with CSS variables, spacing scales, and slide generation | 8 slide CSV databases, 9 Node.js/Python scripts for token generation and validation, design token templates |
+| **`ui-styling`** | Beautiful accessible UIs with shadcn/ui (Radix UI + Tailwind), utility-first styling, canvas-based visual designs | 65+ bundled TTF fonts, shadcn/Tailwind reference docs, Python generators for configs |
+| **`brand`** | Brand voice, visual identity, messaging frameworks, and asset management | 11 reference guides (voice framework, color palette management, approval checklist), 4 Node.js scripts, brand guideline templates |
+| **`slides`** | Strategic HTML presentations with data visualization | Chart.js patterns, copywriting formulas, 5 layout strategy guides, responsive slide templates |
+| **`banner-design`** | Multi-format banner design for social media, ads, website heroes, and print | 22 art direction styles, platform-specific dimensions and safe zones |
+
+#### BM25 Search Engine
+
+The design suite includes a **built-in Python search engine** that provides instant, ranked access to the entire design database:
+
+```bash
+# Search for design styles matching a query
+python scripts/search.py "minimalist dark mode dashboard"
+
+# Generate a complete design system from requirements
+python scripts/design_system.py --style modern --palette dark --stack react
+```
+
+The search engine uses **BM25 (Best Matching 25)** ranking across 32+ CSV databases covering styles, palettes, typography, colors, charts, UX guidelines, and 13 stack-specific recommendation sets (React, Vue, Svelte, Next.js, Flutter, React Native, SwiftUI, HTML+Tailwind, and more).
+
+#### Stack-Specific Design Guidelines
+
+Every major frontend stack has dedicated design recommendations:
+
+| Stack | Covers |
+|-------|--------|
+| React | Component architecture, state patterns, styling approaches |
+| Next.js | SSR considerations, image optimization, font loading |
+| Vue | Composition API patterns, Vuetify/Quasar integration |
+| Svelte | Scoped styling, transitions, SvelteKit layouts |
+| Flutter | Material 3, adaptive layouts, platform conventions |
+| React Native | NativeWind, platform-specific UX, gesture patterns |
+| SwiftUI | SF Symbols, dynamic type, platform idioms |
+| HTML + Tailwind | Utility-first, JIT, responsive breakpoints |
+| Angular · Nuxt · Astro · Remix · Solid | Framework-specific patterns |
+
+#### Install the Design Suite
+
+```bash
+# Install all 7 design skills to your preferred platforms
+npx claude-fulcrum skill-install --skills ui-ux-pro-max,design,design-system,ui-styling,brand,slides,banner-design --platform claude,copilot,cursor
+
+# Or install the entire ui-design module (includes all 7)
+npx claude-fulcrum install --module ui-design
+
+# Swarm parallel install across all platforms
+npx claude-fulcrum skill-swarm --skills ui-ux-pro-max,design,design-system,ui-styling,brand,slides,banner-design --platform all
+```
+
+> The design skills automatically activate when working on HTML, CSS, SCSS, React (TSX/JSX), Vue, or Svelte files. Copilot gets dedicated [UI/UX instructions](.github/instructions/ui-ux.instructions.md) with 19 accessibility and design rules that auto-apply based on file type.
+
 ---
 
 ## 🤖 Agent Catalog
 
 25 specialized agents that activate **automatically** based on context — no manual invocation needed. Each agent is a Markdown file with YAML frontmatter defining its name, description, tools, and model tier (Opus for deep reasoning, Sonnet for most tasks, Haiku for lightweight ops).
+
+> **Design skills** also activate automatically when editing HTML, CSS, SCSS, TSX, JSX, Vue, or Svelte files. See [UI/UX Design Intelligence](#7-uiux-design-intelligence) above.
 
 ### Development Agents
 
@@ -345,9 +442,9 @@ Sessions persist across restarts with full context recovery:
 
 ---
 
-## 📚 112 Workflow Skills
+## 📚 119 Workflow Skills
 
-Skills are **deep domain knowledge** that agents draw from — patterns, idioms, testing strategies, and best practices in Markdown with clear sections (When to Use, How It Works, Examples). They activate contextually — you never need to invoke them manually.
+Skills are **deep domain knowledge** that agents draw from — patterns, idioms, testing strategies, design systems, and best practices in Markdown with clear sections (When to Use, How It Works, Examples). They activate contextually — you never need to invoke them manually.
 
 <details>
 <summary><b>Languages & Frameworks (50+)</b></summary>
@@ -488,6 +585,21 @@ Skills are **deep domain knowledge** that agents draw from — patterns, idioms,
 | `django-verification` | Django security patterns |
 | `laravel-verification` | Laravel security best practices |
 | `springboot-verification` | Spring Security, JWT, CORS |
+
+</details>
+
+<details>
+<summary><b>UI/UX Design Intelligence (7)</b></summary>
+
+| Skill | Domain |
+|-------|--------|
+| `ui-ux-pro-max` | Core design engine — 67 styles, 96 palettes, 57 font pairings, BM25 search, 13 stack databases |
+| `design` | Logos (55 styles), corporate identity (50 deliverables), icons (15 styles), banners, social photos |
+| `design-system` | Three-layer token architecture, CSS variables, spacing/typography scales, slide generation |
+| `ui-styling` | shadcn/ui + Tailwind CSS, 65+ bundled fonts, canvas-based visual designs, dark mode |
+| `brand` | Brand voice, visual identity, messaging frameworks, asset management, style guides |
+| `slides` | Strategic HTML presentations, Chart.js data visualization, copywriting formulas |
+| `banner-design` | Multi-format banners, 22 art direction styles, platform-specific dimensions |
 
 </details>
 
@@ -641,9 +753,10 @@ Each rule set covers: **coding style**, **testing requirements**, **security pra
 | Capability | ECC | **Claude Fulcrum** |
 |-----------|-----|-------------------|
 | **Agents** | 21 | **25** |
-| **Skills** | ~80 | **112** |
+| **Skills** | ~80 | **119** (includes 7 UI/UX design intelligence skills) |
 | **Commands** | ~40 | **62** |
 | **Platforms** | 4 | **5** (+ full Copilot with 11 agents, 30 prompts) |
+| **Design Intelligence** | None | **7 skills** — 67 styles, 96 palettes, 57 font pairings, BM25 search |
 | **Language Rules** | 5 | **9** (each with 5 files: style, testing, security, patterns, hooks) |
 | **Memory** | Per-platform | **Unified hybrid** (FTS5 + vector + knowledge graph + 50+ API methods) |
 | **Search** | Keyword | **4-signal neural** (lexical + recency + structure + vector via RRF) |
@@ -715,7 +828,15 @@ Swarm architecture: Coordinator spawns one `worker_threads` worker per platform.
 ```
 claude-fulcrum/
 ├── agents/              # 25 specialized agents (YAML frontmatter + Markdown)
-├── skills/              # 112 workflow skills (domain knowledge modules)
+├── skills/              # 119 workflow skills (domain knowledge modules)
+│   ├── ui-ux-pro-max/  #   Design engine: 67 styles, BM25 search, 13 stack databases
+│   ├── design/          #   Logos, CIP, icons, banners, social photos
+│   ├── design-system/   #   Token architecture, CSS variables, slide generation
+│   ├── ui-styling/      #   shadcn/ui + Tailwind, 65+ fonts, canvas designs
+│   ├── brand/           #   Voice, identity, messaging, asset management
+│   ├── slides/          #   HTML presentations, Chart.js, copywriting
+│   ├── banner-design/   #   Multi-format banners, 22 art direction styles
+│   └── ...              #   112 more: languages, testing, security, AI, business
 ├── commands/            # 62 slash commands
 ├── hooks/               # hooks.json + 33 hook scripts across 7 lifecycle phases
 ├── rules/               # 9 language rule sets (5 files each)
@@ -983,7 +1104,7 @@ npm test                              # all 1,536 tests must pass
 | Metric | Count |
 |--------|------:|
 | Specialized Agents | **25** |
-| Workflow Skills | **112** |
+| Workflow Skills | **119** |
 | Slash Commands | **62** |
 | Language Rule Sets | **9** |
 | Rule Files (total) | **~50** |
@@ -1000,6 +1121,11 @@ npm test                              # all 1,536 tests must pass
 | Search Signals | **4** |
 | Entity Types | **12** |
 | Embedding Dimensions | **384** |
+| Design Styles | **67** |
+| Color Palettes | **96** |
+| Font Pairings | **57** |
+| UX Guidelines | **99** |
+| Tech Stack Databases | **13** |
 | Copilot Agents | **11** |
 | Copilot Prompts | **30** |
 | Install Profiles | **5** |
@@ -1017,7 +1143,7 @@ npm test                              # all 1,536 tests must pass
 
 <br>
 
-**Claude Fulcrum** — *where every AI coding tool becomes part of the same team.*
+**Claude Fulcrum** — *where every AI coding tool becomes part of the same team — from architecture to pixel-perfect design.*
 
 <br>
 
