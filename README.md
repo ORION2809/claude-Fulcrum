@@ -26,7 +26,7 @@ One harness. Every AI coding tool. Unified memory. Swarm orchestration. Neural s
 
 <br>
 
-[**Quick Start**](#-quick-start) · [**Architecture**](#-system-architecture) · [**Core Systems**](#-core-systems) · [**Agents**](#-agent-catalog) · [**Skills**](#-112-workflow-skills) · [**Commands**](#-62-slash-commands) · [**Guides**](#-guides) · [**Contributing**](#-contributing)
+[**Quick Start**](#-quick-start) · [**A Day with Fulcrum**](#-what-a-day-with-fulcrum-feels-like) · [**Architecture**](#-system-architecture) · [**Core Systems**](#-core-systems) · [**Design Intelligence**](#7-uiux-design-intelligence) · [**Agents**](#-agent-catalog) · [**Skills**](#-119-workflow-skills) · [**Performance**](#-performance) · [**Roadmap**](#-roadmap)
 
 ---
 
@@ -52,6 +52,22 @@ You need a design system  →  7 design skills generate tokens, palettes, and ty
 ```
 
 **The result:** Your AI tools stop being isolated autocomplete engines and start functioning as a coordinated engineering team with shared memory and institutional knowledge.
+
+---
+
+## ⚡ What a Day With Fulcrum Feels Like
+
+**9:00am** — You open Cursor. Before you type a word, Fulcrum has already loaded context from yesterday's Claude Code session. The auth bug you were debugging? The knowledge graph remembers the pattern. Copilot's first suggestion already reflects it.
+
+**10:30am** — You start a feature. `/plan` generates a phased implementation with risk analysis. Codex workers execute phases 2 and 3 in parallel worktrees while you handle phase 1 in Claude Code. Three agents working simultaneously on the same feature.
+
+**2:00pm** — A build breaks. Before you notice, the `build-error-resolver` agent has already diagnosed it. The quality loop tries three approaches. The third passes all 1,536 checks. It opens the fix for your review.
+
+**5:00pm** — You need a UI for the feature. Seven design skills activate automatically. BM25 search finds the right palette for your stack. Token architecture generated. shadcn/ui components scaffolded. The design system matches your brand.
+
+**5:30pm** — Session ends. Everything is stored. Tomorrow's tools already know what today accomplished.
+
+**This is not a future workflow. This is Fulcrum today.**
 
 ---
 
@@ -130,39 +146,46 @@ npx claude-fulcrum skill-install --list
 
 ## 🏗 System Architecture
 
-```
-┌─────────────────────────────────────────────────────────────────────┐
-│                        CLAUDE FULCRUM                                │
-│                                                                     │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────────────┐   │
-│  │ 25 Agents│  │119 Skills│  │62 Commands│  │ 9 Language Rules │   │
-│  └────┬─────┘  └────┬─────┘  └────┬─────┘  └───────┬──────────┘   │
-│       │              │             │                 │              │
-│  ┌────▼──────────────▼─────────────▼─────────────────▼──────────┐  │
-│  │              Orchestration Engine                             │  │
-│  │  ┌─────────────┐  ┌──────────────┐  ┌─────────────────────┐ │  │
-│  │  │ Swarm Coord  │  │ Task Router  │  │ Quality Enforcer    │ │  │
-│  │  │ (claude-flow)│  │              │  │ (lint+test+review)  │ │  │
-│  │  └─────────────┘  └──────────────┘  └─────────────────────┘ │  │
-│  └──────────────────────────┬───────────────────────────────────┘  │
-│                             │                                      │
-│  ┌──────────────────────────▼───────────────────────────────────┐  │
-│  │                    Memory Layer                               │  │
-│  │  ┌────────────┐  ┌──────────────┐  ┌──────────────────────┐ │  │
-│  │  │ SQLite +   │  │ Vector Search│  │ Knowledge Graph      │ │  │
-│  │  │ FTS5 Index │  │ (Embeddings) │  │ (Entity Extraction)  │ │  │
-│  │  └────────────┘  └──────────────┘  └──────────────────────┘ │  │
-│  │  4-Signal Hybrid Ranking: Lexical + Recency + Structure +   │  │
-│  │  Vector Similarity via Reciprocal Rank Fusion               │  │
-│  └──────────────────────────┬───────────────────────────────────┘  │
-│                             │                                      │
-│  ┌──────────────────────────▼───────────────────────────────────┐  │
-│  │                  Platform Adapters                            │  │
-│  │  ┌───────────┐ ┌─────────┐ ┌──────┐ ┌───────┐ ┌──────────┐ │  │
-│  │  │Claude Code│ │Codex CLI│ │Cursor│ │Copilot│ │ OpenCode │ │  │
-│  │  └───────────┘ └─────────┘ └──────┘ └───────┘ └──────────┘ │  │
-│  └──────────────────────────────────────────────────────────────┘  │
-└─────────────────────────────────────────────────────────────────────┘
+```mermaid
+graph TB
+    subgraph PLATFORMS["🖥️ Platform Layer"]
+        CC[Claude Code]
+        CX[Codex CLI]
+        CU[Cursor]
+        CP[Copilot]
+        OC[OpenCode]
+    end
+
+    subgraph ENGINE["⚙️ Orchestration Engine"]
+        SW["Swarm Coordinator<br/>claude-flow · 4 topologies"]
+        TR["Task Router<br/>3-tier model routing"]
+        QE["Quality Enforcer<br/>lint → test → review → fix"]
+    end
+
+    subgraph MEMORY["🧠 Memory Layer"]
+        SQ["SQLite + FTS5<br/>Canonical Store"]
+        VS["Vector Search<br/>384-dim ONNX"]
+        KG["Knowledge Graph<br/>12 entity types"]
+        RRF["RRF Fusion<br/>4-signal ranking"]
+    end
+
+    subgraph AGENTS["🤖 25 Agents"]
+        DEV["Development<br/>planner · architect · tdd"]
+        REV["Reviewers<br/>code · security · 6 languages"]
+        OPS["Operations<br/>chief-of-staff · loop-operator"]
+    end
+
+    subgraph DESIGN["🎨 Design Intelligence"]
+        UX["ui-ux-pro-max<br/>67 styles · BM25 search"]
+        DS["design-system<br/>3-layer tokens · CSS"]
+        UI["ui-styling · brand<br/>shadcn · Tailwind · 65+ fonts"]
+    end
+
+    CC & CX & CU & CP & OC --> ENGINE
+    ENGINE --> MEMORY
+    ENGINE --> AGENTS
+    ENGINE --> DESIGN
+    MEMORY --> CC & CX & CU & CP & OC
 ```
 
 **Every platform reads from and writes to the same shared context:**
@@ -302,31 +325,31 @@ Sessions persist across restarts with full context recovery:
 
 A complete design intelligence suite that transforms any AI coding tool into a full-stack design partner. Every design decision — from color palettes to component tokens to responsive layouts — is backed by searchable databases with **BM25-ranked retrieval** and stack-specific guidelines.
 
-```
-┌─────────────────────────────────────────────────────────────────────┐
-│                    UI/UX DESIGN INTELLIGENCE                        │
-│                                                                     │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────────────────┐  │
-│  │ ui-ux-pro-max│  │    design    │  │      design-system       │  │
-│  │ Core Engine  │  │ Logos · CIP  │  │  Tokens · Slides · CSS   │  │
-│  │ 67 styles    │  │ Icons · SVG  │  │  Primitive → Semantic    │  │
-│  │ BM25 search  │  │ 55 logo      │  │  → Component layers      │  │
-│  │ 13 stacks    │  │ styles       │  │                          │  │
-│  └──────┬───────┘  └──────┬───────┘  └────────────┬─────────────┘  │
-│         │                 │                        │               │
-│  ┌──────▼───────┐  ┌──────▼───────┐  ┌────────────▼─────────────┐  │
-│  │   ui-styling │  │    brand     │  │         slides           │  │
-│  │ shadcn/ui +  │  │ Voice · Logo │  │  HTML presentations      │  │
-│  │ Tailwind CSS │  │ Guidelines   │  │  Chart.js · Copywriting  │  │
-│  │ 65+ fonts    │  │ Asset mgmt   │  │  Layout strategies       │  │
-│  └──────────────┘  └──────┬───────┘  └──────────────────────────┘  │
-│                           │                                        │
-│                    ┌──────▼───────┐                                 │
-│                    │banner-design │                                 │
-│                    │ 22 art styles│                                 │
-│                    │ Multi-format │                                 │
-│                    └──────────────┘                                 │
-└─────────────────────────────────────────────────────────────────────┘
+```mermaid
+graph LR
+    subgraph CORE["🔍 Core Engine"]
+        UX["ui-ux-pro-max<br/>67 styles · 96 palettes<br/>BM25 search · 13 stacks"]
+    end
+
+    subgraph VISUAL["🎨 Visual Design"]
+        D["design<br/>55 logo styles<br/>50 CIP deliverables<br/>15 icon styles"]
+        B["banner-design<br/>22 art directions<br/>multi-format"]
+    end
+
+    subgraph SYSTEM["⚙️ Systems"]
+        DS["design-system<br/>3-layer tokens<br/>CSS variables"]
+        ST["ui-styling<br/>shadcn/ui + Tailwind<br/>65+ fonts"]
+    end
+
+    subgraph CONTENT["📝 Content"]
+        BR["brand<br/>voice · identity<br/>asset management"]
+        SL["slides<br/>Chart.js · HTML<br/>copywriting"]
+    end
+
+    UX --> D & DS & ST
+    D --> B
+    DS --> ST
+    BR --> SL
 ```
 
 #### The 7 Design Skills
@@ -388,6 +411,39 @@ npx claude-fulcrum skill-swarm --skills ui-ux-pro-max,design,design-system,ui-st
 
 ---
 
+## 🧬 The Institutional Memory Problem
+
+Every developer has experienced this:
+
+- New team member joins → weeks to ramp up on codebase patterns
+- You return to a project after 3 months → can't remember why decisions were made
+- Different team members solve the same problem differently because nobody shared the pattern
+- Your AI tools give generic suggestions that ignore months of project-specific learning
+
+**This is the institutional memory problem.** Every codebase has accumulated wisdom — patterns that work, decisions that were made, approaches that failed — but it lives only in people's heads and scattered comments.
+
+Fulcrum's knowledge graph is a persistent institutional memory layer:
+
+```
+auth.ts → decided-in → "Session 2024-01-15: Chose JWT over sessions
+                         because of horizontal scaling requirements"
+
+jwt-service.ts → evolved-from → "token-service.ts (deprecated) —
+                                  refactored after CVE-2024-1234"
+
+login-endpoint → tested-by → auth.spec.ts
+               → depends-on → jwt-service.ts
+               → authored-by → "Claude Code session 2024-02-03"
+```
+
+When you ask "why was this decision made?" — Fulcrum already knows.
+When a new team member asks "how does auth work?" — the graph traces it.
+When a bug appears — the evolution history shows what changed.
+
+**The codebase remembers. So you don't have to.**
+
+---
+
 ## 🤖 Agent Catalog
 
 25 specialized agents that activate **automatically** based on context — no manual invocation needed. Each agent is a Markdown file with YAML frontmatter defining its name, description, tools, and model tier (Opus for deep reasoning, Sonnet for most tasks, Haiku for lightweight ops).
@@ -439,6 +495,55 @@ npx claude-fulcrum skill-swarm --skills ui-ux-pro-max,design,design-system,ui-st
 | `loop-operator` | Sonnet | Autonomous agent loop monitoring, stall detection & intervention |
 | `harness-optimizer` | Sonnet | Harness configuration tuning (cost, reliability, throughput) |
 | `docs-lookup` | Sonnet | Live documentation lookup via Context7 MCP (not training data) |
+
+---
+
+## 🧭 Agent Decision Guide
+
+Not sure which agent you need? Fulcrum routes automatically, but here's how it decides:
+
+```
+What are you doing?
+│
+├── Planning or designing a system?
+│   ├── New feature (multi-file) ────────────────→ planner
+│   └── Architectural decision ──────────────────→ architect
+│
+├── Writing code?
+│   ├── New feature/bug fix ─────────────────────→ tdd-guide
+│   ├── Just finished writing ───────────────────→ code-reviewer (auto)
+│   └── Security-sensitive code ─────────────────→ security-reviewer (auto)
+│
+├── Something broke?
+│   ├── TypeScript/JS build error ───────────────→ build-error-resolver
+│   ├── Go build error ──────────────────────────→ go-build-resolver
+│   ├── Kotlin/Gradle error ─────────────────────→ kotlin-build-resolver
+│   ├── Java/Maven error ────────────────────────→ java-build-resolver
+│   ├── Rust borrow checker ─────────────────────→ rust-build-resolver
+│   └── C++ / CMake error ──────────────────────→ cpp-build-resolver
+│
+├── Reviewing code?
+│   ├── TypeScript/JavaScript ───────────────────→ code-reviewer
+│   ├── Python/Django ───────────────────────────→ python-reviewer
+│   ├── Go ──────────────────────────────────────→ go-reviewer
+│   ├── Kotlin/Android ──────────────────────────→ kotlin-reviewer
+│   ├── Java/Spring Boot ────────────────────────→ java-reviewer
+│   ├── Rust ────────────────────────────────────→ rust-reviewer
+│   └── C++ ─────────────────────────────────────→ cpp-reviewer
+│
+├── Working on UI/design?
+│   ├── Need a design system ────────────────────→ design-system skill
+│   ├── Choosing colors/fonts ───────────────────→ ui-ux-pro-max skill
+│   ├── Building components ─────────────────────→ ui-styling skill
+│   ├── Brand identity ──────────────────────────→ brand skill
+│   └── Presentations ──────────────────────────→ slides skill
+│
+└── Operations?
+    ├── Database schema/queries ─────────────────→ database-reviewer
+    ├── Communication triage ────────────────────→ chief-of-staff
+    ├── Autonomous loops ────────────────────────→ loop-operator
+    └── Documentation ───────────────────────────→ doc-updater
+```
 
 ---
 
@@ -748,6 +853,23 @@ Each rule set covers: **coding style**, **testing requirements**, **security pra
 
 ---
 
+## 📈 Performance
+
+| Operation | Time | Notes |
+|-----------|------|-------|
+| Memory search (4-signal) | <50ms | FTS5 + vector + graph parallel |
+| Session restore | <200ms | Full context from last session |
+| Quality loop (pass) | <30s | Average first-pass on clean code |
+| Agent activation | <100ms | Context-based auto-selection |
+| Embedding generation | <3ms | ONNX local, no API call |
+| Hook execution (full cycle) | <500ms | 33 hooks, all async |
+| Skill install (all platforms) | <10s | Sequential mode |
+| Skill install (swarm mode) | <3s | 6 parallel workers |
+
+*Benchmarked on MacBook M3, Node.js 20, 10k observation database*
+
+---
+
 ## ⚖️ How Fulcrum Compares
 
 | Capability | ECC | **Claude Fulcrum** |
@@ -764,6 +886,7 @@ Each rule set covers: **coding style**, **testing requirements**, **security pra
 | **Orchestration** | Commands only | **Full swarm** (claude-flow, 4 topologies, 3-tier model routing) |
 | **Quality Loop** | Partial | **Automated** (scorer + confidence gate + cross-model auditor + policy validators) |
 | **Knowledge Graph** | No | **Yes** (12 entity types, 5 relationship types, multi-hop reasoning) |
+| **Institutional Memory** | No | **Yes** — decisions, evolution history, author tracing |
 | **Hooks** | Few | **33 hooks** across 7 lifecycle phases with flag-based profiles |
 | **Tests** | Some | **1,536 passing** across 76 test files |
 | **Schemas** | None | **13 JSON Schemas** validated via Ajv at runtime |
@@ -772,14 +895,29 @@ Each rule set covers: **coding style**, **testing requirements**, **security pra
 
 ---
 
+## 🌊 Built for How AI Development Works in 2026
+
+The four directions dominating AI tooling in 2026:
+
+| Direction | What It Means | How Fulcrum Addresses It |
+|-----------|--------------|--------------------------|
+| **Agentic execution** | AI that acts autonomously, not just suggests | 25 auto-activating agents, quality loop, autonomous loops |
+| **Workflow orchestration** | Coordinating multiple AI tools and models | 5-platform unified layer, swarm coordination, 3-tier routing |
+| **Data and context** | AI that remembers and learns from your history | 4-signal hybrid memory, knowledge graph, institutional memory |
+| **Multimodal generation** | Code + design + content in one flow | 7 design skills, BM25 search, 96 palettes, 57 font pairings |
+
+Fulcrum is the only developer harness that addresses all four simultaneously.
+
+---
+
 ## 🖥️ Supported Platforms
 
 | Platform | Config Location | Components | Best For |
 |----------|----------------|------------|----------|
-| **Claude Code** | `~/.claude/` | Full 25 agents, 112 skills, 9 rulesets, 33 hooks | Deep workflows, TDD, planning, security |
+| **Claude Code** | `~/.claude/` | Full 25 agents, 119 skills, 9 rulesets, 33 hooks | Deep workflows, TDD, planning, security |
 | **Codex CLI** | `~/.codex/` | Core agents + rules | Fast parallel execution, batch tasks |
 | **Cursor** | `.cursor/` | 11 agents, full rules | Visual IDE, real-time coding |
-| **GitHub Copilot** | `.github/` | 11 agents, 30 prompts, 7 language instructions | Inline completions, chat |
+| **GitHub Copilot** | `.github/` | 11 agents, 30 prompts, 8 language instructions | Inline completions, chat |
 | **OpenCode** | `.opencode/` | Core agents + skills | Open-source, extensible |
 
 **Shared context:** All platforms read from and write to the same memory layer. Patterns learned in Claude Code are available in Copilot completions. Plans created in one tool execute in another.
@@ -818,7 +956,9 @@ Swarm architecture: Coordinator spawns one `worker_threads` worker per platform.
 | [**Longform Guide**](docs/the-longform-guide.md) | Token optimization, memory persistence, evals |
 | [**Security Guide**](docs/the-security-guide.md) | Scanning, secret management, OWASP patterns |
 | [**Copilot Integration**](docs/GITHUB_COPILOT_INTEGRATION.md) | GitHub Copilot agent, prompt, and instruction setup |
-| [**Selective Install Design**](docs/SELECTIVE-INSTALL-DESIGN.md) | Profile-based installation (core, developer, security, research, full) || [**Skill Installer CLI**](#cross-platform-skill-installer) | Install any/all skills to any/all platforms (sequential + swarm) || [**Session Adapter Contract**](docs/SESSION-ADAPTER-CONTRACT.md) | Canonical session schema and adapter protocol |
+| [**Selective Install Design**](docs/SELECTIVE-INSTALL-DESIGN.md) | Profile-based installation (core, developer, security, research, full) |
+| [**Skill Installer CLI**](#cross-platform-skill-installer) | Install any/all skills to any/all platforms (sequential + swarm) |
+| [**Session Adapter Contract**](docs/SESSION-ADAPTER-CONTRACT.md) | Canonical session schema and adapter protocol |
 | [**Troubleshooting**](TROUBLESHOOTING.md) | Common issues and fixes |
 
 ---
@@ -867,7 +1007,7 @@ claude-fulcrum/
 ├── docs/                # Comprehensive guides + ARCHITECTURE.md
 │   ├── ARCHITECTURE.md  #   Full technical reference (16 sections)
 │   └── ...              #   Cross-platform, security, playbooks, i18n (ja, ko, zh)
-├── .github/             # GitHub + Copilot config (11 agents, 30 prompts, 7 instructions)
+├── .github/             # GitHub + Copilot config (11 agents, 30 prompts, 8 instructions)
 ├── .codex/              # Codex CLI config
 ├── .cursor/             # Cursor config
 ├── .opencode/           # OpenCode config
@@ -1070,6 +1210,33 @@ SessionEnd hooks fire (2)
 
 ---
 
+## 🗺️ Roadmap
+
+### Now — v3.1 (Current)
+- ✅ 4-signal hybrid memory (FTS5 + vector + graph + recency)
+- ✅ 25 agents across 6 platforms
+- ✅ 7 UI/UX design intelligence skills with BM25 search
+- ✅ 33 lifecycle hooks across 7 phases
+- ✅ 119 skills, 62 commands, 9 language rulesets
+- ✅ 1,536 tests passing
+- ✅ Cross-platform skill installer with swarm mode
+
+### Next — v3.2 (Q2 2026)
+- 🔄 Agent-lightning RL training pipeline (quality loop data → reward signals → model improvement)
+- 🔄 GitHub Actions + GCP training orchestration
+- 🔄 Voice command interface for all slash commands
+- 🔄 Real-time collaboration — share memory namespaces across team members
+
+### Future — v4.0
+- 🔮 Self-improving agents (models fine-tuned on your codebase)
+- 🔮 Multimodal context — design screenshots → component code
+- 🔮 Team memory — shared institutional knowledge across developers
+- 🔮 IDE-native dashboard (VS Code extension)
+
+> Star this repo to follow progress. Open an issue to influence the roadmap.
+
+---
+
 ## 🤝 Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for details.
@@ -1095,7 +1262,7 @@ npm test                              # all 1,536 tests must pass
 
 ## 🏷️ Topics
 
-`claude-code` · `claude-code-agents` · `ai-dev-workflow` · `claude-code-setup` · `codex-cli` · `cursor-ai` · `github-copilot` · `opencode` · `claude-flow` · `ai-agents` · `mcp-server` · `developer-tools` · `tdd` · `code-review` · `multi-agent` · `agent-orchestration` · `vector-search` · `knowledge-graph` · `swarm-intelligence`
+`claude-code` · `claude-code-agents` · `ai-dev-workflow` · `claude-code-setup` · `codex-cli` · `cursor-ai` · `github-copilot` · `opencode` · `claude-flow` · `ai-agents` · `mcp-server` · `developer-tools` · `tdd` · `code-review` · `multi-agent` · `agent-orchestration` · `vector-search` · `knowledge-graph` · `swarm-intelligence` · `design-system` · `ui-ux`
 
 ---
 
@@ -1133,6 +1300,12 @@ npm test                              # all 1,536 tests must pass
 
 ---
 
+## ⭐ Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=ORION2809/claude-Fulcrum&type=Date)](https://star-history.com/#ORION2809/claude-Fulcrum&Date)
+
+---
+
 ## 📜 License
 
 [MIT](LICENSE) — use it, fork it, ship it.
@@ -1144,6 +1317,8 @@ npm test                              # all 1,536 tests must pass
 <br>
 
 **Claude Fulcrum** — *where every AI coding tool becomes part of the same team — from architecture to pixel-perfect design.*
+
+*The codebase remembers. So you don't have to.*
 
 <br>
 
