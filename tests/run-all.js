@@ -45,16 +45,16 @@ function discoverTestFiles() {
 
 const testFiles = discoverTestFiles();
 
-const BOX_W = 58; // inner width between â•‘ delimiters
-const boxLine = s => `â•‘${s.padEnd(BOX_W)}â•‘`;
+const BOX_W = 58;
+const boxLine = value => `|${String(value).padEnd(BOX_W)}|`;
 
-console.log('â•”' + 'â•'.repeat(BOX_W) + 'â•—');
+console.log('+' + '-'.repeat(BOX_W) + '+');
 console.log(boxLine('           Claude Fulcrum - Test Suite'));
-console.log('â•š' + 'â•'.repeat(BOX_W) + 'â•');
+console.log('+' + '-'.repeat(BOX_W) + '+');
 console.log();
 
 if (testFiles.length === 0) {
-  console.log(`âœ— No test files matched ${TEST_GLOB}`);
+  console.log(`x No test files matched ${TEST_GLOB}`);
   process.exit(1);
 }
 
@@ -67,52 +67,58 @@ for (const testFile of testFiles) {
   const displayPath = testFile.split(path.sep).join('/');
 
   if (!fs.existsSync(testPath)) {
-    console.log(`âš  Skipping ${displayPath} (file not found)`);
+    console.log(`! Skipping ${displayPath} (file not found)`);
     continue;
   }
 
-  console.log(`\nâ”â”â” Running ${displayPath} â”â”â”`);
+  console.log(`\n--- Running ${displayPath} ---`);
 
   const result = spawnSync('node', [testPath], {
     encoding: 'utf8',
-    stdio: ['pipe', 'pipe', 'pipe']
+    stdio: ['pipe', 'pipe', 'pipe'],
   });
 
   const stdout = result.stdout || '';
   const stderr = result.stderr || '';
 
-  // Show both stdout and stderr so hook warnings are visible
-  if (stdout) console.log(stdout);
-  if (stderr) console.log(stderr);
+  if (stdout) {
+    console.log(stdout);
+  }
+  if (stderr) {
+    console.log(stderr);
+  }
 
-  // Parse results from combined output
   const combined = stdout + stderr;
   const passedMatch = combined.match(/Passed:\s*(\d+)/);
   const failedMatch = combined.match(/Failed:\s*(\d+)/);
 
-  if (passedMatch) totalPassed += parseInt(passedMatch[1], 10);
-  if (failedMatch) totalFailed += parseInt(failedMatch[1], 10);
+  if (passedMatch) {
+    totalPassed += parseInt(passedMatch[1], 10);
+  }
+  if (failedMatch) {
+    totalFailed += parseInt(failedMatch[1], 10);
+  }
 
   if (result.error) {
-    console.log(`âœ— ${displayPath} failed to start: ${result.error.message}`);
+    console.log(`x ${displayPath} failed to start: ${result.error.message}`);
     totalFailed += failedMatch ? 0 : 1;
     continue;
   }
 
   if (result.status !== 0) {
-    console.log(`âœ— ${displayPath} exited with status ${result.status}`);
+    console.log(`x ${displayPath} exited with status ${result.status}`);
     totalFailed += failedMatch ? 0 : 1;
   }
 }
 
 totalTests = totalPassed + totalFailed;
 
-console.log('\nâ•”' + 'â•'.repeat(BOX_W) + 'â•—');
+console.log('\n+' + '-'.repeat(BOX_W) + '+');
 console.log(boxLine('                     Final Results'));
-console.log('â• ' + 'â•'.repeat(BOX_W) + 'â•£');
+console.log('+' + '-'.repeat(BOX_W) + '+');
 console.log(boxLine(`  Total Tests: ${String(totalTests).padStart(4)}`));
-console.log(boxLine(`  Passed:      ${String(totalPassed).padStart(4)}  âœ“`));
-console.log(boxLine(`  Failed:      ${String(totalFailed).padStart(4)}  ${totalFailed > 0 ? 'âœ—' : ' '}`));
-console.log('â•š' + 'â•'.repeat(BOX_W) + 'â•');
+console.log(boxLine(`  Passed:      ${String(totalPassed).padStart(4)}  ok`));
+console.log(boxLine(`  Failed:      ${String(totalFailed).padStart(4)}  ${totalFailed > 0 ? 'x' : ' '}`));
+console.log('+' + '-'.repeat(BOX_W) + '+');
 
 process.exit(totalFailed > 0 ? 1 : 0);

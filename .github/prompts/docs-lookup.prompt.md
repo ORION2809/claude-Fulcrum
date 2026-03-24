@@ -1,6 +1,6 @@
 ---
 description: "Look up current documentation for a library or framework via Context7 MCP. Returns accurate, up-to-date answers with code examples."
-mode: "agent"
+agent: "agent"
 ---
 
 # Documentation Lookup

@@ -41,6 +41,7 @@ function runTests() {
     assert.ok(targets.includes('antigravity'), 'Should include antigravity target');
     assert.ok(targets.includes('codex'), 'Should include codex target');
     assert.ok(targets.includes('opencode'), 'Should include opencode target');
+    assert.ok(targets.includes('copilot'), 'Should include copilot target');
   })) passed++; else failed++;
 
   if (test('resolves cursor adapter root and install-state path from project root', () => {
@@ -187,6 +188,41 @@ function runTests() {
         && operation.destinationPath === path.join(projectRoot, '.agent', 'rules', 'common-coding-style.md')
       )),
       'Should flatten common rules for antigravity'
+    );
+  })) passed++; else failed++;
+
+  if (test('plans copilot installs under project .claude with optional .github remap', () => {
+    const repoRoot = path.join(__dirname, '..', '..');
+    const projectRoot = '/workspace/app';
+
+    const plan = planInstallTargetScaffold({
+      target: 'copilot',
+      repoRoot,
+      projectRoot,
+      modules: [
+        {
+          id: 'ui-design',
+          paths: ['skills/ui-styling', '.github'],
+        },
+      ],
+    });
+
+    assert.strictEqual(plan.adapter.id, 'copilot-project');
+    assert.strictEqual(plan.targetRoot, path.join(projectRoot, '.claude'));
+    assert.strictEqual(plan.installStatePath, path.join(projectRoot, '.claude', 'ecc-install-state.json'));
+    assert.ok(
+      plan.operations.some(operation => (
+        operation.sourceRelativePath === 'skills/ui-styling'
+        && operation.destinationPath === path.join(projectRoot, '.claude', 'skills', 'ui-styling')
+      )),
+      'Should install skills into project .claude/skills'
+    );
+    assert.ok(
+      plan.operations.some(operation => (
+        operation.sourceRelativePath === '.github'
+        && operation.destinationPath === path.join(projectRoot, '.github')
+      )),
+      'Should remap .github scaffold to project .github'
     );
   })) passed++; else failed++;
 

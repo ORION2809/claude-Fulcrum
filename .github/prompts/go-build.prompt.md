@@ -1,6 +1,6 @@
 ---
 description: "Fix Go build errors: go build, go vet, and linter failures. Parse errors, fix one at a time, verify after each fix."
-mode: "agent"
+agent: "agent"
 ---
 
 # Go Build Fix

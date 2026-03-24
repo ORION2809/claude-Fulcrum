@@ -1,6 +1,6 @@
 ---
 description: "Extract reusable patterns from the current session — error resolutions, debugging techniques, workarounds, and project-specific conventions."
-mode: "agent"
+agent: "agent"
 ---
 
 # Learn — Extract Reusable Patterns

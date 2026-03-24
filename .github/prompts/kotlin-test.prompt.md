@@ -1,6 +1,6 @@
 ---
 description: "Generate and run Kotlin tests: Kotest, MockK, coroutine testing, and Kover coverage."
-mode: "agent"
+agent: "agent"
 ---
 
 # Kotlin Test

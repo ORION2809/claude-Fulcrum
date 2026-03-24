@@ -1,6 +1,6 @@
 ---
 description: "Review Java/Spring Boot code for layered architecture, JPA patterns, security, and concurrency."
-mode: "agent"
+agent: "agent"
 ---
 
 # Java Review

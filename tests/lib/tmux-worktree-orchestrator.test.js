@@ -9,6 +9,8 @@ const {
   slugify,
   renderTemplate,
   buildOrchestrationPlan,
+  buildAttemptLogPath,
+  buildLoggedLaunchCommand,
   executePlan,
   materializePlan,
   normalizeSeedPaths,
@@ -71,6 +73,10 @@ test('buildOrchestrationPlan creates worktrees, branches, and tmux commands', ()
   assert.strictEqual(plan.workerPlans[0].branchName, 'orchestrator-skill-audit-docs-a');
   assert.strictEqual(plan.workerPlans[1].branchName, 'orchestrator-skill-audit-docs-b');
   assert.strictEqual(plan.workerPlans[0].attemptId, 'attempt-skill-audit-docs-a');
+  assert.ok(
+    plan.workerPlans[0].logFilePath.endsWith(path.join('.orchestration', 'attempts', 'attempt-skill-audit-docs-a', 'attempt.log')),
+    'Should allocate a per-attempt log file in the shared orchestration area'
+  );
   assert.deepStrictEqual(
     plan.workerPlans[0].gitArgs.slice(0, 4),
     ['worktree', 'add', '-b', 'orchestrator-skill-audit-docs-a'],
@@ -103,6 +109,29 @@ test('buildOrchestrationPlan creates worktrees, branches, and tmux commands', ()
   assert.ok(
     plan.tmuxCommands.some(command => command.args.includes('select-layout')),
     'Should include tiled layout command'
+  );
+  assert.ok(
+    plan.tmuxCommands.some(command => command.args.some(arg => arg.includes('tee -a'))),
+    'Launch command should stream stdout/stderr into the attempt log'
+  );
+});
+
+test('buildAttemptLogPath creates the shared attempt-log location', () => {
+  assert.strictEqual(
+    buildAttemptLogPath('/tmp/ecc', 'attempt-alpha'),
+    path.join('/tmp/ecc', '.orchestration', 'attempts', 'attempt-alpha', 'attempt.log')
+  );
+});
+
+test('buildLoggedLaunchCommand wraps worker launch with tee logging', () => {
+  const workerPlan = {
+    launchCommand: 'codex exec --task-file task.md',
+    logFilePath: '/tmp/ecc/.orchestration/attempts/attempt-alpha/attempt.log'
+  };
+
+  assert.strictEqual(
+    buildLoggedLaunchCommand(workerPlan),
+    "(codex exec --task-file task.md) 2>&1 | tee -a '/tmp/ecc/.orchestration/attempts/attempt-alpha/attempt.log'"
   );
 });
 
@@ -234,6 +263,10 @@ test('materializePlan keeps worker instructions inside the worktree boundary', (
       'Task file should include attempt metadata'
     );
     assert.ok(
+      taskFile.includes('Launcher log file'),
+      'Task file should expose the shared attempt log path'
+    );
+    assert.ok(
       taskFile.includes('Do not spawn subagents or external agents for this task.'),
       'Task file should keep nested workers single-session'
     );
@@ -244,6 +277,10 @@ test('materializePlan keeps worker instructions inside the worktree boundary', (
     assert.ok(
       !taskFile.includes('Update `'),
       'Task file should not instruct the nested worker to update orchestration status files'
+    );
+    assert.ok(
+      fs.existsSync(plan.workerPlans[0].logFilePath),
+      'Materialization should create the attempt log artifact for live tailing'
     );
   } finally {
     fs.rmSync(tempRoot, { recursive: true, force: true });

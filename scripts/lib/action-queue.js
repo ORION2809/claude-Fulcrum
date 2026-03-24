@@ -11,10 +11,8 @@
  * - reset: discard selected processes, optionally reset git state
  */
 
-const path = require('path');
-const fs = require('fs');
 const { appendGovernanceEvent } = require('../lib/governance-log');
-const { loadControlPlane, getRepoRoot, createStableId } = require('../lib/fulcrum-control');
+const { getRepoRoot, createStableId } = require('../lib/fulcrum-control');
 
 const ACTION_STATUS = Object.freeze({
   QUEUED: 'queued',

@@ -1,6 +1,6 @@
 ---
 description: "Review Rust code for ownership correctness, error handling, unsafe usage, and idiomatic patterns."
-mode: "agent"
+agent: "agent"
 ---
 
 # Rust Review

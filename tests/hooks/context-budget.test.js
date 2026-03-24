@@ -7,8 +7,6 @@ const {
   computeBudgetStatus,
   buildRecommendations,
   DEFAULT_MAX_TOKENS,
-  WARNING_THRESHOLD,
-  CRITICAL_THRESHOLD,
 } = require('../../scripts/hooks/context-budget');
 
 function test(name, fn) {

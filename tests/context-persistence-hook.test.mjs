@@ -36,8 +36,6 @@ const {
 
 // Test fixtures
 const TMP_DIR = join(__dirname, '.tmp-ctx-test');
-const TMP_DB = join(TMP_DIR, 'test-archive.db');
-const TMP_ARCHIVE = join(TMP_DIR, 'test-archive.json');
 const TMP_TRANSCRIPT = join(TMP_DIR, 'test-transcript.jsonl');
 
 function makeUserMsg(text) {

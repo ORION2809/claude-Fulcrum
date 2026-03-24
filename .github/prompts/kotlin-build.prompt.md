@@ -1,6 +1,6 @@
 ---
 description: "Fix Kotlin/Gradle build errors: compilation, Gradle sync, and dependency issues. Parse errors, fix one at a time."
-mode: "agent"
+agent: "agent"
 ---
 
 # Kotlin Build Fix

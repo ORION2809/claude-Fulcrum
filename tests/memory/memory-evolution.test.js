@@ -4,9 +4,12 @@ const assert = require('assert');
 
 const {
   EVOLUTION_ACTIONS,
+  MEMORY_EDGE_TYPES,
+  inferMemoryEdgeType,
   isStale,
   computeRelevanceScore,
   suggestEvolutionActions,
+  buildEvolutionLinkPlan,
   identifyMergeCandidates,
   planConsolidation,
   cloneForAttempt,
@@ -75,17 +78,101 @@ if (test('computeRelevanceScore is higher for accessed notes', () => {
   assert.ok(computeRelevanceScore(accessed) > computeRelevanceScore(unaccessed));
 })) passed += 1; else failed += 1;
 
-if (test('suggestEvolutionActions finds STRENGTHEN for keyword overlap', () => {
-  const note = { keywords: ['react', 'hooks', 'state'] };
-  const neighbors = [{ id: 'n1', keywords: ['react', 'hooks', 'component'] }];
+if (test('suggestEvolutionActions finds typed PREVENTS links for fix and issue notes', () => {
+  const note = {
+    title: 'sanitize token leak',
+    summary: 'guard secrets and prevent exposure',
+    keywords: ['sanitize', 'guard', 'token', 'leak'],
+    tags: ['security'],
+  };
+  const neighbors = [{
+    id: 'n1',
+    title: 'token leak bug',
+    summary: 'bug causes secret exposure',
+    keywords: ['guard', 'token', 'bug'],
+    tags: ['security'],
+  }];
   const actions = suggestEvolutionActions(note, neighbors);
-  assert.ok(actions.some(a => a.action === EVOLUTION_ACTIONS.STRENGTHEN));
+  const action = actions.find(a => a.action === EVOLUTION_ACTIONS.STRENGTHEN);
+  assert.ok(action);
+  assert.strictEqual(action.suggestedEdgeType, MEMORY_EDGE_TYPES.PREVENTS);
+  assert.ok(action.confidence >= 0.8);
+  assert.ok(Array.isArray(action.linkMetadata.sharedKeywords));
+  assert.ok(action.linkMetadata.sharedKeywords.length >= 2);
 })) passed += 1; else failed += 1;
 
 if (test('suggestEvolutionActions returns empty for no neighbors', () => {
   const note = { keywords: ['react'] };
   assert.deepStrictEqual(suggestEvolutionActions(note, []), []);
   assert.deepStrictEqual(suggestEvolutionActions(note, null), []);
+})) passed += 1; else failed += 1;
+
+if (test('buildEvolutionLinkPlan surfaces transitive neighbors through existing graph links', () => {
+  const note = {
+    id: 'note-current',
+    sessionId: 'session-1',
+    category: 'observation',
+    tags: ['memory', 'retrieval'],
+    keywords: ['memory', 'search', 'timeline'],
+  };
+  const neighbors = [
+    {
+      id: 'note-direct',
+      sessionId: 'session-1',
+      category: 'observation',
+      tags: ['memory'],
+      keywords: ['memory', 'search', 'graph'],
+    },
+    {
+      id: 'note-transitive',
+      sessionId: 'session-1',
+      category: 'reference',
+      tags: ['timeline'],
+      keywords: ['timeline', 'history', 'sequence'],
+    },
+  ];
+  const linksByNoteId = new Map([
+    ['note-direct', [{
+      fromNoteId: 'note-direct',
+      toNoteId: 'note-transitive',
+      linkType: MEMORY_EDGE_TYPES.DEPENDS_ON,
+    }]],
+  ]);
+
+  const plan = buildEvolutionLinkPlan(note, neighbors, {
+    maxLinks: 3,
+    linksByNoteId,
+  });
+
+  assert.ok(plan.some(entry => entry.targetId === 'note-direct'));
+  assert.ok(plan.some(entry => entry.targetId === 'note-transitive'));
+  const transitive = plan.find(entry => entry.targetId === 'note-transitive');
+  assert.strictEqual(transitive.traversalDepth, 2);
+  assert.strictEqual(transitive.via, 'note-direct');
+  assert.ok(transitive.metadata.transitiveVia);
+})) passed += 1; else failed += 1;
+
+if (test('inferMemoryEdgeType prefers evolved_from for same-category follow-on notes', () => {
+  const inference = inferMemoryEdgeType(
+    {
+      category: 'observation',
+      sessionId: 'session-a',
+      title: 'Refactor session start',
+      summary: 'follow-up refinement for memory retrieval',
+      keywords: ['refactor', 'follow-up', 'memory'],
+    },
+    {
+      category: 'observation',
+      sessionId: 'session-a',
+      title: 'Session start capture',
+      summary: 'initial memory retrieval behavior',
+      keywords: ['memory', 'retrieval', 'update'],
+    }
+  );
+
+  assert.strictEqual(inference.edgeType, MEMORY_EDGE_TYPES.EVOLVED_FROM);
+  assert.ok(inference.confidence >= 0.75);
+  assert.ok(inference.signals.sameSession);
 })) passed += 1; else failed += 1;
 
 if (test('identifyMergeCandidates groups by category+keywords', () => {
@@ -141,12 +228,17 @@ if (test('applyEvolutionAction STRENGTHEN adds link', () => {
   const action = {
     action: EVOLUTION_ACTIONS.STRENGTHEN,
     targetId: 'n2',
-    suggestedEdgeType: 'related_to',
+    suggestedEdgeType: MEMORY_EDGE_TYPES.DEPENDS_ON,
     reason: 'test',
+    confidence: 0.91,
+    linkMetadata: { sharedKeywords: ['memory', 'retrieval'] },
   };
   const updated = applyEvolutionAction(note, action);
   assert.strictEqual(updated.links.length, 1);
   assert.strictEqual(updated.links[0].targetId, 'n2');
+  assert.strictEqual(updated.links[0].edgeType, MEMORY_EDGE_TYPES.DEPENDS_ON);
+  assert.strictEqual(updated.links[0].confidence, 0.91);
+  assert.deepStrictEqual(updated.links[0].metadata.sharedKeywords, ['memory', 'retrieval']);
   assert.ok(updated.evolutionHistory.length > 0);
 })) passed += 1; else failed += 1;
 

@@ -1,7 +1,6 @@
 ---
 name: design
 description: "Comprehensive design skill covering logo generation (55 styles), corporate identity programs (50 deliverables), HTML presentations, banner design, icon design (15 styles), and social photos across major platforms."
-origin: claude-fulcrum
 ---
 
 # Design

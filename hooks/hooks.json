@@ -152,6 +152,21 @@
           }
         ],
         "description": "Record a normalized session_start event in the SQLite control plane"
+      },
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": [
+              "node",
+              "${CLAUDE_PLUGIN_ROOT}/scripts/hooks/session-memory-init.js"
+            ],
+            "async": true,
+            "timeout": 15
+          }
+        ],
+        "description": "Load recent memories and project context on session start (memsearch warm init)"
       }
     ],
     "UserPromptSubmit": [
@@ -198,6 +213,12 @@
       {
         "matcher": "Edit|Write|MultiEdit",
         "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/scripts/hooks/run-with-flags.js\" \"post:write-time-enforce\" \"scripts/hooks/write-time-enforce.js\" \"standard,strict\"",
+            "async": true,
+            "timeout": 30
+          },
           {
             "type": "command",
             "command": "node \"${CLAUDE_PLUGIN_ROOT}/scripts/hooks/run-with-flags.js\" \"post:quality-gate\" \"scripts/hooks/quality-gate.js\" \"standard,strict\"",
@@ -270,7 +291,10 @@
         "hooks": [
           {
             "type": "command",
-            "command": "code-review-graph update 2>/dev/null || true",
+            "command": [
+              "node",
+              "${CLAUDE_PLUGIN_ROOT}/scripts/hooks/update-code-review-graph.js"
+            ],
             "async": true,
             "timeout": 10
           }
@@ -324,6 +348,18 @@
         "hooks": [
           {
             "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/scripts/hooks/run-with-flags.js\" \"stop:cross-model-audit\" \"scripts/hooks/stop-cross-model-audit.js\" \"standard,strict\"",
+            "async": true,
+            "timeout": 20
+          }
+        ],
+        "description": "Run stop-boundary cross-model audit over changed files and transcript evidence"
+      },
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
             "command": "node \"${CLAUDE_PLUGIN_ROOT}/scripts/hooks/run-with-flags.js\" \"stop:cost-tracker\" \"scripts/hooks/cost-tracker.js\" \"minimal,standard,strict\"",
             "async": true,
             "timeout": 10
@@ -363,9 +399,18 @@
             "command": "node \"${CLAUDE_PLUGIN_ROOT}/scripts/hooks/daily-memory-view.js\"",
             "async": true,
             "timeout": 30
+          },
+          {
+            "type": "command",
+            "command": [
+              "node",
+              "${CLAUDE_PLUGIN_ROOT}/scripts/hooks/session-end-markdown.js"
+            ],
+            "async": true,
+            "timeout": 15
           }
         ],
-        "description": "Finalize control-plane session records and governance logs"
+        "description": "Finalize control-plane session records, governance logs, and export markdown archive"
       }
     ]
   }

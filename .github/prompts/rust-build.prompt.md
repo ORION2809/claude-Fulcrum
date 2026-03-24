@@ -1,6 +1,6 @@
 ---
 description: "Fix Rust build errors: cargo build, borrow checker, and clippy failures. Parse errors, fix one at a time, verify after each fix."
-mode: "agent"
+agent: "agent"
 ---
 
 # Rust Build Fix

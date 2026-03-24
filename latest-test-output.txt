@@ -1,0 +1,3888 @@
+
+> claude-fulcrum@2.0.0 test
+> node scripts/ci/validate-agents.js && node scripts/ci/validate-commands.js && node scripts/ci/validate-rules.js && node scripts/ci/validate-skills.js && node scripts/ci/validate-hooks.js && node scripts/ci/validate-install-manifests.js && node scripts/ci/validate-no-personal-paths.js && node scripts/ci/catalog.js --text && node tests/run-all.js
+
+Validated 26 agent files
+WARN: learn-eval.md - references skill directory skills/learned/ (not found locally)
+WARN: learn-eval.md - references skill directory skills/learned/ (not found locally)
+WARN: learn.md - references skill directory skills/learned/ (not found locally)
+WARN: learn.md - references skill directory skills/learned/ (not found locally)
+Validated 66 command files (4 warnings)
+Validated 50 rule files
+Validated 122 skill directories
+Validated 30 hook matchers
+Validated 20 install modules, 31 install components, and 5 profiles
+Validated: no personal absolute paths in shipped docs/skills/commands
+Catalog counts:
+- agents: 26
+- commands: 66
+- skills: 122
+
+Documentation counts match the repository catalog.
++----------------------------------------------------------+
+|           Claude Fulcrum - Test Suite                    |
++----------------------------------------------------------+
+
+
+--- Running agents/agent-selector.test.js ---
+
+Agent Selector Tests (Phase 6.1)
+================================
+
+  ✓ AGENT_TIERS has core, trait, extension
+  ✓ TIER_PRIORITY core=1 trait=0 extension=2
+  ✓ SELECTION_WEIGHTS sum to 1.0
+  ✓ MIN_CONFIDENCE and HIGH_CONFIDENCE are correct
+  ✓ DEFAULT_AGENT is general-purpose
+  ✓ TRAIT_CONFLICTS has minimal-changes < > rapid-prototype
+  ✓ TRAIT_TENSIONS has legacy-friendly < > cloud-native
+  ✓ parseFrontmatter extracts YAML fields
+  ✓ parseFrontmatter handles booleans and numbers
+  ✓ parseFrontmatter returns null for no frontmatter
+  ✓ parseListField extracts list items
+  ✓ parseListField returns empty for missing field
+  ✓ calculateScore returns high score for trigger match
+  ✓ calculateScore category hint boosts score
+  ✓ calculateScore file pattern matching works
+  ✓ calculateScore priority bonus favors higher-priority agents
+  ✓ calculateScore with string context works
+  ✓ processTraits detects conflicts
+  ✓ processTraits detects tensions
+  ✓ processTraits reports invalid traits
+  ✓ createRegistry returns frozen structure
+  ✓ discoverAgents reads real agents/ directory
+  ✓ parseAgentFile parses a markdown agent file
+  ✓ parseAgentFile returns null for invalid file
+  ✓ selectAgent returns best match from registry
+  ✓ selectAgent falls back to default when no match
+  ✓ selectAgent excludes agents
+  ✓ selectAgent includes trait paths and conflicts
+  ✓ getAgentSuggestions returns top-N list
+
+29 passed, 0 failed
+
+Results: Passed: 29, Failed: 0
+
+
+--- Running agents/handoff-contracts.test.js ---
+
+Handoff Contracts Tests (Phase 6.4)
+====================================
+
+  ✓ CONTRACT_STATUSES has 5 statuses
+  ✓ VERIFICATION_METHODS has 6 methods
+  ✓ DEFAULT_CONTRACTS has 5 role contracts
+  ✓ createContract returns frozen immutable contract
+  ✓ createContract defaults empty arrays
+  ✓ planner contract has correct inputs/outputs
+  ✓ tester contract requires 80% coverage postcondition
+  ✓ reviewer contract has empty allowedMutations
+  ✓ validateHandoff succeeds with all required artifacts
+  ✓ validateHandoff fails when missing required inputs
+  ✓ validateHandoff fails for unknown source role
+  ✓ validateHandoff fails for unknown target role
+  ✓ validateHandoff detects postcondition failures
+  ✓ createLedger creates empty pending ledger
+  ✓ addStep adds a step with correct defaults
+  ✓ startStep sets IN_PROGRESS and startedAt
+  ✓ completeStep sets COMPLETED with outputs
+  ✓ completeStep marks ledger COMPLETED when all steps done
+  ✓ failStep sets FAILED with error
+  ✓ canStartStep returns true when dependencies met
+  ✓ canStartStep blocks on incomplete dependency
+  ✓ canStartStep fails for already-started step
+  ✓ canStartStep fails for non-existent step
+  ✓ getLedgerSummary returns correct counts
+  ✓ ledger operations are immutable
+
+25 passed, 0 failed
+
+Results: Passed: 25, Failed: 0
+
+
+--- Running agents/persona-router.test.js ---
+
+Persona Router Tests (Phase 6.2)
+================================
+
+  ✓ PERSONAS has 8 personas
+  ✓ RISK_LEVELS has 4 levels
+  ✓ EXPERTISE_LEVELS has 3 levels
+  ✓ COMMAND_FLOWS has expected workflows
+  ✓ scorePersona returns high score for keyword match
+  ✓ scorePersona category matching boosts score
+  ✓ scorePersona risk alignment works
+  ✓ scorePersona expertise matching works
+  ✓ routePersona routes security task to security persona
+  ✓ routePersona routes bug fix to debugger
+  ✓ routePersona routes architecture task to architect
+  ✓ routePersona routes testing task to tester
+  ✓ routePersona includes persona stack with top 3
+  ✓ routePersona defaults riskLevel and expertiseLevel
+  ✓ selectCommandFlow returns bug-fix for bug category
+  ✓ selectCommandFlow returns security-audit for security category
+  ✓ selectCommandFlow returns persona-based flow when no category
+  ✓ getAvailablePersonas lists all 8 personas
+
+18 passed, 0 failed
+
+Results: Passed: 18, Failed: 0
+
+
+--- Running agents/pm-meta-layer.test.js ---
+
+PM Meta-Layer & Reflexion Tests (Phase 6.3)
+============================================
+
+  ✓ ERROR_TYPES has 5 types
+  ✓ PDCA_PHASES has 4 phases
+  ✓ WORD_OVERLAP_THRESHOLD is 0.7
+  ✓ createPDCACycle initializes in PLAN phase
+  ✓ advancePDCA progresses through phases
+  ✓ advancePDCA sets completedAt after ACT
+  ✓ advancePDCA is immutable (does not mutate original)
+  ✓ classifyError detects INPUT errors
+  ✓ classifyError detects API errors
+  ✓ classifyError detects CONFIG errors
+  ✓ classifyError detects ENVIRONMENT errors
+  ✓ classifyError detects LOGIC errors
+  ✓ classifyError defaults to LOGIC for unknown
+  ✓ computeWordOverlap identical strings = 1.0
+  ✓ computeWordOverlap disjoint strings = 0
+  ✓ computeWordOverlap partial match
+  ✓ computeWordOverlap ignores short words
+  ✓ createErrorSignature normalizes numbers
+  ✓ createErrorSignature removes quotes
+  ✓ createReflexionStore with non-existent file returns empty entries
+  ✓ persistEntry writes JSONL and returns updated store
+  ✓ findMatchingPattern finds matching error
+  ✓ findMatchingPattern returns null for no match
+  ✓ recordMistake adds new entry
+  ✓ recordMistake detects duplicate pattern
+  ✓ suggestFix finds a fix when pattern exists
+  ✓ suggestFix returns found:false when no match
+  ✓ createCheckpoint returns valid checkpoint
+  ✓ restoreContext returns latest phase and cumulative files
+  ✓ restoreContext handles empty checkpoints
+
+30 passed, 0 failed
+
+Results: Passed: 30, Failed: 0
+
+
+--- Running ci/validators.test.js ---
+
+=== Testing CI Validators ===
+
+validate-agents.js:
+  ✓ passes on real project agents
+  ✓ fails on agent without frontmatter
+  ✓ fails on agent missing required model field
+  ✓ fails on agent missing required tools field
+  ✓ passes on valid agent with all required fields
+  ✓ handles frontmatter with BOM and CRLF
+  ✓ handles frontmatter with colons in values
+  ✓ skips non-md files
+  ✓ exits 0 when directory does not exist
+  ✓ rejects agent with empty model value
+  ✓ rejects agent with empty tools value
+
+validate-hooks.js:
+  ✓ passes on real project hooks.json
+
+catalog.js:
+  ✓ passes on real project catalog counts
+  ✓ fails when README and AGENTS catalog counts drift
+  ✓ accepts AGENTS project structure entries with varied spacing and dash styles
+  ✓ exits 0 when hooks.json does not exist
+  ✓ fails on invalid JSON
+  ✓ fails on invalid event type
+  ✓ fails on hook entry missing type field
+  ✓ fails on hook entry missing command field
+  ✓ fails on invalid async field type
+  ✓ fails on negative timeout
+  ✓ fails on invalid inline JS syntax
+  ✓ passes valid inline JS commands
+  ✓ validates array command format
+  ✓ validates legacy array format
+  ✓ fails on matcher missing hooks array
+
+validate-skills.js:
+  ✓ passes on real project skills
+  ✓ exits 0 when directory does not exist
+  ✓ fails on skill directory without SKILL.md
+  ✓ fails on empty SKILL.md
+  ✓ passes on valid skill directory
+  ✓ ignores non-directory entries
+  ✓ fails on whitespace-only SKILL.md
+
+validate-commands.js:
+  ✓ passes on real project commands
+  ✓ exits 0 when directory does not exist
+  ✓ fails on empty command file
+  ✓ passes on valid command files
+  ✓ ignores non-md files
+  ✓ detects broken command cross-reference
+  ✓ detects broken agent path reference
+  ✓ skips references inside fenced code blocks
+  ✓ detects broken workflow agent reference
+  ✓ skips command references on creates: lines
+  ✓ accepts valid cross-reference between commands
+  ✓ checks references in unclosed code blocks
+  ✓ captures ALL command references on a single line (multi-ref)
+  ✓ captures three command refs on one line
+  ✓ multi-ref line with one valid and one invalid ref
+  ✓ creates: line with multiple refs skips entire line
+  ✓ validates valid workflow diagram with known agents
+
+validate-rules.js:
+  ✓ passes on real project rules
+  ✓ exits 0 when directory does not exist
+  ✓ fails on empty rule file
+  ✓ passes on valid rule files
+  ✓ fails on whitespace-only rule file
+  ✓ validates rules in subdirectories recursively
+
+validate-hooks.js (whitespace edge cases):
+  ✓ rejects whitespace-only command string
+  ✓ rejects null command value
+  ✓ rejects numeric command value
+
+validate-agents.js (whitespace edge cases):
+  ✓ rejects agent with whitespace-only model value
+  ✓ rejects agent with whitespace-only tools value
+  ✓ accepts agent with extra unknown frontmatter fields
+  ✓ rejects agent with invalid model value
+
+validate-commands.js (additional edge cases):
+  ✓ reports all invalid agents in mixed agent references
+  ✓ validates workflow with hyphenated agent names
+  ✓ detects skill directory reference warning
+
+validate-hooks.js (schema edge cases):
+  ✓ rejects event type value that is not an array
+  ✓ rejects matcher entry that is null
+  ✓ rejects matcher entry that is a string
+  ✓ rejects top-level data that is a string
+  ✓ rejects top-level data that is a number
+  ✓ rejects empty string command
+  ✓ rejects empty array command
+  ✓ rejects array command with non-string elements
+  ✓ rejects non-string type field
+  ✓ rejects non-number timeout type
+  ✓ accepts timeout of exactly 0
+  ✓ validates object format without wrapping hooks key
+
+validate-hooks.js (legacy format errors):
+  ✓ legacy format: rejects matcher missing matcher field
+  ✓ legacy format: rejects matcher missing hooks array
+
+validate-agents.js (empty directory):
+  ✓ passes on empty agents directory
+
+validate-commands.js (whitespace edge cases):
+  ✓ fails on whitespace-only command file
+  ✓ accepts valid skill directory reference
+
+validate-rules.js (mixed files):
+  ✓ fails on mix of valid and empty rule files
+
+validate-hooks.js (Round 27 edge cases):
+  ✓ rejects array command with empty string element
+  ✓ rejects negative timeout
+  ✓ rejects non-boolean async field
+  ✓ reports correct index for error in deeply nested hook
+  ✓ validates node -e with escaped quotes in inline JS
+  ✓ accepts multiple valid event types in single hooks file
+
+validate-commands.js (Round 27 edge cases):
+  ✓ validates multiple command refs on same non-creates line
+  ✓ fails when one of multiple refs on same line is invalid
+  ✓ code blocks are stripped before checking references
+
+validate-skills.js (mixed dirs):
+  ✓ fails on mix of valid and invalid skill directories
+
+Round 30: validate-commands (skill warnings):
+  ✓ warns (not errors) when skill directory reference is not found
+  ✓ passes when command has no slash references at all
+
+Round 30: validate-agents (model validation):
+  ✓ rejects agent with unrecognized model value
+  ✓ accepts all valid model values (haiku, sonnet, opus)
+
+Round 32: validate-agents (empty frontmatter):
+  ✓ rejects agent with empty frontmatter block (no key-value pairs)
+  ✓ rejects agent with no content between --- markers (Missing frontmatter)
+  ✓ rejects agent with partial frontmatter (only model, no tools)
+  ✓ handles multiple agents where only one is invalid
+
+Round 32: validate-rules (non-file entries):
+  ✓ skips directory entries even if named with .md extension
+  ✓ handles deeply nested rule in subdirectory
+
+Round 32: validate-commands (agent reference with valid workflow):
+  ✓ passes workflow with three chained agents
+  ✓ detects broken agent in middle of workflow chain
+
+Round 42: validate-agents (case sensitivity):
+  ✓ rejects uppercase model value (case-sensitive check)
+  ✓ handles space before colon in frontmatter key
+
+Round 42: validate-commands (missing agents dir):
+  ✓ flags agent path references when AGENTS_DIR does not exist
+
+Round 42: validate-hooks (empty matchers array):
+  ✓ accepts event type with empty matchers array
+
+Round 47: validate-hooks (inline JS escape sequences):
+  ✓ validates inline JS with mixed escape sequences (newline + escaped quote)
+  ✓ rejects inline JS with syntax error after unescaping
+
+Round 47: validate-agents (frontmatter lines without colon):
+  ✓ silently ignores frontmatter line without colon
+
+Round 52: validate-commands (inline backtick refs):
+  ✓ validates command refs inside inline backticks (not stripped by code block removal)
+
+Round 52: validate-commands (workflow whitespace):
+  ✓ validates workflow arrows with irregular whitespace
+
+Round 52: validate-rules (code-only content):
+  ✓ passes rule file containing only a fenced code block
+
+Round 57: validate-skills.js (SKILL.md is a directory â€” readFileSync error):
+  ✓ fails gracefully when SKILL.md is a directory instead of a file
+
+Round 57: validate-rules.js (broken symlink â€” statSync catch block):
+    (skipped â€” symlinks not supported)
+  ✓ reports error for broken symlink .md file in rules directory
+
+Round 57: validate-commands.js (adjacent code blocks both stripped):
+  ✓ strips multiple adjacent code blocks before checking references
+
+Round 58: validate-agents.js (unreadable agent file â€” readFileSync catch):
+    (skipped â€” not supported on this platform)
+  ✓ reports error when agent .md file is unreadable (chmod 000)
+
+Round 58: validate-agents.js (frontmatter line with colon at position 0):
+  ✓ rejects agent when required field key has colon at position 0 (no key name)
+
+Round 58: validate-hooks.js (command is a plain object â€” not string or array):
+  ✓ rejects hook entry where command is a plain object
+
+Round 63: validate-hooks.js (object-format matcher missing matcher field):
+  ✓ rejects object-format matcher entry missing matcher field
+
+Round 63: validate-commands.js (unreadable command file):
+    (skipped â€” not supported on this platform)
+  ✓ reports error when command .md file is unreadable (chmod 000)
+
+Round 63: validate-commands.js (empty commands directory):
+  ✓ passes on empty commands directory (no .md files)
+
+Round 65: validate-rules.js (empty directory â€” no .md files):
+  ✓ passes on rules directory with no .md files (Validated 0)
+
+Round 65: validate-skills.js (empty directory â€” no subdirectories):
+  ✓ passes on skills directory with only files, no subdirectories (Validated 0)
+
+Round 70: validate-commands.js (would create: skip):
+  ✓ skips command references on "would create:" lines
+
+Round 72: validate-hooks.js (async and timeout type validation):
+  ✓ rejects hook with non-boolean async field
+  ✓ rejects hook with negative timeout value
+
+Round 73: validate-commands.js (unreadable skill entry â€” statSync catch):
+  ✓ skips unreadable skill directory entries without error (broken symlink)
+
+Round 76: validate-hooks.js (invalid JSON in hooks.json):
+  ✓ reports error for invalid JSON in hooks.json
+
+Round 78: validate-hooks.js (wrapped hooks format):
+  ✓ validates wrapped format { hooks: { PreToolUse: [...] } }
+
+Round 79: validate-commands.js (warnings count in output):
+  ✓ output includes (N warnings) suffix when skill references produce warnings
+
+Round 80: validate-hooks.js (legacy array format):
+  ✓ validates hooks in legacy array format (hooks is an array, not object)
+
+Round 82: validate-hooks (Notification and SubagentStop event types):
+  ✓ accepts Notification and SubagentStop as valid event types
+
+Round 82b: validate-hooks (current official events and hook types):
+  ✓ accepts UserPromptSubmit with omitted matcher and prompt/http/agent hooks
+
+Round 83: validate-agents (whitespace-only frontmatter field value):
+  ✓ rejects agent with whitespace-only model field (trim guard)
+
+Round 83: validate-skills (empty SKILL.md file):
+  ✓ rejects skill directory with empty SKILL.md file
+
+validate-install-manifests.js:
+  ✓ passes on real project install manifests
+  ✓ exits 0 when install manifests do not exist
+  ✓ fails on invalid install manifest JSON
+  ✓ fails when install module references a missing path
+  ✓ fails when two install modules claim the same path
+  ✓ fails when an install profile references an unknown module
+  ✓ passes on a valid standalone install manifest fixture
+  ✓ fails when an install component references an unknown module
+
+Results: Passed: 148, Failed: 0
+
+
+--- Running codex-config.test.js ---
+  ✓ reference config does not pin a top-level model
+  ✓ reference config does not pin a top-level model provider
+  ✓ sample Codex role configs do not use o4-mini
+
+Passed: 3
+Failed: 0
+
+
+--- Running hooks/auto-tmux-dev.test.js ---
+
+=== Testing auto-tmux-dev.js ===
+
+Dev server detection:
+  ✓ transforms npm run dev command
+  ✓ transforms pnpm dev command
+  ✓ transforms yarn dev command
+  ✓ transforms bun run dev command
+
+Non-dev commands (pass-through):
+  ✓ does not transform npm install
+  ✓ does not transform npm test
+  ✓ does not transform npm run build
+  ✓ does not transform npm run develop (partial match)
+
+Edge cases:
+  ✓ handles empty input gracefully
+  ✓ handles invalid JSON gracefully
+  ✓ passes through missing command field
+
+Results: Passed: 11, Failed: 0
+
+
+--- Running hooks/check-hook-enabled.test.js ---
+
+=== Testing check-hook-enabled.js ===
+
+No arguments:
+  ✓ returns yes when no hookId provided
+
+Default profile (standard):
+  ✓ returns yes for hook with default profiles
+  ✓ returns yes for hook with standard,strict profiles
+  ✓ returns no for hook with only strict profile
+  ✓ returns no for hook with only minimal profile
+
+Disabled hooks:
+  ✓ returns no when hook is disabled via env
+  ✓ returns yes when different hook is disabled
+
+Profile overrides:
+  ✓ returns yes for strict profile with strict-only hook
+  ✓ returns yes for minimal profile with minimal-only hook
+
+Results: Passed: 9, Failed: 0
+
+
+--- Running hooks/compress-observation.test.js ---
+
+Compress Observation Tests
+
+  ✓ summarizes structured tool payloads without raw JSON scaffolding
+  ✓ prioritizes meaningful error and action lines over boilerplate
+  ✓ respects maxChars while preserving a readable summary
+  ✓ extracts semantic fields from nested structured payloads
+
+Results: Passed: 4, Failed: 0
+
+
+--- Running hooks/context-budget.test.js ---
+
+Context Budget Tracker Tests
+===========================
+
+  ✓ estimateTokenCount returns 0 for empty input
+  ✓ estimateTokenCount approximates ~4 chars per token
+  ✓ computeBudgetStatus returns normal for low utilization
+  ✓ computeBudgetStatus returns warning at 70%+
+  ✓ computeBudgetStatus returns critical at 85%+
+  ✓ computeBudgetStatus uses default max tokens when not provided
+  ✓ buildRecommendations returns empty for normal level
+  ✓ buildRecommendations returns suggestions for warning level
+  ✓ buildRecommendations returns aggressive suggestions for critical level
+
+9 passed, 0 failed
+
+
+
+--- Running hooks/cost-tracker.test.js ---
+
+=== Testing cost-tracker.js ===
+
+  ✓ passes through input on stdout
+  ✓ creates metrics file when given valid usage data
+  ✓ handles empty input gracefully
+  ✓ handles invalid JSON gracefully
+  ✓ handles missing usage fields gracefully
+
+Results: Passed: 5, Failed: 0
+
+
+--- Running hooks/doc-file-warning.test.js ---
+
+=== Testing doc-file-warning.js ===
+
+  ✓ allows standard doc file: README.md
+  ✓ allows standard doc file: CLAUDE.md
+  ✓ allows standard doc file: AGENTS.md
+  ✓ allows standard doc file: CONTRIBUTING.md
+  ✓ allows standard doc file: CHANGELOG.md
+  ✓ allows standard doc file: LICENSE.md
+  ✓ allows standard doc file: SKILL.md
+  ✓ allows standard doc file: MEMORY.md
+  ✓ allows standard doc file: WORKLOG.md
+  ✓ allows directory path: docs/foo.md
+  ✓ allows directory path: docs/guide/setup.md
+  ✓ allows directory path: skills/bar.md
+  ✓ allows directory path: skills/testing/tdd.md
+  ✓ allows directory path: .history/session.md
+  ✓ allows directory path: memory/patterns.md
+  ✓ allows directory path: .claude/commands/deploy.md
+  ✓ allows directory path: .claude/plans/roadmap.md
+  ✓ allows directory path: .claude/projects/myproject.md
+  ✓ allows .plan.md files
+  ✓ allows nested .plan.md files
+  ✓ allows non-doc file: foo.js
+  ✓ allows non-doc file: app.py
+  ✓ allows non-doc file: styles.css
+  ✓ allows non-doc file: data.json
+  ✓ allows non-doc file: image.png
+  ✓ warns on non-standard doc file: random-notes.md
+  ✓ warns on non-standard doc file: TODO.md
+  ✓ warns on non-standard doc file: notes.txt
+  ✓ warns on non-standard doc file: scratch.md
+  ✓ warns on non-standard doc file: ideas.txt
+  ✓ handles empty object input without error
+  ✓ handles missing file_path without error
+  ✓ handles empty file_path without error
+  ✓ passes through input to stdout for allowed file
+  ✓ passes through input to stdout for warned file
+  ✓ passes through input to stdout for empty input
+
+Results: Passed: 36, Failed: 0
+
+
+--- Running hooks/evaluate-session.test.js ---
+
+=== Testing evaluate-session.js ===
+
+Threshold boundary (default min=10):
+  ✓ skips session with 9 user messages (below threshold)
+  ✓ evaluates session with exactly 10 user messages (at threshold)
+  ✓ evaluates session with 11 user messages (above threshold)
+
+Edge cases:
+  ✓ exits 0 with missing transcript_path
+  ✓ exits 0 with non-existent transcript file
+  ✓ exits 0 with invalid stdin JSON
+  ✓ skips empty transcript file (0 user messages)
+  ✓ counts only user messages (ignores assistant messages)
+
+Config file parsing:
+  ✓ uses custom min_session_length from config file
+  ✓ handles transcript with only assistant messages (0 user match)
+  ✓ handles transcript with malformed JSON lines (still counts valid ones)
+  ✓ handles empty stdin (no input) gracefully
+
+Round 53: CLAUDE_TRANSCRIPT_PATH fallback:
+  ✓ falls back to CLAUDE_TRANSCRIPT_PATH env var when stdin is invalid JSON
+
+Round 65: regex whitespace tolerance around colon:
+  ✓ counts user messages when JSON has spaces around colon ("type" : "user")
+
+Round 85: config parse error catch block:
+  ✓ falls back to defaults when config file contains invalid JSON
+
+Round 86: config learned_skills_path override:
+  ✓ uses learned_skills_path from config with ~ expansion
+
+Results: Passed: 16, Failed: 0
+
+
+--- Running hooks/hook-flags.test.js ---
+
+=== Testing hook-flags.js ===
+
+VALID_PROFILES:
+  ✓ is a Set
+  ✓ contains minimal, standard, strict
+  ✓ contains exactly 3 profiles
+
+normalizeId:
+  ✓ returns empty string for null
+  ✓ returns empty string for undefined
+  ✓ returns empty string for empty string
+  ✓ trims whitespace
+  ✓ converts to lowercase
+  ✓ handles mixed case with whitespace
+  ✓ converts numbers to string
+  ✓ returns empty string for whitespace-only input
+
+getHookProfile:
+  ✓ defaults to standard when env var not set
+  ✓ returns minimal when set to minimal
+  ✓ returns standard when set to standard
+  ✓ returns strict when set to strict
+  ✓ is case-insensitive
+  ✓ trims whitespace from env var
+  ✓ defaults to standard for invalid value
+  ✓ defaults to standard for empty string
+
+getDisabledHookIds:
+  ✓ returns empty Set when env var not set
+  ✓ returns empty Set for empty string
+  ✓ returns empty Set for whitespace-only string
+  ✓ parses single hook id
+  ✓ parses multiple comma-separated hook ids
+  ✓ trims whitespace around hook ids
+  ✓ normalizes hook ids to lowercase
+  ✓ filters out empty entries from trailing commas
+
+parseProfiles:
+  ✓ returns fallback for null input
+  ✓ returns fallback for undefined input
+  ✓ uses custom fallback when provided
+  ✓ parses comma-separated string
+  ✓ parses single string value
+  ✓ parses array of profiles
+  ✓ filters invalid profiles from string
+  ✓ filters invalid profiles from array
+  ✓ returns fallback when all string values are invalid
+  ✓ returns fallback when all array values are invalid
+  ✓ is case-insensitive for string input
+  ✓ is case-insensitive for array input
+  ✓ trims whitespace in string input
+  ✓ handles null values in array
+
+isHookEnabled:
+  ✓ returns true by default for a hook (standard profile)
+  ✓ returns true for empty hookId
+  ✓ returns true for null hookId
+  ✓ returns false when hook is in disabled list
+  ✓ disabled check is case-insensitive
+  ✓ returns true when hook is not in disabled list
+  ✓ returns false when current profile is not in allowed profiles
+  ✓ returns true when current profile is in allowed profiles
+  ✓ returns true when current profile matches single allowed profile
+  ✓ disabled hooks take precedence over profile match
+  ✓ uses default profiles (standard, strict) when none specified
+  ✓ allows standard profile by default
+  ✓ allows strict profile by default
+  ✓ accepts array profiles option
+
+Results: Passed: 55, Failed: 0
+
+
+--- Running hooks/hooks.test.js ---
+
+=== Testing Hook Scripts ===
+
+session-start.js:
+  âœ“ runs without error
+  âœ“ outputs session info to stderr
+
+session-start.js (edge cases):
+  âœ“ exits 0 even with isolated empty HOME
+  âœ“ reports package manager detection
+  âœ“ skips template session content
+  âœ“ injects real session content
+  âœ“ reports learned skills count
+
+insaits-security-wrapper.js:
+  âœ“ passes through input unchanged when integration is disabled
+
+check-console-log.js:
+  âœ“ passes through stdin data to stdout
+  âœ“ exits 0 with empty stdin
+  âœ“ handles invalid JSON stdin gracefully
+
+session-end.js:
+  âœ“ runs without error
+  âœ“ creates or updates session file
+  âœ“ includes session ID in filename
+  âœ“ writes project, branch, and worktree metadata into new session files
+
+pre-compact.js:
+  âœ“ runs without error
+  âœ“ outputs PreCompact message
+  âœ“ creates compaction log
+  âœ“ annotates active session file with compaction marker
+  âœ“ compaction log contains timestamp
+
+suggest-compact.js:
+  âœ“ runs without error
+  âœ“ increments counter on each call
+  âœ“ suggests compact at threshold
+  âœ“ does not suggest below threshold
+  âœ“ suggests at regular intervals after threshold
+  âœ“ handles corrupted counter file
+  âœ“ uses default session ID when no env var
+  âœ“ validates threshold bounds
+
+evaluate-session.js:
+  âœ“ runs without error when no transcript
+  âœ“ skips short sessions
+  âœ“ processes sessions with enough messages
+  âœ“ counts user messages with whitespace in JSON (regression)
+  âœ“ handles transcript with null content array elements (regression)
+
+post-edit-console-warn.js:
+  âœ“ warns about console.log in JS files
+  âœ“ does not warn for non-JS files
+  âœ“ does not warn for clean JS files
+  âœ“ handles missing file gracefully
+  âœ“ limits console.log output to 5 matches
+  âœ“ ignores console.warn and console.error (only flags console.log)
+  âœ“ passes through original data on stdout
+
+post-edit-format.js:
+  âœ“ runs without error on empty stdin
+  âœ“ skips non-JS/TS files
+  âœ“ passes through data for invalid JSON
+  âœ“ handles null tool_input gracefully
+  âœ“ handles missing file_path in tool_input
+  âœ“ exits 0 and passes data when prettier is unavailable
+  âœ“ finds formatter config in parent dirs without package.json
+  âœ“ respects CLAUDE_PACKAGE_MANAGER for formatter fallback runner
+  âœ“ respects project package-manager config for formatter fallback runner
+
+pre-bash-dev-server-block.js:
+  âœ“ allows non-dev commands whose heredoc text mentions npm run dev
+  âœ“ blocks bare npm run dev outside tmux on non-Windows platforms
+  âœ“ blocks env-wrapped npm run dev outside tmux on non-Windows platforms
+  âœ“ blocks nohup-wrapped npm run dev outside tmux on non-Windows platforms
+
+post-edit-typecheck.js:
+  âœ“ runs without error on empty stdin
+  âœ“ skips non-TypeScript files
+  âœ“ handles nonexistent TS file gracefully
+  âœ“ handles TS file with no tsconfig gracefully
+  âœ“ stops tsconfig walk at max depth (20)
+  âœ“ passes through stdin data on stdout (post-edit-typecheck)
+
+session-end.js (extractSessionSummary):
+  âœ“ extracts user messages from transcript
+  âœ“ handles transcript with array content fields
+  âœ“ extracts tool names and file paths from transcript
+  âœ“ handles transcript with malformed JSON lines
+  âœ“ handles empty transcript (no user messages)
+  âœ“ truncates long user messages to 200 chars
+  âœ“ uses CLAUDE_TRANSCRIPT_PATH env var as fallback
+  âœ“ escapes backticks in user messages in session file
+  âœ“ session file contains tools used and files modified
+  âœ“ omits Tools Used and Files Modified sections when empty
+  âœ“ slices user messages to last 10
+  âœ“ slices tools to first 20
+  âœ“ slices files modified to first 30
+  âœ“ parses Claude Code JSONL format (entry.message.content)
+  âœ“ extracts tool_use from assistant message content blocks
+
+hooks.json Validation:
+  âœ“ hooks.json is valid JSON
+  âœ“ hooks.json has required event types
+  âœ“ SessionEnd marker hook is async and cleanup-safe
+  âœ— all hook commands use node or approved shell wrappers
+    Error: Hook command should use node or approved shell wrapper: bash -lc "code-review-graph update 2>/dev/null || true"...
+  âœ“ script references use CLAUDE_PLUGIN_ROOT variable (except SessionStart fallback)
+  âœ“ InsAIts hook is opt-in and scoped to high-signal tool inputs
+
+plugin.json Validation:
+  âœ“ plugin.json does NOT have explicit hooks declaration
+
+evaluate-session.js:
+  âœ“ skips when no transcript_path in stdin
+  âœ“ skips when transcript file does not exist
+  âœ“ skips short sessions (< 10 user messages)
+  âœ“ evaluates long sessions (>= 10 user messages)
+  âœ“ handles malformed stdin JSON (falls back to env var)
+
+suggest-compact.js:
+  âœ“ increments tool counter on each invocation
+  âœ“ suggests compact at exact threshold
+  âœ“ suggests at periodic intervals after threshold
+  âœ“ does not suggest below threshold
+  âœ“ resets counter when file contains huge overflow number
+  âœ“ resets counter when file contains negative number
+  âœ“ handles COMPACT_THRESHOLD of zero (falls back to 50)
+  âœ“ handles invalid COMPACT_THRESHOLD (falls back to 50)
+
+check-console-log.js (exact pass-through):
+  âœ“ stdout is exact byte match of stdin (no trailing newline)
+  âœ“ preserves empty string stdin without adding newline
+  âœ“ preserves data with embedded newlines exactly
+
+post-edit-format.js (security & extension tests):
+  âœ“ source code does not pass shell option to execFileSync (security)
+  âœ“ matches .tsx extension for formatting
+  âœ“ matches .jsx extension for formatting
+
+post-edit-typecheck.js (security & extension tests):
+  âœ“ source code does not pass shell option to execFileSync (security)
+
+Shell wrapper portability:
+  âœ“ run-with-flags-shell resolves plugin root when CLAUDE_PLUGIN_ROOT is unset
+  âœ“ continuous-learning shell scripts use resolved Python command instead of hardcoded python3 invocations
+  âœ“ observer-loop uses a configurable max-turn budget with safe default
+  âœ“ detect-project exports the resolved Python command for downstream scripts
+  âœ“ detect-project writes project metadata to the registry and project directory
+  âœ“ observe.sh falls back to legacy output fields when tool_response is null
+  âœ“ observe.sh skips non-cli entrypoints before project detection side effects
+  âœ“ observe.sh skips minimal hook profile before project detection side effects
+  âœ“ observe.sh skips cooperative skip env before project detection side effects
+  âœ“ observe.sh skips subagent payloads before project detection side effects
+  âœ“ observe.sh skips configured observer-session paths before project detection side effects
+  âœ“ matches .tsx extension for type checking
+
+Round 23: evaluate-session.js (config & nullish coalescing):
+  âœ“ respects min_session_length=0 from config (nullish coalescing)
+  âœ“ config with min_session_length=null falls back to default 10
+  âœ“ config with custom learned_skills_path creates directory
+  âœ“ handles invalid config JSON gracefully (uses defaults)
+
+Round 23: session-end.js (update existing file path):
+  âœ“ updates Last Updated timestamp in existing session file
+  âœ“ normalizes existing session headers with project, branch, and worktree metadata
+  âœ“ replaces blank template with summary when updating existing file
+  âœ“ always updates session summary content on session end
+
+Round 23: pre-compact.js (glob specificity):
+  âœ“ only annotates *-session.tmp files, not other .tmp files
+  âœ“ handles no active session files gracefully
+
+Round 23: session-end.js (extractSessionSummary edge cases):
+  âœ“ handles transcript with only assistant messages (no user messages)
+  âœ“ extracts tool_use from assistant message content blocks
+
+Round 24: suggest-compact.js (interval fix & fd fallback):
+  âœ“ periodic intervals are consistent with non-25-divisible threshold
+  âœ“ does not suggest at old-style multiples that skip threshold offset
+  âœ“ fd fallback: handles corrupted counter file gracefully
+  âœ“ handles counter at exact 1000000 boundary
+
+Round 24: post-edit-format.js (edge cases):
+  âœ“ passes through malformed JSON unchanged
+  âœ“ passes through data for non-JS/TS file extensions
+
+Round 24: post-edit-typecheck.js (edge cases):
+  âœ“ skips typecheck for non-existent file and still passes through
+  âœ“ passes through for non-TS extensions without running tsc
+
+Round 24: session-start.js (edge cases):
+  âœ“ exits 0 with empty sessions directory (no recent sessions)
+  âœ“ does not inject blank template session into context
+
+Round 25: post-edit-console-warn.js (pass-through fix):
+  âœ“ stdout is exact byte match of stdin (no trailing newline)
+  âœ“ passes through malformed JSON unchanged without crash
+  âœ“ handles missing file_path in tool_input gracefully
+  âœ“ passes through when file does not exist (readFile returns null)
+
+Round 25: check-console-log.js (edge cases):
+  âœ“ source has expected exclusion patterns
+  âœ“ passes through data unchanged on non-git repo
+  âœ“ exits 0 even when no stdin is provided
+
+Round 29: post-edit-format.js (cwd and exit):
+  âœ“ source uses cwd based on file directory for npx
+  âœ“ source calls process.exit(0) after writing output
+  âœ“ uses process.stdout.write instead of console.log for pass-through
+
+Round 29: post-edit-typecheck.js (exit and pass-through):
+  âœ“ source calls process.exit(0) after writing output
+  âœ“ uses process.stdout.write instead of console.log for pass-through
+  âœ“ exact stdout pass-through without trailing newline (typecheck)
+  âœ“ exact stdout pass-through without trailing newline (format)
+
+Round 29: post-edit-console-warn.js (extension and exit):
+  âœ“ source calls process.exit(0) after writing output
+  âœ“ does NOT match .mts or .mjs extensions
+  âœ“ does NOT match uppercase .TS extension
+  âœ“ detects console.log in commented-out code
+
+Round 29: check-console-log.js (exclusion patterns and exit):
+  âœ“ source calls process.exit(0) after writing output
+  âœ“ EXCLUDED_PATTERNS correctly excludes test files
+  âœ“ exclusion patterns match expected file paths
+
+Round 29: run-all.js test runner improvements:
+  âœ“ test runner uses spawnSync to capture stderr on success
+  âœ“ test runner discovers nested tests via tests/**/*.test.js glob
+
+Round 32: post-edit-typecheck (special character paths):
+  âœ“ handles file path with spaces gracefully
+  âœ“ handles file path with shell metacharacters safely
+  âœ“ handles .tsx file extension
+
+Round 32: check-console-log (edge cases):
+  âœ“ passes through data when git commands fail
+  âœ“ handles very large stdin within limit
+
+Round 32: post-edit-console-warn (additional edge cases):
+  âœ“ handles file with only console.error (no warning)
+  âœ“ handles null tool_input gracefully
+
+Round 32: session-end.js (empty transcript):
+  âœ“ handles completely empty transcript file
+  âœ“ handles transcript with only whitespace lines
+
+Round 38: evaluate-session.js (tilde expansion & missing config):
+  âœ“ expands ~ in learned_skills_path to home directory
+  âœ“ does NOT expand ~ in middle of learned_skills_path
+  âœ“ uses defaults when config file does not exist
+
+Round 41: pre-compact.js (multiple session files):
+  âœ“ annotates only the newest session file when multiple exist
+
+Round 40: session-end.js (newline collapse):
+  âœ“ collapses newlines in user messages to single-line markdown items
+
+Round 44: session-start.js (empty session file):
+  âœ“ does not inject empty session file content into context
+
+Round 49: post-edit-typecheck.js (extension edge cases):
+  âœ“ .d.ts files match the TS regex and trigger typecheck path
+  âœ“ .mts extension does not trigger typecheck
+
+Round 49: session-end.js (conditional summary sections):
+  âœ“ summary omits Files Modified and Tools Used when none found
+
+Round 50: session-start.js (alias reporting):
+  âœ“ reports available session aliases on startup
+
+Round 50: pre-compact.js (parallel execution):
+  âœ“ parallel compaction runs all append to log without loss
+
+Round 50: session-start.js (graceful degradation):
+  âœ“ exits 0 when sessions path is a file (not a directory)
+
+Round 53: post-edit-console-warn.js (max matches truncation):
+  âœ“ reports maximum 5 console.log matches per file
+
+Round 53: post-edit-format.js (non-existent file):
+  âœ“ passes through data for non-existent .tsx file path
+
+Round 55: session-start.js (maxAge 7-day boundary):
+  âœ“ excludes session files older than 7 days
+
+Round 55: session-start.js (newest session selection):
+  âœ“ injects newest session when multiple recent sessions exist
+
+Round 55: session-end.js (stdin overflow):
+  âœ“ handles stdin exceeding MAX_STDIN (1MB) gracefully
+
+Round 56: post-edit-typecheck.js (tsconfig in parent directory):
+  âœ“ walks up directory tree to find tsconfig.json in grandparent
+
+Round 56: suggest-compact.js (counter file as directory â€” fallback path):
+  âœ“ exits 0 when counter file path is occupied by a directory
+
+Round 59: session-start.js (unreadable session file â€” readFile returns null):
+    (skipped â€” not supported on this platform)
+  âœ“ does not inject content when session file is unreadable
+
+Round 59: check-console-log.js (stdin exceeding 1MB â€” truncation):
+  âœ“ truncates stdin at 1MB limit and still passes through data
+
+Round 59: pre-compact.js (read-only session file â€” appendFile error):
+    (skipped â€” not supported on this platform)
+  âœ“ exits 0 when session file is read-only (appendFile fails)
+
+Round 60: session-end.js (replaceInFile returns false â€” timestamp update warning):
+  âœ“ logs warning when existing session file lacks Last Updated field
+
+Round 60: post-edit-console-warn.js (stdin exceeding 1MB â€” truncation):
+  âœ“ truncates stdin at 1MB limit and still passes through data
+
+Round 60: post-edit-format.js (valid JSON without tool_input key):
+  âœ“ skips formatting when JSON has no tool_input field
+
+Round 64: post-edit-typecheck.js (valid JSON without tool_input):
+  âœ“ skips typecheck when JSON has no tool_input field
+
+Round 66: session-end.js (entry.role user fallback):
+  âœ“ extracts user messages from role-only format (no type field)
+
+Round 66: session-end.js (nonexistent transcript path):
+  âœ“ logs "Transcript not found" for nonexistent transcript_path
+
+Round 70: session-end.js (entry.name/entry.input fallback):
+  âœ“ extracts tool name and file path from entry.name/entry.input (not tool_name/tool_input)
+
+Round 71: session-start.js (default source â€” selection prompt):
+  âœ“ shows selection prompt when no package manager preference found (default source)
+
+Round 74: session-start.js (main catch â€” unrecoverable error):
+    (skipped â€” /dev/null not available on Windows)
+  âœ“ session-start exits 0 with error message when HOME is non-directory
+
+Round 75: pre-compact.js (main catch â€” unrecoverable error):
+    (skipped â€” /dev/null not available on Windows)
+  âœ“ pre-compact exits 0 with error message when HOME is non-directory
+
+Round 75: session-end.js (main catch â€” unrecoverable error):
+    (skipped â€” /dev/null not available on Windows)
+  âœ“ session-end exits 0 with error message when HOME is non-directory
+
+Round 76: evaluate-session.js (main catch â€” unrecoverable error):
+    (skipped â€” /dev/null not available on Windows)
+  âœ“ evaluate-session exits 0 with error message when HOME is non-directory
+
+Round 76: suggest-compact.js (main catch â€” double-failure):
+    (skipped â€” /dev/null not available on Windows)
+  âœ“ suggest-compact exits 0 with error when TMPDIR is non-directory
+
+Round 80: session-end.js (entry.message.role user â€” third OR condition):
+  âœ“ extracts user messages from entries where only message.role is user (not type or role)
+
+Round 81: suggest-compact.js (COMPACT_THRESHOLD > 10000):
+  âœ“ COMPACT_THRESHOLD exceeding 10000 falls back to default 50
+
+Round 81: session-end.js (user entry with non-string non-array content):
+  âœ“ skips user messages with numeric content (non-string non-array branch)
+
+Round 82: session-end.js (entry.tool_name without type=tool_use):
+  âœ“ collects tool name from entry with tool_name but non-tool_use type
+
+Round 82: session-end.js (template marker present but regex no-match):
+  âœ“ preserves file when marker present but regex does not match corrupted template
+
+Round 87: post-edit-format.js (stdin exceeding 1MB â€” truncation):
+  âœ“ truncates stdin at 1MB limit and still passes through data (post-edit-format)
+
+Round 87: post-edit-typecheck.js (stdin exceeding 1MB â€” truncation):
+  âœ“ truncates stdin at 1MB limit and still passes through data (post-edit-typecheck)
+
+Round 89: post-edit-typecheck.js (TypeScript error detection path):
+  âœ“ filters TypeScript errors to edited file when tsc reports errors
+
+Round 89: session-end.js (entry.name + entry.input fallback in extractSessionSummary):
+  âœ“ extracts tool name from entry.name and file path from entry.input (fallback format)
+
+Round 90: readStdinJson (timeout fires when stdin stays open):
+  âœ“ readStdinJson resolves with {} when stdin never closes (timeout fires, no data)
+  âœ“ readStdinJson resolves with {} when timeout fires with invalid partial JSON
+
+Round 94: session-end.js (tools used without files modified):
+  âœ“ session file includes Tools Used but omits Files Modified when only Read/Grep used
+
+=== Test Results ===
+Passed: 213
+Failed: 1
+Total:  214
+
+
+x hooks/hooks.test.js exited with status 1
+
+--- Running hooks/observer-memory.test.js ---
+
+=== Observer Memory Fix Tests  ===
+
+--- observe.sh signal throttling ---
+  ✓ observe.sh contains SIGNAL_EVERY_N throttle variable
+  ✓ observe.sh uses a counter file instead of signaling every call
+  ✓ observe.sh only signals when counter reaches threshold
+  ✓ observe.sh default throttle is 20 observations per signal
+
+--- observer-loop.sh re-entrancy guard ---
+  ✓ observer-loop.sh defines ANALYZING guard variable
+  ✓ on_usr1 checks ANALYZING before starting analysis
+  ✓ on_usr1 sets ANALYZING=1 before and ANALYZING=0 after analysis
+
+--- observer-loop.sh cooldown throttle ---
+  ✓ observer-loop.sh defines ANALYSIS_COOLDOWN
+  ✓ on_usr1 enforces cooldown between analyses
+  ✓ default cooldown is 60 seconds
+
+--- observer-loop.sh tail-based sampling ---
+  ✓ analyze_observations uses tail to sample recent observations
+  ✓ default max analysis lines is 500
+  ✓ analysis temp file is created and cleaned up
+  ✓ prompt references analysis_file not full OBSERVATIONS_FILE
+
+--- Signal counter file behavior ---
+  ✓ counter file increments and resets correctly
+  ✓ counter file handles missing/corrupt file gracefully
+
+--- observe.sh end-to-end throttle (shell execution) ---
+    (skipped - bash shell scripts are not testable on Windows)
+  ✓ observe.sh creates counter file and increments on each call
+
+=== Test Results ===
+Passed: 17
+Failed: 0
+Total:  17
+
+
+
+--- Running hooks/post-bash-hooks.test.js ---
+
+Post-Bash Build Complete Hook Tests
+====================================
+
+Build command detection:
+  ✓ stderr contains "Build completed" for npm run build command
+  ✓ stderr contains "Build completed" for pnpm build command
+  ✓ stderr contains "Build completed" for yarn build command
+
+Non-build command detection:
+  ✓ no stderr message for npm test command
+  ✓ no stderr message for ls command
+  ✓ no stderr message for git status command
+
+Stdout pass-through:
+  ✓ stdout passes through input for build command
+  ✓ stdout passes through input for non-build command
+  ✓ stdout passes through input for invalid JSON
+  ✓ stdout passes through empty input
+
+
+Post-Bash PR Created Hook Tests
+================================
+
+PR creation detection:
+  ✓ stderr contains PR URL when gh pr create output has PR URL
+  ✓ stderr contains correct repo in review command
+
+Non-PR command detection:
+  ✓ no stderr about PR for non-gh command
+  ✓ no stderr about PR for gh issue command
+  ✓ no stderr about PR for gh pr create without PR URL in output
+  ✓ no stderr about PR for gh pr list command
+
+Stdout pass-through:
+  ✓ stdout passes through input for PR create command
+  ✓ stdout passes through input for non-PR command
+  ✓ stdout passes through input for invalid JSON
+  ✓ stdout passes through empty input
+
+Results: Passed: 20, Failed: 0
+
+
+--- Running hooks/pre-bash-dev-server-block.test.js ---
+
+=== Testing pre-bash-dev-server-block.js ===
+
+  (skipping blocking tests on Windows)
+
+  ✓ allows tmux-wrapped npm run dev (exit code 0)
+  ✓ allows npm install (exit code 0)
+  ✓ allows npm test (exit code 0)
+  ✓ allows npm run build (exit code 0)
+  ✓ empty/invalid input passes through (exit code 0)
+  ✓ stdout contains original input on pass-through
+
+Results: Passed: 6, Failed: 0
+
+
+--- Running hooks/pre-bash-reminders.test.js ---
+
+=== Testing pre-bash-git-push-reminder.js & pre-bash-tmux-reminder.js ===
+
+  git-push-reminder:
+  ✓ git push triggers stderr warning
+  ✓ git status has no warning
+  ✓ git push always passes through input on stdout
+
+  (skipping tmux-reminder tests on Windows)
+
+
+Results: Passed: 3, Failed: 0
+
+
+--- Running hooks/quality-gate.test.js ---
+
+Quality Gate Hook Tests
+========================
+
+run() pass-through behavior:
+  ✓ returns original input for valid JSON with file_path
+  ✓ returns original input for valid JSON without file_path
+  ✓ returns original input for invalid JSON (no crash)
+
+File path extraction:
+  ✓ extracts file_path from tool_input payloads
+  ✓ extracts path from toolInput payloads
+
+Runtime telemetry integration:
+  ✓ writes persona-aware telemetry for a real file in a temp repo
+
+Results: Passed: 6, Failed: 0
+
+
+--- Running hooks/session-lifecycle.test.js ---
+
+Session Lifecycle Tests
+
+  ✓ estimates tokens and resolves event names from payload
+  ✓ persists a sanitized user prompt into the control-plane store
+  ✓ builds memory links for notes with overlapping keywords and tags
+  ✓ builds typed prevention links for fix-oriented memory notes
+  ✓ builds traversal-aware links using recent graph neighbors
+
+Results: Passed: 5, Failed: 0
+
+
+--- Running hooks/stop-cross-model-audit.test.js ---
+
+Stop Cross-Model Audit Tests
+
+  ✓ summarizes transcript counts and recent messages
+  ✓ executes stop audit from transcript evidence and writes artifact
+  ✓ skips stop audit when transcript is below minimum threshold
+
+Results: Passed: 3, Failed: 0
+
+
+--- Running hooks/suggest-compact.test.js ---
+
+=== Testing suggest-compact.js ===
+
+Basic counter functionality:
+ ✓ creates counter file on first run
+ ✓ increments counter on subsequent runs
+
+Threshold suggestion:
+ ✓ suggests compact at threshold (COMPACT_THRESHOLD=3)
+ ✓ does NOT suggest compact before threshold
+
+Interval suggestion:
+ ✓ suggests at threshold + 25 interval
+
+Environment variable handling:
+ ✓ uses default threshold (50) when COMPACT_THRESHOLD is not set
+ ✓ ignores invalid COMPACT_THRESHOLD (negative)
+ ✓ ignores non-numeric COMPACT_THRESHOLD
+
+Corrupted counter file:
+ ✓ resets counter on corrupted file content
+ ✓ resets counter on extremely large value
+ ✓ handles empty counter file
+
+Session isolation:
+ ✓ uses separate counter files per session ID
+
+Exit code:
+ ✓ always exits 0 (never blocks Claude)
+
+Threshold boundary values:
+ ✓ rejects COMPACT_THRESHOLD=0 (falls back to 50)
+ ✓ accepts COMPACT_THRESHOLD=10000 (boundary max)
+ ✓ rejects COMPACT_THRESHOLD=10001 (falls back to 50)
+ ✓ rejects float COMPACT_THRESHOLD (e.g. 3.5)
+ ✓ counter value at exact boundary 1000000 is valid
+ ✓ counter value at 1000001 is clamped (reset to 1)
+
+Default session ID fallback (Round 64):
+ ✓ uses "default" session ID when CLAUDE_SESSION_ID is empty
+
+Results: Passed: 20, Failed: 0
+
+
+--- Running hooks/write-time-enforce.test.js ---
+
+Write-Time Enforce Tests
+========================
+
+  ✓ TIERS is frozen with expected values
+  ✓ FIX_COMPLEXITY is frozen with expected values
+  ✓ detectFileLanguage identifies JavaScript files
+  ✓ detectFileLanguage identifies TypeScript files
+  ✓ detectFileLanguage identifies Python files
+  ✓ detectFileLanguage identifies shell files
+  ✓ detectFileLanguage returns null for unknown extensions
+  ✓ detectFileLanguage identifies Go, Rust, Kotlin, Java
+  ✓ detectFileLanguage identifies Plankton-style document and Dockerfile inputs
+  ✓ classifyViolationComplexity routes F-codes to auto
+  ✓ classifyViolationComplexity routes I-codes to simple
+  ✓ classifyViolationComplexity routes C901 to moderate
+  ✓ classifyViolationComplexity defaults to simple for unknown
+  ✓ parseViolations parses standard lint output format
+  ✓ parseViolations parses structured JSON linter output
+  ✓ parseViolations returns empty for non-matching output
+  ✓ parseViolations handles empty input
+  ✓ DEFAULT_TIER_CONFIG has all expected tiers
+  ✓ DEFAULT_TIER_CONFIG format has tools for js and py
+  ✓ DEFAULT_TIER_CONFIG covers document and container file types
+  ✓ MODEL_TIERS has haiku, sonnet, opus
+  ✓ MODEL_TIERS opus has higher maxTurns than haiku
+  ✓ selectModelTier returns haiku for simple codes
+  ✓ selectModelTier returns sonnet for C901
+  ✓ selectModelTier returns opus for type-assertion
+  ✓ selectModelTier escalates to opus for high volume
+  ✓ SONNET_CODE_PATTERNS matches expected codes
+  ✓ OPUS_CODE_PATTERNS matches expected codes
+  ✓ hashFile returns null for non-existent file
+  ✓ resolveClaudeCommand uses injected finder and CLI candidates
+  ✓ shouldFailOpenForDelegation reports fail-open for unresolved delegation
+  ✓ delegateFixToSubprocess exercises injected subprocess invocation without a real claude install
+  ✓ delegateFixToSubprocess marks fail-open when no claude command can be resolved
+
+33 passed, 0 failed
+
+
+
+--- Running integration/hooks.test.js ---
+
+=== Hook Integration Tests ===
+
+Hook Input Format Handling:
+  ✓ hooks handle empty stdin gracefully
+  ✓ hooks handle malformed JSON input
+  ✓ hooks parse valid tool_input correctly
+
+Hook Output Format:
+  ✓ hooks output messages to stderr (not stdout)
+  ✓ PreCompact hook logs to stderr
+  ✓ dev server hook transforms command to tmux session
+
+Hook Exit Codes:
+  ✓ non-blocking hooks exit with code 0
+  ✓ dev server hook transforms yarn dev to tmux session
+  ✓ hooks handle missing files gracefully
+
+Realistic Scenarios:
+  ✓ suggest-compact increments and triggers at threshold
+  ✓ evaluate-session processes transcript with sufficient messages
+  ✓ PostToolUse PR hook extracts PR URL
+
+Session End Transcript Parsing:
+  ✓ session-end extracts summary from mixed JSONL formats
+  ✓ session-end handles transcript with malformed lines gracefully
+  ✓ session-end creates session file with nested user messages
+
+Error Handling:
+  ✓ hooks do not crash on unexpected input structure
+  ✓ hooks handle null and missing values in input
+  ✓ hooks handle very large input without hanging
+  ✓ hooks survive stdin exceeding 1MB limit
+  ✓ hooks handle truncated JSON from overflow gracefully
+
+Round 51: Timeout Enforcement:
+  ✓ runHookWithInput kills hanging hooks after timeout
+
+Round 51: hooks.json Schema Validation:
+  ✓ hooks.json async hook has valid timeout field
+  ✓ all hook commands in hooks.json are valid format
+
+=== Test Results ===
+Passed: 23
+Failed: 0
+Total:  23
+
+
+
+--- Running integration/session-start-retrieval.test.js ---
+
+Session-Start Retrieval Integration Tests
+
+  ✓ session-start uses retrieval execution and writes retrieval artifacts when memory exists
+
+Results: Passed: 1, Failed: 0
+
+
+--- Running lib/action-queue.test.js ---
+
+Action Queue Tests
+==================
+
+  ✓ ACTION_STATUS is frozen with expected values
+  ✓ RECOVERY_MODE is frozen with expected values
+  ✓ createQueuedAction creates valid action
+  ✓ createQueuedAction defaults priority to 0
+  ✓ enqueueAction sorts by priority descending
+  ✓ claimNextAction claims first available queued action
+  ✓ claimNextAction respects dependencies
+  ✓ claimNextAction returns null when no actions available
+  ✓ completeAction marks action as completed
+  ✓ completeAction marks failed on success=false
+  ✓ retryAction requeues and increments retryCount
+  ✓ retryAction skips when max retries exceeded
+  ✓ buildRetryPlan creates valid plan from checkpoint
+  ✓ buildRetryPlan returns invalid for missing checkpoint
+  ✓ buildResetPlan identifies actions to discard
+  ✓ buildResetPlan returns invalid for missing action
+  ✓ applyRetryPlan requeues specified actions
+  ✓ applyRetryPlan does nothing for invalid plan
+  ✓ applyResetPlan removes discarded actions
+  ✓ getQueueStats returns correct counts
+  ✓ ACTION_STATUS includes KILLED
+  ✓ killRunningActions transitions IN_PROGRESS to KILLED
+  ✓ applyResetPlan uses soft-delete with dropped flag
+  ✓ getQueueStats includes killed and dropped counts
+  ✓ killRunningActions does not mutate original queue
+
+25 passed, 0 failed
+
+
+
+--- Running lib/install-config.test.js ---
+
+=== Testing install/config.js ===
+
+  ✓ resolves relative config paths from the provided cwd
+  ✓ loads and normalizes a valid install config
+  ✓ rejects invalid config schema values
+  ✓ fails when the install config does not exist
+
+Results: Passed: 4, Failed: 0
+
+
+--- Running lib/install-lifecycle.test.js ---
+
+=== Testing install-lifecycle.js ===
+
+  ✓ discovers installed states for multiple targets in the current context
+  ✓ doctor reports missing managed files as an error
+  ✓ doctor reports a healthy legacy install when managed files are present
+  ✓ doctor reports drifted managed files as a warning
+  ✓ doctor reports manifest resolution drift for non-legacy installs
+  ✓ repair restores render-template outputs from recorded rendered content
+  ✓ repair reapplies merge-json operations without clobbering unrelated keys
+  ✓ repair re-applies managed remove operations when files reappear
+  ✓ uninstall restores JSON merged files from recorded previous content
+  ✓ uninstall restores rendered template files from recorded previous content
+  ✓ uninstall restores files removed during install when previous content is recorded
+
+Results: Passed: 11, Failed: 0
+
+
+--- Running lib/install-manifests.test.js ---
+
+=== Testing install-manifests.js ===
+
+  ✓ loads real project install manifests
+  ✓ lists install profiles from the real project
+  ✓ lists install modules from the real project
+  ✓ lists install components from the real project
+  ✓ lists supported legacy compatibility languages
+  ✓ resolves a real project profile with target-specific skips
+  ✓ resolves antigravity profiles by skipping incompatible dependency trees
+  ✓ resolves explicit modules with dependency expansion
+  ✓ validates explicit module IDs against the real manifest catalog
+  ✓ resolves legacy compatibility selections into manifest module IDs
+  ✓ keeps antigravity legacy compatibility selections target-safe
+  ✓ rejects unknown legacy compatibility languages
+  ✓ resolves included and excluded user-facing components
+  ✓ fails when a selected component depends on an excluded component module
+  ✓ throws on unknown install profile
+  ✓ throws on unknown install target
+  ✓ skips a requested module when its dependency chain does not support the target
+
+Results: Passed: 17, Failed: 0
+
+
+--- Running lib/install-request.test.js ---
+
+=== Testing install/request.js ===
+
+  ✓ parses manifest-mode CLI arguments
+  ✓ normalizes legacy language installs into a canonical request
+  ✓ normalizes manifest installs into a canonical request
+  ✓ merges config-backed component selections with CLI overrides
+  ✓ validates explicit module IDs against the manifest catalog
+  ✓ rejects mixing legacy languages with manifest flags
+  ✓ rejects empty install requests when not asking for help
+
+Results: Passed: 7, Failed: 0
+
+
+--- Running lib/install-state.test.js ---
+
+=== Testing install-state.js ===
+
+  ✓ creates a valid install-state payload
+  ✓ writes and reads install-state from disk
+  ✓ deep-clones nested operation metadata for lifecycle-managed operations
+  ✓ rejects invalid install-state payloads on read
+  ✓ rejects unexpected properties and missing required request fields
+
+Results: Passed: 5, Failed: 0
+
+
+--- Running lib/install-targets.test.js ---
+
+=== Testing install-target adapters ===
+
+  ✓ lists supported target adapters
+  ✓ resolves cursor adapter root and install-state path from project root
+  ✓ resolves claude adapter root and install-state path from home dir
+  ✓ plans scaffold operations and flattens native target roots
+  ✓ plans cursor rules with flat namespaced filenames to avoid rule collisions
+  ✓ plans antigravity remaps for workflows, skills, and flat rules
+  ✓ plans copilot installs under project .claude with optional .github remap
+  ✓ exposes validate and planOperations on adapters
+  ✓ throws on unknown target adapter
+
+Results: Passed: 9, Failed: 0
+
+
+--- Running lib/orchestration-session.test.js ---
+=== Testing orchestration-session.js ===
+
+  ✓ parseWorkerStatus extracts structured status fields
+  ✓ parseWorkerTask extracts objective and seeded overlays
+  ✓ parseWorkerHandoff extracts summary, validation, and risks
+  ✓ parseWorkerHandoff also supports bold section headers
+  ✓ loadWorkerSnapshots reads coordination worker directories
+  ✓ buildSessionSnapshot merges tmux panes with worker metadata
+  ✓ listTmuxPanes returns an empty array when tmux is unavailable
+  ✓ resolveSnapshotTarget handles plan files and direct session names
+
+=== Results: 8 passed, 0 failed ===
+
+
+--- Running lib/package-manager.test.js ---
+
+=== Testing package-manager.js ===
+
+PACKAGE_MANAGERS Constant:
+ ✓ PACKAGE_MANAGERS has all expected managers
+ ✓ Each manager has required properties
+
+detectFromLockFile:
+ ✓ detects npm from package-lock.json
+ ✓ detects pnpm from pnpm-lock.yaml
+ ✓ detects yarn from yarn.lock
+ ✓ detects bun from bun.lockb
+ ✓ returns null when no lock file exists
+ ✓ respects detection priority (pnpm > npm)
+
+detectFromPackageJson:
+ ✓ detects package manager from packageManager field
+ ✓ handles packageManager without version
+ ✓ returns null when no packageManager field
+ ✓ returns null when no package.json exists
+
+getAvailablePackageManagers:
+ ✓ returns array of available managers
+
+getPackageManager:
+ ✓ returns object with name, config, and source
+ ✓ respects environment variable
+ ✓ detects from lock file in project
+
+getRunCommand:
+ ✓ returns correct install command
+ ✓ returns correct test command
+
+getExecCommand:
+ ✓ returns correct exec command for npm
+ ✓ returns correct exec command for pnpm
+
+getCommandPattern:
+ ✓ generates pattern for dev command
+ ✓ pattern matches actual commands
+
+getSelectionPrompt:
+ ✓ returns informative prompt
+
+setProjectPackageManager:
+ ✓ sets project package manager
+ ✓ rejects unknown package manager
+
+setPreferredPackageManager:
+ ✓ rejects unknown package manager
+
+detectFromPackageJson (edge cases):
+ ✓ handles invalid JSON in package.json
+ ✓ returns null for unknown package manager in packageManager field
+
+getExecCommand (edge cases):
+ ✓ returns exec command without args
+
+getRunCommand (additional):
+ ✓ returns correct build command
+ ✓ returns correct dev command
+ ✓ returns correct custom script command
+
+DETECTION_PRIORITY:
+ ✓ has pnpm first
+ ✓ has npm last
+
+getCommandPattern (additional):
+ ✓ generates pattern for install command
+ ✓ generates pattern for custom action
+
+getPackageManager (robustness):
+ ✓ falls through on corrupted project config JSON
+ ✓ falls through on project config with unknown PM
+
+getRunCommand (validation):
+ ✓ rejects empty script name
+ ✓ rejects null script name
+ ✓ rejects script name with shell metacharacters
+ ✓ rejects script name with backticks
+ ✓ accepts scoped package names
+
+getExecCommand (validation):
+ ✓ rejects empty binary name
+ ✓ rejects null binary name
+ ✓ rejects binary name with shell metacharacters
+ ✓ accepts dotted binary names like tsc
+
+getPackageManager (source detection):
+ ✓ detects from valid project-config (.claude/package-manager.json)
+ ✓ project-config takes priority over package.json
+ ✓ package.json takes priority over lock file
+ ✓ defaults to npm when no config found
+
+setPreferredPackageManager (success):
+ ✓ successfully saves preferred package manager
+
+getCommandPattern (completeness):
+ ✓ generates pattern for test command
+ ✓ generates pattern for build command
+
+getRunCommand (PM-specific formats):
+ ✓ pnpm custom script: pnpm (no run keyword)
+ ✓ yarn custom script: yarn <script>
+ ✓ bun custom script: bun run <script>
+ ✓ npm custom script: npm run <script>
+ ✓ pnpm install returns pnpm install
+ ✓ yarn install returns yarn (no install keyword)
+ ✓ bun test returns bun test
+
+getExecCommand (PM-specific formats):
+ ✓ pnpm exec: pnpm dlx <binary>
+ ✓ yarn exec: yarn dlx <binary>
+ ✓ bun exec: bunx <binary>
+ ✓ ignores unknown env var package manager
+
+getExecCommand (args validation):
+ ✓ rejects args with shell metacharacter semicolon
+ ✓ rejects args with pipe character
+ ✓ rejects args with backtick injection
+ ✓ rejects args with dollar sign
+ ✓ rejects args with ampersand
+ ✓ allows safe args like --write .
+ ✓ allows empty args without trailing space
+
+getCommandPattern (regex escaping):
+ ✓ escapes dot in action name for regex safety
+ ✓ escapes brackets in action name
+ ✓ escapes parentheses in action name
+
+getRunCommand (non-string input):
+ ✓ rejects undefined script name
+ ✓ rejects numeric script name
+ ✓ rejects boolean script name
+
+getExecCommand (non-string binary):
+ ✓ rejects undefined binary name
+ ✓ rejects numeric binary name
+
+getCommandPattern (escapeRegex completeness):
+ ✓ escapes all regex metacharacters in action
+ ✓ escapeRegex preserves alphanumeric chars
+
+getPackageManager (global config edge cases):
+ ✓ ignores global config with non-string packageManager
+
+Round 30: getCommandPattern edge cases:
+ ✓ escapes pipe character in action name
+ ✓ escapes dollar sign in action name
+ ✓ handles action with leading/trailing spaces gracefully
+ ✓ known action "dev" does NOT use escapeRegex path
+
+setProjectPackageManager (write verification, Round 31):
+ ✓ setProjectPackageManager creates .claude directory if missing
+ ✓ setProjectPackageManager includes setAt timestamp
+
+getExecCommand (safe argument edge cases, Round 31):
+ ✓ allows colons in args (e.g. --fix:all)
+ ✓ allows at-sign in args (e.g. @latest)
+ ✓ allows equals in args (e.g. --config=path)
+
+Round 34: getExecCommand non-string args:
+ ✓ getExecCommand with args=0 produces command without extra args
+ ✓ getExecCommand with args=false produces command without extra args
+ ✓ getExecCommand with args=null produces command without extra args
+
+Round 34: detectFromPackageJson with non-string packageManager:
+ ✓ detectFromPackageJson handles array packageManager field gracefully
+ ✓ detectFromPackageJson handles numeric packageManager field gracefully
+
+Round 48: detectFromPackageJson (version format edge cases):
+ ✓ returns null for packageManager with non-@ separator
+ ✓ extracts package manager from caret version like yarn@^4.0.0
+ ✓ getPackageManager falls through corrupted global config to npm default
+
+Round 69: getPackageManager (global-config success):
+ ✓ getPackageManager returns source global-config when valid global config exists
+
+Round 71: setPreferredPackageManager (save failure):
+ (skipped — chmod ineffective on Windows/root)
+ ✓ setPreferredPackageManager throws wrapped error when save fails
+
+Round 72: setProjectPackageManager (save failure):
+ (skipped — chmod ineffective on Windows/root)
+ ✓ setProjectPackageManager throws wrapped error when write fails
+
+Round 80: getExecCommand (truthy non-string args):
+ ✓ getExecCommand with args=42 (truthy number) appends stringified value
+
+Round 86: detectFromPackageJson (empty package.json):
+ ✓ detectFromPackageJson returns null for empty (0-byte) package.json
+
+Round 91: getCommandPattern (empty action):
+ ✓ getCommandPattern with empty string returns valid regex pattern
+
+Round 91: detectFromPackageJson (whitespace-only packageManager):
+ ✓ detectFromPackageJson returns null for whitespace-only packageManager field
+
+Round 92: detectFromPackageJson (empty string packageManager):
+ ✓ detectFromPackageJson returns null for empty string packageManager field
+
+Round 94: detectFromPackageJson (scoped package name @scope/pkg@version):
+ ✓ detectFromPackageJson returns null for scoped package name (@scope/pkg@version)
+
+Round 94: getPackageManager (empty string CLAUDE_PACKAGE_MANAGER env var):
+ ✓ getPackageManager skips empty string CLAUDE_PACKAGE_MANAGER (falsy short-circuit)
+
+Round 104: detectFromLockFile (null projectDir — throws TypeError):
+ ✓ detectFromLockFile(null) throws TypeError (path.join rejects null)
+
+Round 105: getExecCommand (object args — typeof bypass coerces to [object Object]):
+ ✓ getExecCommand with args={} bypasses SAFE_ARGS validation and coerces to "[object Object]"
+
+Round 109: getExecCommand (path traversal in binary — SAFE_NAME_REGEX permits ../ in binary name):
+ ✓ getExecCommand accepts ../../../etc/passwd as binary because SAFE_NAME_REGEX allows ../
+
+Round 108: getRunCommand (path traversal — SAFE_NAME_REGEX permits ../ via allowed / and . chars):
+ ✓ getRunCommand accepts @scope/../../evil because SAFE_NAME_REGEX allows ../
+
+Round 111: getExecCommand (newline in args — SAFE_ARGS_REGEX \s matches \n):
+ ✓ getExecCommand accepts newline in args because SAFE_ARGS_REGEX includes newline
+
+=== Test Results ===
+Passed: 115
+Failed: 0
+Total: 115
+
+
+
+--- Running lib/parallel-board.test.js ---
+
+Parallel Board Tests
+====================
+
+  ✓ createTask builds a todo task with preferred agents
+  ✓ attachAttempt links an attempt and moves task to running
+  ✓ addFeedback records feedback and moves task to review
+  ✓ saveBoard and loadBoard persist tasks
+
+4 passed, 0 failed
+
+
+
+--- Running lib/persona-runtime.test.js ---
+
+Persona Runtime Tests
+=====================
+
+  ✓ parsePersonaArgs strips explicit persona flags from child args
+  ✓ buildPersonaSelection honors explicit persona over routed persona
+  ✓ buildPersonaEnv and getPersonaFromEnv round-trip persona state
+  ✓ loadPersonaProfile resolves @include composition
+
+4 passed, 0 failed
+
+
+
+--- Running lib/privacy-gate.test.js ---
+
+Privacy Gate Tests
+
+  ✓ strips private and recursion tags
+  ✓ redacts common secret patterns before storage
+  ✓ redacts secrets inside structured object payloads
+  ✓ skips storage when content becomes empty after stripping
+
+Results: Passed: 4, Failed: 0
+
+
+--- Running lib/project-detect.test.js ---
+
+=== Testing project-detect.js ===
+
+Rule Definitions:
+  ✓ LANGUAGE_RULES is non-empty array
+  ✓ FRAMEWORK_RULES is non-empty array
+  ✓ each language rule has type, markers, and extensions
+  ✓ each framework rule has framework, language, markers, packageKeys
+
+Empty Directory:
+  ✓ empty directory returns unknown primary
+
+Python Detection:
+  ✓ detects python from requirements.txt
+  ✓ detects python from pyproject.toml
+  ✓ detects flask framework from requirements.txt
+  ✓ detects django framework from manage.py
+  ✓ detects fastapi from pyproject.toml dependencies
+
+TypeScript/JavaScript Detection:
+  ✓ detects typescript from tsconfig.json
+  ✓ detects nextjs from next.config.mjs
+  ✓ detects react from package.json
+  ✓ detects angular from angular.json
+
+Go Detection:
+  ✓ detects golang from go.mod
+
+Rust Detection:
+  ✓ detects rust from Cargo.toml
+
+Ruby Detection:
+  ✓ detects ruby and rails
+
+PHP Detection:
+  ✓ detects php and laravel
+
+Fullstack Detection:
+  ✓ detects fullstack when frontend + backend frameworks present
+
+Dependency Readers:
+  ✓ getPackageJsonDeps reads deps and devDeps
+  ✓ getPythonDeps reads requirements.txt
+  ✓ getGoDeps reads go.mod require block
+  ✓ getRustDeps reads Cargo.toml
+  ✓ returns empty arrays for missing files
+
+Elixir Detection:
+  ✓ detects elixir from mix.exs
+
+Edge Cases:
+  ✓ handles non-existent directory gracefully
+  ✓ handles malformed package.json
+  ✓ handles malformed composer.json
+
+=== Results: 28 passed, 0 failed ===
+
+
+
+--- Running lib/quality-scorer.test.js ---
+
+Quality Scorer Tests
+
+  ✓ computes a passing score for a healthy run
+  ✓ applies hard caps when the build is broken
+  ✓ detects oscillation and stagnation patterns
+
+Results: Passed: 3, Failed: 0
+
+
+--- Running lib/resolve-formatter.test.js ---
+
+=== Testing resolve-formatter.js ===
+
+  ✓ findProjectRoot: finds package.json in parent dir
+  ✓ findProjectRoot: returns startDir when no package.json
+  ✓ findProjectRoot: caches result for same startDir
+  ✓ detectFormatter: detects biome.json
+  ✓ detectFormatter: detects biome.jsonc
+  ✓ detectFormatter: detects .prettierrc
+  ✓ detectFormatter: detects prettier.config.js
+  ✓ detectFormatter: detects prettier key in package.json
+  ✓ detectFormatter: ignores package.json without prettier key
+  ✓ detectFormatter: biome takes priority over prettier
+  ✓ detectFormatter: returns null when no config found
+  ✓ resolveFormatterBin: uses local biome binary when available
+  ✓ resolveFormatterBin: falls back to npx for biome
+  ✓ resolveFormatterBin: uses local prettier binary when available
+  ✓ resolveFormatterBin: falls back to npx for prettier
+  ✓ resolveFormatterBin: returns null for unknown formatter
+  ✓ resolveFormatterBin: caches resolved binary
+  ✓ clearCaches: clears all cached values
+
+=== Test Results ===
+Passed: 18
+Failed: 0
+Total:  18
+
+
+--- Running lib/session-adapters.test.js ---
+=== Testing session-adapters ===
+
+  âœ“ dmux adapter normalizes orchestration snapshots into canonical form
+  âœ“ dmux adapter marks finished sessions as completed and records history
+  âœ“ fallback recording does not append duplicate history entries for unchanged snapshots
+  âœ“ claude-history adapter loads the latest recorded session
+  âœ“ adapter registry routes plan files to dmux and explicit claude targets to history
+  âœ“ adapter registry resolves structured target types into the correct adapter
+  âœ“ default registry forwards a nested state-store writer to adapters
+  âœ“ adapter registry lists adapter metadata and target types
+  âœ“ memory retrieval adapter normalizes coordination artifacts into canonical form
+  âœ“ persistence only falls back when the state-store module is missing
+
+=== Results: 10 passed, 0 failed ===
+
+
+--- Running lib/session-aliases.test.js ---
+
+=== Testing session-aliases.js ===
+
+loadAliases:
+  ✓ returns default structure when no file exists
+  ✓ returns default structure for corrupted JSON
+  ✓ returns default structure for invalid structure
+
+setAlias:
+  ✓ creates a new alias
+  ✓ updates an existing alias
+  ✓ rejects empty alias name
+  ✓ rejects null alias name
+  ✓ rejects invalid characters in alias
+  ✓ rejects alias longer than 128 chars
+  ✓ rejects reserved alias names
+  ✓ rejects empty session path
+  ✓ accepts underscores and dashes in alias
+
+resolveAlias:
+  ✓ resolves existing alias
+  ✓ returns null for non-existent alias
+  ✓ returns null for null/undefined input
+  ✓ returns null for invalid alias characters
+
+listAliases:
+  ✓ lists all aliases sorted by recency
+  ✓ filters aliases by search string
+  ✓ limits number of results
+  ✓ returns empty array when no aliases exist
+  ✓ search is case-insensitive
+
+deleteAlias:
+  ✓ deletes existing alias
+  ✓ returns error for non-existent alias
+
+renameAlias:
+  ✓ renames existing alias
+  ✓ rejects rename to existing alias
+  ✓ rejects rename of non-existent alias
+  ✓ rejects rename to invalid characters
+  ✓ rejects rename to empty string
+  ✓ rejects rename to reserved name
+  ✓ rejects rename to name exceeding 128 chars
+
+updateAliasTitle:
+  ✓ updates title of existing alias
+  ✓ clears title with null
+  ✓ rejects non-string non-null title
+  ✓ rejects title update for non-existent alias
+
+resolveSessionAlias:
+  ✓ resolves alias to session path
+  ✓ returns input as-is when not an alias
+
+getAliasesForSession:
+  ✓ finds all aliases for a session path
+  ✓ returns empty array for session with no aliases
+
+cleanupAliases:
+  ✓ removes aliases for non-existent sessions
+  ✓ handles all sessions existing (no cleanup needed)
+  ✓ rejects non-function sessionExists
+  ✓ handles sessionExists that throws an exception
+
+listAliases (edge cases):
+  ✓ handles entries with missing timestamps gracefully
+  ✓ search matches title in addition to name
+  ✓ limit of 0 returns empty array
+  ✓ search with no matches returns empty array
+
+setAlias (edge cases):
+  ✓ rejects non-string session path types
+  ✓ rejects whitespace-only session path
+  ✓ preserves createdAt on update
+
+updateAliasTitle (edge cases):
+  ✓ empty string title becomes null
+
+saveAliases (atomic write):
+  ✓ persists data across load/save cycles
+  ✓ updates metadata on save
+
+cleanupAliases (edge cases):
+  ✓ returns correct totalChecked when all removed
+  ✓ cleanupAliases returns success:true when aliases removed
+  ✓ cleanupAliases returns success:true when no cleanup needed
+  ✓ cleanupAliases with empty aliases file does nothing
+  ✓ cleanupAliases preserves aliases where sessionExists returns true
+
+renameAlias (edge cases):
+  ✓ rename preserves session path and title
+  ✓ rename preserves original createdAt timestamp
+
+getAliasesForSession (edge cases):
+  ✓ does not match partial session paths
+
+setAlias (reserved names case sensitivity):
+  ✓ rejects uppercase reserved name LIST
+  ✓ rejects mixed-case reserved name Help
+  ✓ rejects mixed-case reserved name Set
+
+listAliases (negative limit):
+  ✓ negative limit does not truncate results
+
+setAlias (undefined title):
+  ✓ undefined title becomes null (same as explicit null)
+
+saveAliases (failure paths, Round 31):
+  ✓ saveAliases returns false for invalid data (non-serializable)
+  ✓ saveAliases handles writing to read-only directory gracefully
+  ✓ loadAliases returns fresh structure for missing file
+
+renameAlias rollback (Round 33):
+  ✓ renameAlias with circular data triggers rollback path
+  ✓ renameAlias returns rolled-back error message on save failure
+  ✓ renameAlias rollback preserves original alias data on naming conflict
+
+saveAliases backup/restore (Round 33):
+  ✓ saveAliases creates backup before write and removes on success
+  ✓ saveAliases with non-serializable data returns false and preserves existing file
+
+Round 39: atomic overwrite:
+  ✓ saveAliases overwrites existing file atomically
+
+Round 48: rapid sequential saves:
+  ✓ rapid sequential setAlias calls maintain data integrity
+
+Round 56: Windows platform atomic write path:
+  ✓ Windows platform mock: unlinks existing file before rename
+
+Round 64: loadAliases version/metadata backfill:
+  ✓ loadAliases backfills missing version and metadata fields
+
+Round 67: loadAliases (empty 0-byte file):
+  ✓ loadAliases returns default structure for empty (0-byte) file
+
+Round 67: resolveSessionAlias (null/falsy input):
+  ✓ resolveSessionAlias returns null when given null input
+
+Round 67: loadAliases (metadata-only backfill, version present):
+  ✓ loadAliases backfills only metadata when version already present
+
+updateAliasTitle save failure (Round 70):
+    (skipped — chmod ineffective on Windows/root)
+  ✓ updateAliasTitle returns failure when saveAliases fails (read-only dir)
+
+Round 72: deleteAlias (save failure):
+    (skipped — chmod ineffective on Windows/root)
+  ✓ deleteAlias returns failure when saveAliases fails (read-only dir)
+
+Round 73: cleanupAliases (save failure):
+    (skipped — chmod ineffective on Windows/root)
+  ✓ cleanupAliases returns failure when saveAliases fails after removing aliases
+
+Round 73: setAlias (save failure):
+    (skipped — chmod ineffective on Windows/root)
+  ✓ setAlias returns failure when saveAliases fails
+
+Round 84: listAliases (NaN date fallback in sort comparator):
+  ✓ listAliases sorts entries with invalid/missing dates to the end via || 0 fallback
+
+Round 86: loadAliases (truthy non-object aliases field):
+  ✓ loadAliases resets to defaults when aliases field is a string (typeof !== object)
+
+Round 90: saveAliases (backup restore double failure):
+    (skipped — chmod not reliable on Windows)
+  ✓ saveAliases triggers inner restoreErr catch when both save and restore fail
+
+Round 95: renameAlias (self-rename same name):
+  ✓ renameAlias returns "already exists" error when renaming alias to itself
+
+Round 100: cleanupAliases (callback returns 0 — falsy non-boolean coercion):
+  ✓ cleanupAliases removes alias when callback returns 0 (falsy coercion: !0 === true)
+
+Round 102: setAlias (title=0 — falsy coercion silently converts to null):
+  ✓ setAlias with title=0 stores null (0 || null === null due to JavaScript falsy coercion)
+
+Round 103: loadAliases (array aliases — typeof bypass):
+  ✓ loadAliases accepts array aliases because typeof [] === "object" passes validation
+
+Round 104: resolveSessionAlias (path-traversal input — returned unchanged):
+  ✓ resolveSessionAlias returns path-traversal input as-is when alias lookup fails
+
+Round 107: setAlias (whitespace-only title — truthy string stored as-is, unlike sessionPath which is trim-checked):
+  ✓ setAlias stores whitespace-only title as-is (no trim validation, unlike sessionPath)
+
+Round 111: setAlias (128-char alias — exact boundary of > 128 check):
+  ✓ setAlias accepts alias of exactly 128 characters (128 is NOT > 128)
+
+Round 112: resolveAlias (Unicode rejection):
+  ✓ resolveAlias returns null for alias names containing Unicode characters
+
+Round 114: listAliases (non-string search — number triggers TypeError):
+  ✓ listAliases throws TypeError when search option is a number (no toLowerCase method)
+
+Round 115: updateAliasTitle (empty string title — stored null, returned ""):
+  ✓ updateAliasTitle with empty string stores null but returns empty string (|| coercion mismatch)
+
+Round 116: loadAliases (extra unknown JSON fields — preserved by loose validation):
+  ✓ loadAliases preserves extra unknown fields because only aliases key is validated
+
+Round 118: renameAlias (same name — "already exists" because data.aliases[newAlias] is truthy):
+  ✓ renameAlias to the same name returns "already exists" error (no self-rename short-circuit)
+
+Round 118: setAlias (reserved names — case-insensitive rejection):
+  ✓ setAlias rejects all reserved names case-insensitively (list, help, remove, delete, create, set)
+
+Round 119: renameAlias (reserved newAlias name — parallel check to setAlias):
+  ✓ renameAlias rejects reserved names for newAlias (same reserved list as setAlias)
+
+Round 120: setAlias (max alias length boundary — 128 ok, 129 rejected):
+  ✓ setAlias accepts exactly 128-char alias name but rejects 129 chars (> 128 boundary)
+
+Round 121: setAlias (sessionPath validation — null, empty, whitespace, non-string):
+  ✓ setAlias rejects invalid sessionPath: null, empty, whitespace-only, and non-string types
+
+Round 122: listAliases (limit edge cases — 0/negative/NaN are falsy, return all):
+  ✓ listAliases limit=0 returns all aliases because 0 is falsy in JS (no slicing)
+
+Round 125: loadAliases (__proto__ key in JSON — safe, no prototype pollution):
+  ✓ loadAliases with __proto__ alias key does not pollute Object prototype
+
+Results: Passed: 105, Failed: 0
+
+[Aliases] Error parsing aliases file: Unexpected token 'N', "NOT VALID JSON!!!" is not valid JSON
+[Aliases] Invalid aliases file structure, resetting
+[Aliases] Error saving aliases: Converting circular structure to JSON
+    --> starting at object with constructor 'Object'
+    --- property 'self' closes the circle
+[Aliases] Error saving aliases: Converting circular structure to JSON
+    --> starting at object with constructor 'Object'
+    --- property 'self' closes the circle
+[Aliases] Invalid aliases file structure, resetting
+
+
+--- Running lib/session-manager.test.js ---
+
+=== Testing session-manager.js ===
+
+parseSessionFilename:
+  ✓ parses new format with short ID
+  ✓ parses old format without short ID
+  ✓ returns null for invalid filename
+  ✓ returns null for malformed date
+  ✓ parses long short IDs (8+ chars)
+  ✓ accepts short IDs under 8 chars
+
+parseSessionMetadata:
+  ✓ parses full session content
+  ✓ handles null/undefined/empty content
+  ✓ handles content with no sections
+
+getSessionStats:
+  ✓ calculates stats from content string
+  ✓ handles empty content
+  ✓ does not treat non-absolute path as file path
+
+Session CRUD:
+  ✓ writeSessionContent and getSessionContent round-trip
+  ✓ appendSessionContent appends to existing
+  ✓ writeSessionContent returns false for invalid path
+  ✓ getSessionContent returns null for non-existent file
+  ✓ deleteSession removes file
+  ✓ deleteSession returns false for non-existent file
+  ✓ sessionExists returns true for existing file
+  ✓ sessionExists returns false for non-existent file
+  ✓ sessionExists returns false for directory
+
+getSessionSize:
+  ✓ returns human-readable size for existing file
+  ✓ returns "0 B" for non-existent file
+  ✓ returns bytes for small file
+
+getSessionTitle:
+  ✓ extracts title from session file
+  ✓ returns "Untitled Session" for empty content
+  ✓ returns "Untitled Session" for non-existent file
+
+getAllSessions:
+  ✓ getAllSessions returns all sessions
+  ✓ getAllSessions paginates correctly
+  ✓ getAllSessions filters by date
+  ✓ getAllSessions filters by search (short ID)
+  ✓ getAllSessions returns sorted by newest first
+  ✓ getAllSessions handles offset beyond total
+  ✓ getAllSessions returns empty for non-existent date
+  ✓ getAllSessions ignores non-.tmp files
+
+getSessionById:
+  ✓ getSessionById finds by short ID prefix
+  ✓ getSessionById finds by short ID prefix match
+  ✓ getSessionById finds by full filename
+  ✓ getSessionById finds by filename without .tmp
+  ✓ getSessionById returns null for non-existent ID
+  ✓ getSessionById includes content when requested
+  ✓ getSessionById finds old format (no short ID)
+  ✓ getSessionById returns null for empty string
+  ✓ getSessionById metadata and stats populated when includeContent=true
+
+parseSessionMetadata (edge cases):
+  ✓ handles CRLF line endings
+  ✓ takes first h1 heading as title
+  ✓ handles empty sections (Completed with no items)
+  ✓ handles content with only title and notes
+  ✓ extracts context with backtick fenced block
+  ✓ trims whitespace from title
+
+getSessionStats (edge cases):
+  ✓ detects notes and context presence
+  ✓ detects absence of notes and context
+  ✓ treats Unix absolute path ending with .tmp as file path
+
+getSessionSize (edge cases):
+  ✓ returns MB for large file
+  ✓ appendSessionContent returns false for invalid path
+
+parseSessionFilename (additional edge cases):
+  ✓ accepts uppercase letters in short ID
+  ✓ accepts underscores in short ID
+  ✓ accepts hyphenated short IDs (extra segments)
+  ✓ rejects impossible month (13)
+  ✓ rejects impossible day (32)
+  ✓ rejects month 00
+  ✓ rejects day 00
+  ✓ accepts valid edge date (month 12, day 31)
+  ✓ rejects Feb 31 (calendar-inaccurate date)
+  ✓ rejects Apr 31 (calendar-inaccurate date)
+  ✓ rejects Feb 29 in non-leap year
+  ✓ accepts Feb 29 in leap year
+  ✓ accepts Jun 30 (valid 30-day month)
+  ✓ rejects Jun 31 (invalid 30-day month)
+  ✓ datetime field is a Date object
+
+writeSessionContent:
+  ✓ creates new session file
+  ✓ overwrites existing session file
+  ✓ writeSessionContent returns false for invalid path
+
+appendSessionContent:
+  ✓ appends to existing session file
+
+deleteSession:
+  ✓ deletes existing session file
+  ✓ deleteSession returns false for non-existent file
+
+sessionExists:
+  ✓ returns true for existing session file
+  ✓ returns false for non-existent file
+  ✓ returns false for directory (not a file)
+
+getAllSessions (pagination edge cases):
+  ✓ getAllSessions clamps negative offset to 0
+  ✓ getAllSessions clamps NaN offset to 0
+  ✓ getAllSessions clamps NaN limit to default
+  ✓ getAllSessions clamps negative limit to 1
+  ✓ getAllSessions clamps zero limit to 1
+  ✓ getAllSessions handles string offset/limit gracefully
+  ✓ getAllSessions handles fractional offset (floors to integer)
+  ✓ getAllSessions handles Infinity offset
+
+getSessionStats (code blocks & special chars):
+  ✓ counts tasks with inline backticks correctly
+  ✓ handles special chars in notes section
+  ✓ counts items in multiline code-heavy session
+  ✓ getSessionStats handles empty string content
+
+parseSessionFilename (30-day month validation):
+  ✓ rejects Sep 31 (September has 30 days)
+  ✓ rejects Nov 31 (November has 30 days)
+  ✓ accepts Sep 30 (valid 30-day month boundary)
+
+getSessionStats (path heuristic edge cases):
+  ✓ multiline content ending with .tmp is treated as content
+  ✓ single-line content not starting with / treated as content
+
+getAllSessions (combined filters):
+  ✓ combines date filter + search filter + pagination
+  ✓ date filter + offset beyond matches returns empty
+
+getSessionById (ambiguous prefix):
+  ✓ returns first match when multiple sessions share a prefix
+
+parseSessionMetadata (edge cases):
+  ✓ handles unclosed code fence in Context section
+  ✓ handles empty task text in checklist items
+
+Round 43: getSessionById (default excludes content):
+  ✓ getSessionById without includeContent omits content, metadata, and stats
+
+Round 54: search filter scope and path utility:
+  ✓ getAllSessions search filter matches only short ID, not title or content
+  ✓ getSessionPath returns absolute path for session filename
+
+Round 66: getSessionById (noIdMatch â€” date-only match for old format):
+  ✓ getSessionById finds old-format session by date-only string (noIdMatch)
+
+Round 30: datetime local-time fix:
+  ✓ datetime day matches the filename date (local-time constructor)
+  ✓ datetime matches for January 1 (timezone-sensitive date)
+  ✓ datetime matches for December 31 (year boundary)
+
+Round 30: parseSessionFilename edge cases:
+  ✓ parses session ID with many dashes (UUID-like)
+  ✓ rejects filename with missing session.tmp suffix
+  ✓ rejects filename with extra text after suffix
+  ✓ handles old-format filename without session ID
+
+createdTime fallback (Round 33):
+  ✓ getAllSessions returns createdTime from birthtime when available
+  ✓ getSessionById returns createdTime field
+  ✓ createdTime falls back to ctime when birthtime is epoch-zero
+
+getSessionStats Windows path heuristic (Round 46):
+  ✓ recognises Windows drive-letter path as a file path
+  ✓ does not treat bare drive letter without slash as path
+
+parseSessionMetadata checkbox case sensitivity (Round 46):
+  ✓ uppercase [X] does not match completed items regex
+  ✓ getAllSessions returns empty when sessions dir missing
+
+Round 69: getSessionById (missing sessions directory):
+  ✓ getSessionById returns null when sessions directory does not exist
+
+Round 78: getSessionStats (actual file path â†’ reads from disk):
+  ✓ getSessionStats reads from disk when given path to existing .tmp file
+
+Round 78: getAllSessions (hasContent field):
+  ✓ getAllSessions hasContent is true for non-empty and false for empty files
+
+Round 75: deleteSession (unlink failure in read-only dir):
+    (skipped â€” chmod ineffective on Windows/root)
+  ✓ deleteSession returns false when file exists but directory is read-only
+
+Round 81: getSessionStats(null) (null input):
+  ✓ getSessionStats(null) returns zero lineCount and empty metadata
+
+Round 83: getAllSessions (broken symlink â€” statSync catch):
+    (skipped â€” broken symlink creation not permitted on this Windows setup)
+  ✓ getAllSessions skips broken symlink .tmp files gracefully
+
+Round 84: getSessionById (broken symlink â€” statSync catch):
+    (skipped â€” broken symlink creation not permitted on this Windows setup)
+  ✓ getSessionById returns null when matching session is a broken symlink
+
+Round 88: parseSessionMetadata content lacking Date/Started/Updated fields:
+  ✓ parseSessionMetadata returns null for date, started, lastUpdated when fields absent
+
+Round 89: getAllSessions (subdirectory skip):
+  ✓ getAllSessions skips subdirectories inside sessions dir
+
+Round 91: getSessionStats (mixed Windows path separators):
+  ✓ getSessionStats treats mixed Windows separators as a file path
+
+Round 92: getSessionStats (Windows UNC path):
+  ✓ getSessionStats treats UNC path as content (not recognized as file path)
+
+Round 93: getSessionStats (drive letter without slash â€” regex boundary):
+  ✓ getSessionStats treats drive letter without slash as content (not a path)
+
+Round 95: getAllSessions (both negative offset and negative limit):
+  ✓ getAllSessions clamps both negative offset (to 0) and negative limit (to 1) simultaneously
+
+Round 96: parseSessionFilename (Feb 30 â€” impossible date):
+  ✓ parseSessionFilename rejects Feb 30 (passes day<=31 but fails Date rollover)
+
+Round 96: getAllSessions (limit: Infinity â€” pagination bypass):
+  ✓ getAllSessions with limit: Infinity returns all sessions (no pagination)
+
+Round 96: getAllSessions (limit: null â€” destructuring default bypass):
+  ✓ getAllSessions with limit: null clamps to 1 (null bypasses destructuring default)
+
+Round 97: getAllSessions (whitespace search â€” truthy but unmatched):
+  ✓ getAllSessions with search: " " returns empty because space is truthy but never matches shortId
+
+Round 98: getSessionById (null sessionId â€” crashes at line 297):
+  ✓ getSessionById(null) throws TypeError when session files exist
+
+Round 98: parseSessionFilename (null input â€” crashes at line 30):
+  ✓ parseSessionFilename(null) throws TypeError because null has no .match()
+
+Round 99: writeSessionContent (null path â€” error handling):
+  ✓ writeSessionContent(null, content) returns false (TypeError caught by try/catch)
+
+Round 100: parseSessionMetadata (### in item text â€” lazy regex truncation):
+  ✓ parseSessionMetadata truncates item text at embedded ### due to lazy regex lookahead
+
+Round 101: getSessionStats (non-string input â€” type confusion crash):
+  ✓ getSessionStats(123) throws TypeError (number reaches parseSessionMetadata â†’ .match() fails)
+
+Round 101: appendSessionContent (null path â€” error handling):
+  ✓ appendSessionContent(null, content) returns false (TypeError caught by try/catch)
+
+Round 102: getSessionStats (Unix nonexistent .tmp path â€” looksLikePath â†’ null content):
+  ✓ getSessionStats returns zeroed stats when Unix path looks like file but does not exist
+
+Round 102: parseSessionMetadata ([x] items in In Progress â€” regex skips checked):
+  ✓ parseSessionMetadata skips [x] checked items in In Progress section (regex only matches [ ])
+
+Round 104: parseSessionMetadata (whitespace-only notes â€” trim reduces to empty):
+  ✓ parseSessionMetadata treats whitespace-only notes as absent (trim â†’ empty string â†’ falsy)
+
+Round 105: parseSessionMetadata (blank line inside section â€” regex stops at \n\n):
+  ✓ parseSessionMetadata drops completed items after a blank line within the section
+
+Round 106: getAllSessions (array/object limit coercion â€” Number([5])â†’5, Number({})â†’NaNâ†’50):
+  ✓ getAllSessions coerces array/object limit via Number() with NaN fallback to 50
+
+Round 109: getAllSessions (non-session .tmp files â€” parseSessionFilename returns null â†’ skip):
+  ✓ getAllSessions ignores .tmp files with non-matching filenames
+
+Round 108: getSessionSize (exact 1024-byte boundary â€” < means 1024 is KB, 1023 is B):
+  ✓ getSessionSize returns KB at exactly 1024 bytes and B at 1023
+
+Round 110: parseSessionFilename (year 0000 â€” Date constructor maps 0â†’1900):
+  ✓ parseSessionFilename with year 0000 produces datetime in 1900 due to JS Date legacy mapping
+
+Round 110: parseSessionFilename (mixed-case IDs are accepted):
+  ✓ parseSessionFilename accepts filenames with uppercase characters in short ID
+
+Round 111: parseSessionMetadata (nested ``` in context â€” lazy \S*? stops at first ```):");
+  ✓ parseSessionMetadata context capture truncated by nested triple backticks
+
+Round 112: getSessionStats (newline-in-path heuristic):
+  ✓ getSessionStats treats absolute .tmp path containing newline as content, not a file path
+
+Round 112: appendSessionContent (read-only file):
+  ✓ appendSessionContent returns false when file is read-only (EACCES)
+
+Round 113: parseSessionFilename (century leap year â€” 100/400 rules):
+  ✓ parseSessionFilename rejects Feb 29 in century non-leap years (1900, 2100) but accepts 2000
+
+Round 113: parseSessionMetadata (title with markdown formatting â€” raw markdown preserved):
+  ✓ parseSessionMetadata captures raw markdown formatting in title without stripping
+
+Round 115: parseSessionMetadata (CRLF line endings â€” \r\n vs \n in section regexes):
+  ✓ parseSessionMetadata handles CRLF content â€” title trimmed, sections may over-capture
+
+Round 117: getSessionSize (B/KB/MB formatting at exact boundary thresholds):
+  ✓ getSessionSize formats correctly at Bâ†’KB boundary (1023â†’"1023 B", 1024â†’"1.0 KB") and KBâ†’MB
+
+Round 117: parseSessionFilename (uppercase, underscores, and short IDs are accepted):
+  ✓ parseSessionFilename accepts uppercase short IDs, underscores, and 7-char names
+
+Round 119: parseSessionMetadata ("Context to Load" â€” code block extraction edge cases):
+  ✓ parseSessionMetadata extracts Context to Load from code block, handles missing/nested blocks
+
+Round 120: parseSessionMetadata ("Notes for Next Session" â€” extraction edge cases):
+  ✓ parseSessionMetadata extracts notes section â€” last section, empty, followed by ###
+
+Round 121: parseSessionMetadata (Started/Last Updated time extraction):
+  ✓ parseSessionMetadata extracts Started and Last Updated times from markdown
+
+Round 122: getSessionById (old format no-id â€” date-only filename match):
+  ✓ getSessionById matches old format YYYY-MM-DD-session.tmp via noIdMatch path
+
+Round 123: parseSessionMetadata (CRLF section boundaries â€” \n\n fails to match \r\n\r\n):
+  ✓ parseSessionMetadata CRLF content: \n\n boundary fails, lazy match bleeds across sections
+
+Round 124: getAllSessions (invalid date format â€” strict !== comparison):
+  ✓ getAllSessions date filter uses strict equality so wrong format returns empty
+
+Round 124: parseSessionMetadata (title regex edge cases â€” /^#\s+(.+)$/m):
+  ✓ parseSessionMetadata title: no space after # fails, ## fails, multiple picks first, empty trims
+
+Results: Passed: 166, Failed: 0
+
+[SessionManager] Error writing session: ENOENT: no such file or directory, open 'C:\nonexistent\deep\path\session.tmp'
+[SessionManager] Error appending to session: ENOENT: no such file or directory, open 'C:\nonexistent\deep\path\session.tmp'
+[SessionManager] Error writing session: ENOENT: no such file or directory, open 'C:\nonexistent\deep\path\session.tmp'
+[SessionManager] Error writing session: The "path" argument must be of type string or an instance of Buffer or URL. Received null
+[SessionManager] Error appending to session: The "path" argument must be of type string or an instance of Buffer or URL. Received null
+
+
+--- Running lib/shell-split.test.js ---
+=== Testing shell-split.js ===
+
+Basic operators:
+  ✓ && splits into two segments
+  ✓ || splits into two segments
+  ✓ ; splits into two segments
+  ✓ single & splits (background)
+
+Redirection operators (should NOT split):
+  ✓ 2>&1 stays as one segment
+  ✓ &> stays as one segment
+  ✓ >& stays as one segment
+
+Quoting:
+  ✓ double-quoted && not split
+  ✓ single-quoted && not split
+  ✓ double-quoted ; not split
+
+Escaped quotes:
+  ✓ escaped double quote inside double quotes
+  ✓ escaped single quote inside single quotes
+
+Escaped operators outside quotes:
+  ✓ escaped && outside quotes not split
+  ✓ escaped ; outside quotes not split
+
+Real-world cases:
+  ✓ tmux new-session with quoted compound command
+  ✓ chained: tmux ls then bare dev
+  ✓ background dev server
+  ✓ empty string returns empty array
+  ✓ single command no operators
+
+=== Results: 19 passed, 0 failed ===
+
+
+--- Running lib/skill-dashboard.test.js ---
+
+=== Testing skill dashboard ===
+
+Chart primitives:
+  ✓ sparkline maps float values to Unicode block characters
+  ✓ sparkline returns empty string for empty array
+  ✓ sparkline renders null values as empty block
+  ✓ horizontalBar renders correct fill ratio
+  ✓ horizontalBar handles zero value
+  ✓ panelBox renders box-drawing characters with title
+
+Time-series bucketing:
+  ✓ bucketByDay groups records into daily bins
+  ✓ bucketByDay returns null rate for empty days
+
+Panel renderers:
+  ✓ renderSuccessRatePanel produces one row per skill with sparklines
+  ✓ renderFailureClusterPanel groups failures by reason
+  ✓ renderAmendmentPanel lists pending amendments
+  ✓ renderVersionTimelinePanel shows version history
+
+Full dashboard:
+  ✓ renderDashboard produces all four panels
+  ✓ renderDashboard supports single panel selection
+  ✓ renderDashboard rejects unknown panel names
+
+CLI integration:
+  ✓ CLI --dashboard --json returns valid JSON with all panels
+  ✓ CLI --panel failures --json returns only the failures panel
+  ✓ CLI --help mentions --dashboard
+
+Edge cases:
+  ✓ dashboard renders gracefully with no execution records
+  ✓ failure cluster panel handles all successes
+
+Results: Passed: 20, Failed: 0
+
+
+--- Running lib/skill-deployers.test.js ---
+
+=== Testing skill-deployers.js ===
+
+Utilities:
+  ✓ ensureDir creates nested directory
+  ✓ ensureDir is idempotent
+  ✓ copyRecursive copies files and subdirectories
+  ✓ countFiles counts all files recursively
+  ✓ countFiles returns 0 for nonexistent dir
+
+DEPLOYERS registry:
+  ✓ DEPLOYERS has entries for all 6 platforms
+  ✓ DEPLOYERS is frozen
+  ✓ getDeployer returns function for valid platform
+  ✓ getDeployer throws for unknown platform
+
+Claude deployer:
+  ✓ deploys skill to ~/.claude/skills/<id>/
+
+Cursor deployer:
+  ✓ deploys skill to <projectRoot>/.cursor/skills/<id>/
+
+Codex deployer:
+  ✓ deploys skill to ~/.codex/skills/<id>/
+
+OpenCode deployer:
+  ✓ deploys skill to ~/.opencode/skills/<id>/
+
+Antigravity deployer:
+  ✓ deploys skill to <projectRoot>/.agent/skills/<id>/
+
+Copilot deployer:
+  ✓ deploys skill to <projectRoot>/.claude/skills/<id>/
+  ✓ copies .github scaffold when includeCopilotScaffold is true
+  ✓ skips scaffold if already present at destination
+
+deploySkill (generic):
+  ✓ dispatches to correct platform deployer
+  ✓ throws for unknown platform
+
+deploySkills (bulk):
+  ✓ deploys multiple skills to one platform
+
+Results: 20 passed, 0 failed
+
+
+
+--- Running lib/skill-evolution.test.js ---
+
+=== Testing skill evolution ===
+
+Provenance:
+  ✓ classifies curated, learned, and imported skill directories
+  ✓ writes and validates provenance metadata for non-curated skills
+  ✓ exports the consolidated module surface from index.js
+
+Versioning:
+  ✓ creates version snapshots and evolution logs for a skill
+  ✓ rolls back to a previous snapshot without losing history
+
+Tracking:
+  ✓ records skill execution rows to JSONL fallback storage
+  ✓ falls back to JSONL when a state-store adapter is unavailable
+  ✓ ignores malformed JSONL rows when reading execution records
+  ✓ preserves zero-valued telemetry fields during normalization
+
+Health:
+  ✓ computes per-skill health metrics and flags declining skills
+  ✓ treats an unsnapshotted SKILL.md as v1 and orders last_run by actual time
+  ✓ CLI emits JSON health output for standalone integration
+  ✓ CLI shows help and rejects missing option values
+
+Results: Passed: 13, Failed: 0
+
+
+--- Running lib/skill-improvement.test.js ---
+=== Testing skill-improvement ===
+
+  ✓ observation layer writes and reads structured skill outcomes
+  ✓ health inspector traces recurring failures for a skill across runs
+  ✓ amendify proposes SKILL.md patch content from failure evidence
+  ✓ evaluation scaffold compares amended and baseline performance
+
+=== Results: 4 passed, 0 failed ===
+
+
+--- Running lib/skill-registry.test.js ---
+
+=== Testing skill-registry.js ===
+
+Constants:
+  ✓ PLATFORM_TARGETS contains 6 platforms
+  ✓ PLATFORM_TARGETS is frozen
+  ✓ SKILL_ENTRY_FILE is SKILL.md
+
+getSourceRoot:
+  ✓ returns the repo root directory
+
+discoverSkills:
+  ✓ discovers skill directories with metadata
+  ✓ returns sorted by id
+  ✓ returns empty array for missing skills dir
+
+extractDescription:
+  ✓ extracts first non-heading non-frontmatter line
+  ✓ skips frontmatter lines
+  ✓ returns null for non-existent file
+
+loadModuleSkillMapping:
+  ✓ loads mapping from manifest for skills modules
+  ✓ returns empty map if no manifest exists
+
+buildSkillRegistry:
+  ✓ merges discovered skills with module info
+  ✓ skills without module get default targets (all except copilot)
+
+validateSkillIds:
+  ✓ separates valid and invalid skill IDs
+  ✓ returns all invalid for empty registry
+
+findSkillsByIds:
+  ✓ finds skills by IDs
+
+findSkillsByModule:
+  ✓ finds skills by module ID
+
+listSkillIds:
+  ✓ lists just the IDs from real repo
+
+Results: 19 passed, 0 failed
+
+
+
+--- Running lib/state-store.test.js ---
+
+=== Testing state-store ===
+
+  ✓ creates the default state.db path and applies migrations idempotently
+  ✓ preserves SQLite special database names like :memory:
+  ✓ stores sessions and returns detailed session views with workers, skill runs, and decisions
+  ✓ builds a status snapshot with active sessions, skill rates, install health, and pending governance
+  ✓ validates entity payloads before writing to the database
+  ✓ supports claim-confirm queue semantics with stale-processing recovery
+  ✓ status CLI supports human-readable and --json output
+  ✓ sessions CLI supports list and detail views in human-readable and --json output
+  ✓ ecc CLI delegates the new status and sessions subcommands
+
+Results: Passed: 9, Failed: 0
+
+
+--- Running lib/tmux-worktree-orchestrator.test.js ---
+=== Testing tmux-worktree-orchestrator.js ===
+
+Helpers:
+  ✓ slugify normalizes mixed punctuation and casing
+  ✓ renderTemplate replaces supported placeholders
+  ✓ renderTemplate rejects unknown placeholders
+
+Plan generation:
+  ✓ buildOrchestrationPlan creates worktrees, branches, and tmux commands
+  ✓ buildAttemptLogPath creates the shared attempt-log location
+  ✓ buildLoggedLaunchCommand wraps worker launch with tee logging
+  ✓ buildOrchestrationPlan requires at least one worker
+  ✓ buildOrchestrationPlan normalizes global and worker seed paths
+  ✓ buildOrchestrationPlan rejects worker names that collapse to the same slug
+  ✓ buildOrchestrationPlan exposes shell-safe launcher aliases alongside raw defaults
+  ✓ buildOrchestrationPlan shell-quotes the orchestration banner command
+  ✓ normalizeSeedPaths rejects paths outside the repo root
+  ✓ materializePlan keeps worker instructions inside the worktree boundary
+  ✓ overlaySeedPaths copies local overlays into the worker worktree
+  ✓ executePlan rolls back partial setup when orchestration fails mid-run
+  ✓ executePlan does not mark pre-existing resources for rollback when worktree creation fails
+
+=== Results: 16 passed, 0 failed ===
+
+
+--- Running lib/utils.test.js ---
+
+=== Testing utils.js ===
+
+Platform Detection:
+  âœ“ isWindows/isMacOS/isLinux are booleans
+  âœ“ exactly one platform should be true
+
+Directory Functions:
+  âœ“ getHomeDir returns valid path
+  âœ“ getClaudeDir returns path under home
+  âœ“ getSessionsDir returns path under Claude dir
+  âœ“ getTempDir returns valid temp directory
+  âœ“ ensureDir creates directory
+
+Date/Time Functions:
+  âœ“ getDateString returns YYYY-MM-DD format
+  âœ“ getTimeString returns HH:MM format
+  âœ“ getDateTimeString returns full datetime format
+
+Project Name Functions:
+  âœ“ getGitRepoName returns string or null
+  âœ“ getProjectName returns non-empty string
+
+Session ID Functions:
+  âœ“ getSessionIdShort falls back to project name
+  âœ“ getSessionIdShort returns last 8 characters
+  âœ“ getSessionIdShort handles short session IDs
+
+File Operations:
+  âœ“ readFile returns null for non-existent file
+  âœ“ writeFile and readFile work together
+  âœ“ appendFile adds content to file
+  âœ“ replaceInFile replaces text
+  âœ“ countInFile counts occurrences
+  âœ“ grepFile finds matching lines
+
+findFiles:
+  âœ“ findFiles returns empty for non-existent directory
+  âœ“ findFiles finds matching files
+
+Edge Cases:
+  âœ“ findFiles returns empty for null/undefined dir
+  âœ“ findFiles returns empty for null/undefined pattern
+  âœ“ findFiles supports maxAge filter
+  âœ“ findFiles supports recursive option
+  âœ“ countInFile handles invalid regex pattern
+  âœ“ countInFile handles non-string non-regex pattern
+  âœ“ countInFile enforces global flag on RegExp
+  âœ“ grepFile handles invalid regex pattern
+  âœ“ replaceInFile returns false for non-existent file
+  âœ“ countInFile returns 0 for non-existent file
+  âœ“ grepFile returns empty for non-existent file
+  âœ“ commandExists rejects unsafe command names
+  âœ“ ensureDir is idempotent
+
+System Functions:
+  âœ“ commandExists finds node
+  âœ“ commandExists returns false for fake command
+  âœ“ runCommand executes simple command
+  âœ“ runCommand handles failed command
+
+output() and log():
+  âœ“ output() writes string to stdout
+  âœ“ output() JSON-stringifies objects
+  âœ“ output() JSON-stringifies null (typeof null === "object")
+  âœ“ output() handles arrays as objects
+  âœ“ log() writes to stderr
+
+isGitRepo():
+  âœ“ isGitRepo returns true in a git repo
+
+getGitModifiedFiles():
+  âœ“ getGitModifiedFiles returns an array
+  âœ“ getGitModifiedFiles filters by regex patterns
+  âœ“ getGitModifiedFiles skips invalid patterns
+  âœ“ getGitModifiedFiles skips non-string patterns
+
+getLearnedSkillsDir():
+  âœ“ getLearnedSkillsDir returns path under Claude dir
+
+replaceInFile (behavior):
+  âœ“ replaces first match when regex has no g flag
+  âœ“ replaces all matches when regex has g flag
+  âœ“ replaces with string search (first occurrence)
+  âœ“ replaces all occurrences with string when options.all is true
+  âœ“ options.all is ignored for regex patterns
+  âœ“ replaces with capture groups
+
+writeFile (edge cases):
+  âœ“ writeFile overwrites existing content
+  âœ“ writeFile handles unicode content
+
+findFiles (regex chars):
+  âœ“ findFiles handles regex special chars in pattern
+  âœ“ findFiles wildcard still works with special chars
+
+readStdinJson():
+  âœ“ readStdinJson parses valid JSON from stdin
+  âœ“ readStdinJson returns {} for invalid JSON
+  âœ“ readStdinJson returns {} for empty stdin
+  âœ“ readStdinJson handles nested objects
+
+grepFile (global regex fix):
+  âœ“ grepFile with /g flag finds ALL matching lines (not alternating)
+  âœ“ grepFile preserves regex flags other than g (e.g. case-insensitive)
+
+commandExists Edge Cases:
+  âœ“ commandExists rejects empty string
+  âœ“ commandExists rejects command with spaces
+  âœ“ commandExists rejects command with path separators
+  âœ“ commandExists rejects shell metacharacters
+  âœ“ commandExists allows dots and underscores
+
+findFiles Edge Cases:
+  âœ“ findFiles with ? wildcard matches single character
+  âœ“ findFiles sorts by mtime (newest first)
+  âœ“ findFiles with maxAge filters old files
+
+ensureDir Edge Cases:
+  âœ“ ensureDir is safe for concurrent calls (EEXIST race)
+  âœ“ ensureDir returns the directory path
+
+runCommand Edge Cases:
+  âœ“ runCommand returns trimmed output
+  âœ“ runCommand captures stderr on failure
+
+getGitModifiedFiles Edge Cases:
+  âœ“ getGitModifiedFiles returns array with empty patterns
+
+replaceInFile Edge Cases:
+  âœ“ replaceInFile with regex capture groups works correctly
+
+readStdinJson Edge Cases:
+  âœ“ readStdinJson type check: returns a Promise
+
+readStdinJson maxSize truncation:
+    (skipped â€” stdin chunking behavior differs on Windows)
+  âœ“ readStdinJson maxSize stops accumulating after threshold (chunk-level guard)
+  âœ“ readStdinJson with maxSize large enough preserves valid JSON
+  âœ“ readStdinJson resolves {} for whitespace-only stdin
+  âœ“ readStdinJson handles JSON with trailing whitespace/newlines
+  âœ“ readStdinJson handles JSON with BOM prefix (returns {})
+
+ensureDir Error Propagation (Round 31):
+  âœ“ ensureDir wraps non-EEXIST errors with descriptive message
+  âœ“ ensureDir error includes the directory path
+
+runCommand failure output (Round 31):
+  âœ“ runCommand returns stderr content on failure when stderr exists
+  âœ“ runCommand returns error output on failed command
+
+runCommand Security (allowlist + metacharacters):
+  âœ“ runCommand blocks disallowed command prefix
+  âœ“ runCommand blocks curl command
+  âœ“ runCommand blocks bash command
+  âœ“ runCommand blocks semicolon command chaining
+  âœ“ runCommand blocks pipe command chaining
+  âœ“ runCommand blocks ampersand command chaining
+  âœ“ runCommand blocks dollar sign command substitution
+  âœ“ runCommand blocks backtick command substitution
+  âœ“ runCommand allows metacharacters inside double quotes
+  âœ“ runCommand allows metacharacters inside single quotes
+  âœ“ runCommand blocks unquoted metacharacters alongside quoted ones
+  âœ“ runCommand blocks prefix without trailing space
+  âœ“ runCommand allows npx prefix
+  âœ“ runCommand blocks newline command injection
+  âœ“ runCommand blocks $() inside double quotes (shell still evaluates)
+  âœ“ runCommand blocks backtick inside double quotes (shell still evaluates)
+  âœ“ runCommand error message does not leak command string
+
+getGitModifiedFiles empty patterns (Round 31):
+  âœ“ getGitModifiedFiles with empty array returns all modified files
+
+readStdinJson error event (Round 33):
+  âœ“ readStdinJson resolves {} when stdin emits error (via broken pipe)
+  âœ“ readStdinJson error handler is guarded by settled flag
+    (skipped â€” chmod ineffective on Windows/root)
+  âœ“ replaceInFile returns false on write failure (read-only file)
+
+getGitModifiedFiles all-invalid patterns (Round 69):
+  âœ“ getGitModifiedFiles with all-invalid patterns skips filtering (returns all files)
+
+Round 71: findFiles (unreadable subdirectory in recursive scan):
+    (skipped â€” chmod ineffective on Windows/root)
+  âœ“ findFiles recursive scan skips unreadable subdirectory silently
+
+Round 79: countInFile (valid string pattern):
+  âœ“ countInFile counts occurrences using a plain string pattern
+
+Round 79: grepFile (valid string pattern):
+  âœ“ grepFile finds matching lines using a plain string pattern
+
+Round 84: findFiles (inner statSync catch â€” broken symlink):
+    (skipped â€” broken symlink creation not permitted on this Windows setup)
+  âœ“ findFiles skips broken symlinks that match the pattern
+
+getSessionIdShort fallback (Round 85):
+    (skipped â€” root CWD differs on Windows)
+  âœ“ getSessionIdShort uses fallback when getProjectName returns null (CWD at root)
+
+Round 88: replaceInFile with empty replacement string (deletion):
+  âœ“ replaceInFile with empty string replacement deletes matched text
+
+Round 88: countInFile with existing file but non-matching pattern:
+  âœ“ countInFile returns 0 for valid file with no pattern matches
+
+Round 92: countInFile (non-string non-RegExp pattern):
+  âœ“ countInFile returns 0 for object pattern (neither string nor RegExp)
+
+Round 93: countInFile (case-insensitive RegExp, g flag auto-appended):
+  âœ“ countInFile with /pattern/i appends g flag and counts case-insensitively
+
+Round 93: countInFile (case-insensitive RegExp, g flag preserved):
+  âœ“ countInFile with /pattern/gi preserves existing flags and counts correctly
+
+Round 95: countInFile (regex alternation without g flag):
+  âœ“ countInFile with /apple|banana/ (alternation, no g) counts all matches
+
+Round 97: getSessionIdShort (whitespace-only session ID):
+  âœ“ getSessionIdShort returns whitespace when CLAUDE_SESSION_ID is all spaces
+
+Round 97: countInFile (RegExp lastIndex reuse validation):
+  âœ“ countInFile returns consistent count when same RegExp object is reused
+
+Round 98: findFiles (maxAge: -1 â€” negative boundary excludes all):
+  âœ“ findFiles with maxAge: -1 excludes all files (ageInDays always >= 0)
+
+Round 99: replaceInFile (no-match still returns true):
+  âœ“ replaceInFile returns true and rewrites file even when search does not match
+
+Round 99: grepFile (CR-only line endings â€” classic Mac format):
+  âœ“ grepFile treats CR-only file as a single line (splits on \n only)
+
+Round 100: findFiles (maxAge + recursive combined â€” untested interaction):
+  âœ“ findFiles with maxAge AND recursive filters age across subdirectories
+
+Round 101: output() (circular reference â€” JSON.stringify crash):
+  âœ“ output() throws TypeError on circular reference object (JSON.stringify has no try/catch)
+
+Round 103: countInFile (boolean false â€” explicit type guard returns 0):
+  âœ“ countInFile returns 0 for boolean false pattern (else branch at line 443)
+
+Round 103: grepFile (numeric 0 â€” implicit toString via RegExp constructor):
+  âœ“ grepFile with numeric 0 implicitly coerces to /0/ via RegExp constructor
+
+Round 105: grepFile (sticky y flag â€” not stripped like g, stateful .test() bug):
+  âœ“ grepFile with /pattern/y sticky flag misses lines due to lastIndex state
+
+Round 107: grepFile (empty line matching â€” ^$ on split lines, trailing \n creates extra empty element):
+  âœ“ grepFile matches empty lines with ^$ pattern including trailing newline phantom line
+
+Round 107: replaceInFile (replacement contains search pattern â€” String.replace is single-pass):
+  âœ“ replaceInFile does not re-scan replacement text (single-pass, no infinite loop)
+
+Round 106: countInFile (named capture groups â€” String.match(g) returns full matches only):
+  âœ“ countInFile with named capture groups counts matches not groups
+
+Round 106: grepFile (multiline m flag â€” preserved in regex, unlike g which is stripped):
+  âœ“ grepFile preserves multiline (m) flag and anchors work on split lines
+
+Round 109: appendFile (new file creation â€” ensureDir creates parent, appendFileSync creates file):
+  âœ“ appendFile creates parent directory and new file when neither exist
+
+Round 108: grepFile (Unicode/emoji â€” regex matching on UTF-16 split lines):
+  âœ“ grepFile finds Unicode emoji patterns across lines
+
+Round 110: findFiles (root directory unreadable â€” EACCES on readdirSync caught silently):
+    (skipped â€” chmod ineffective on Windows/root)
+  âœ“ findFiles returns empty array when root directory exists but is unreadable
+
+Round 113: replaceInFile (zero-width regex /(?:)/g â€” matches every position):
+  âœ“ replaceInFile with zero-width regex /(?:)/g inserts replacement at every position
+
+Round 114: replaceInFile (options.all silently ignored for RegExp search):
+  âœ“ replaceInFile ignores options.all when search is a RegExp â€” falls through to .replace()
+
+Round 114: output (object containing BigInt â€” JSON.stringify throws):
+  âœ“ output throws TypeError when object contains BigInt values (JSON.stringify cannot serialize)
+
+Round 115: countInFile (empty string pattern â€” matches at every zero-width position):
+  âœ“ countInFile with empty string pattern returns content.length + 1 (matches between every char)
+
+Round 117: grepFile (CRLF content â€” trailing \r breaks anchored regex patterns):
+  âœ“ grepFile with CRLF content: unanchored patterns work but anchored $ fails due to trailing \r
+
+Round 116: replaceInFile (null/undefined replacement â€” JS coerces to string "null"/"undefined"):
+  âœ“ replaceInFile with null replacement coerces to string "null" via String.replace ToString
+
+Round 116: ensureDir (null path â€” fs.existsSync(null) throws TypeError):
+  âœ“ ensureDir with null path throws wrapped Error from TypeError (ERR_INVALID_ARG_TYPE)
+
+Round 118: writeFile (non-string content â€” TypeError propagates uncaught):
+  âœ“ writeFile with null/number content throws TypeError because fs.writeFileSync rejects non-string data
+
+Round 119: appendFile (non-string content â€” TypeError propagates like writeFile):
+  âœ“ appendFile with null/number content throws TypeError (no try/catch wrapper)
+
+Round 120: replaceInFile (empty string search â€” replace vs replaceAll dramatic difference):
+  âœ“ replaceInFile with empty search: replace prepends at pos 0; replaceAll inserts between every char
+
+Round 121: findFiles (? glob pattern â€” converted to . regex for single char match):
+  âœ“ findFiles with ? glob matches single character only â€” test?.txt matches test1 but not test12
+
+Round 122: findFiles (dot escaping â€” *.txt matches file.txt but not filetxt):
+  âœ“ findFiles escapes dots in glob pattern so *.txt only matches literal .txt extension
+
+Round 123: countInFile (overlapping patterns â€” String.match(/g/) is non-overlapping):
+  âœ“ countInFile counts non-overlapping matches only â€” "aaa" with /aa/g returns 1 not 2
+
+Round 123: replaceInFile ($& and $$ substitution tokens in replacement):
+  âœ“ replaceInFile replacement string interprets $& as matched text and $$ as literal $
+
+Round 124: findFiles (* glob matches dotfiles â€” unlike shell globbing):
+  âœ“ findFiles with * pattern matches dotfiles because .* regex includes hidden files
+
+Round 125: readFile (binary/non-UTF8 content â€” garbled, not null):
+  âœ“ readFile with binary content returns garbled string (not null) because UTF-8 decode does not throw
+
+Round 125: output() (undefined/NaN/Infinity â€” typeof checks and JSON.stringify):
+  âœ“ output() handles undefined, NaN, Infinity as non-objects â€” logs directly
+
+=== Test Results ===
+Passed: 158
+Failed: 0
+Total:  158
+
+
+
+--- Running memory/fts-vector-search.test.js ---
+
+FTS5 + Vector Search Tests
+==========================
+
+  ✓ migration 4 applies and creates FTS5 virtual tables
+  ✓ searchObservationsFTS returns matching observations
+  ✓ searchMemoryNotesFTS returns matching notes
+  ✓ FTS5 search returns empty for non-matching query
+  ✓ FTS5 search handles empty query gracefully
+  ✓ FTS5 search handles special characters gracefully
+  ✓ upsertEmbedding stores and getEmbedding retrieves a vector
+  ✓ upsertEmbedding updates existing embedding on conflict
+  ✓ getEmbedding returns null for non-existent embedding
+  ✓ findSimilarByVector returns similar entries ranked by cosine similarity
+  ✓ findSimilarByVector respects minSimilarity threshold
+  ✓ findSimilarByVector returns empty for non-existent table entries
+  ✓ computeAndStoreEmbedding auto-generates and stores embedding
+  ✓ searchMemory uses FTS5 and vector scores for hybrid ranking
+  ✓ searchMemory degrades gracefully without embeddings
+  ✓ FTS5 index stays in sync after observation updates
+
+  16 passing, 0 failing
+
+
+
+--- Running memory/graph-retrieval.test.js ---
+
+Graph-Linked Retrieval Tests
+============================
+
+  ✓ EDGE_TYPES are frozen and complete
+  ✓ createMemoryLink creates valid link
+  ✓ createMemoryLink rejects invalid edge type
+  ✓ createMemoryLink defaults weight to 1.0
+  ✓ buildAdjacencyIndex creates bidirectional mapping
+  ✓ buildAdjacencyIndex handles empty links
+  ✓ selectSeeds returns top N by score
+  ✓ selectSeeds uses DEFAULT_SEED_BUDGET when budget is invalid
+  ✓ expandNeighbors finds reachable nodes
+  ✓ expandNeighbors respects maxDepth
+  ✓ expandNeighbors respects edgeFilter
+  ✓ graphLinkedRetrieval returns seeds + neighbors
+  ✓ graphLinkedRetrieval with no links returns seeds only
+  ✓ DEFAULT constants are valid
+
+14 passed, 0 failed
+
+
+
+--- Running memory/incremental-dedup.test.js ---
+
+Incremental Dedup Tests
+======================
+
+  ✓ computeContentHash is deterministic
+  ✓ computeContentHash differs for different content
+  ✓ computeChunkId returns prefixed short hash
+  ✓ findDuplicates separates known and new chunks
+  ✓ findStaleChunks identifies chunks no longer in source
+  ✓ createChunkRecord produces valid record
+  ✓ planIncrementalUpdate calculates insert/delete/skip correctly
+  ✓ buildWorkspaceCollectionId is deterministic and stable
+  ✓ buildWorkspaceCollectionId normalizes path separators
+
+9 passed, 0 failed
+
+
+
+--- Running memory/memory-evolution.test.js ---
+
+Memory Evolution Tests
+=====================
+
+  ✓ EVOLUTION_ACTIONS has all expected actions
+  ✓ isStale returns true for old notes
+  ✓ isStale returns false for recent notes
+  ✓ isStale uses lastAccessed over createdAt
+  ✓ isStale returns true when no dates are present
+  ✓ computeRelevanceScore returns value between 0 and 1
+  ✓ computeRelevanceScore is higher for accessed notes
+  ✓ suggestEvolutionActions finds typed PREVENTS links for fix and issue notes
+  ✓ suggestEvolutionActions returns empty for no neighbors
+  ✓ buildEvolutionLinkPlan surfaces transitive neighbors through existing graph links
+  ✓ inferMemoryEdgeType prefers evolved_from for same-category follow-on notes
+  ✓ identifyMergeCandidates groups by category+keywords
+  ✓ identifyMergeCandidates returns empty for unique notes
+  ✓ planConsolidation separates stale, low-relevance, and active
+  ✓ cloneForAttempt creates new ids with attemptId prefix
+  ✓ cloneForAttempt preserves original note data
+  ✓ applyEvolutionAction STRENGTHEN adds link
+  ✓ applyEvolutionAction STRENGTHEN does not duplicate links
+  ✓ applyEvolutionAction ARCHIVE sets archived flag
+  ✓ applyEvolutionAction UPDATE_NEIGHBOR merges tags
+  ✓ DEFAULT_STALE_THRESHOLD_DAYS is positive
+  ✓ applyEvolutionAction MERGE marks note as merged
+  ✓ applyEvolutionAction MERGE uses targetId when primaryId missing
+  ✓ applyEvolutionAction MERGE does not mutate original note
+
+24 passed, 0 failed
+
+
+
+--- Running memory/search-orchestrator.test.js ---
+
+Memory Search Tests
+===================
+
+  ✓ scores entries using title, summary, keywords, and tags
+  ✓ returns zero score for non-matching entries
+  ✓ hybrid scoring rewards lexical matches plus recency and graph hints
+  ✓ reciprocal rank fusion rewards entries that rank well across signals
+  ✓ ranked retrieval prefers stronger lexical coverage over freshness alone
+  ✓ expands linked notes without duplicating the seed entries
+  ✓ builds a bounded synthesized response for parent context
+  ✓ builds a summary-only parent payload from detailed retrieval output
+  ✓ formats search-stage retrieval without expanding neighbors
+  ✓ builds a compact awareness hint for session start
+  ✓ builds a bounded retrieval query for session-start memory recall
+  ✓ builds a retrieval request envelope for future isolated workers
+  ✓ resolves a retrieval worker script path inside scripts/memory
+  ✓ builds orchestration-style retrieval artifact files
+  ✓ searchMemory expands graph-linked notes in expand mode
+  ✓ searchMemory keeps parent search mode bounded to seed entries
+  ✓ supports timeline and drill-in retrieval against the state store
+  ✓ surfaces graph-linked and time-aware notes during expand retrieval
+  ✓ executes retrieval requests and reports in-process execution metadata
+  ✓ supports isolated execution with graceful fallback metadata
+  ✓ writes orchestration-style artifacts for isolated retrieval requests
+
+Results: Passed: 21, Failed: 0
+
+
+--- Running memory/time-aware-traversal.test.js ---
+
+Time-Aware Traversal Tests
+=========================
+
+  ✓ computeTimeDecay returns 1.0 for very recent (debugging)
+  ✓ computeTimeDecay returns lower value for old memories (debugging)
+  ✓ computeTimeDecay architecture profile favors older
+  ✓ computeTimeDecay handles invalid date
+  ✓ partitionByRecency sorts entries into buckets
+  ✓ partitionByRecency handles empty array
+  ✓ bfsRecentFirst prioritizes recent entries
+  ✓ bfsRecentFirst respects maxResults
+  ✓ dfsDeepChains follows evolved_from edges
+  ✓ dfsDeepChains returns empty for no startIds
+  ✓ timeAwareRetrieval combines BFS and DFS results
+  ✓ QUERY_DECAY_PROFILES contains all expected profiles
+  ✓ DEFAULT_DECAY_WINDOWS is frozen
+  ✓ timeAwareRetrieval prefers higher adjustedScore when DFS > BFS for same node
+
+14 passed, 0 failed
+
+
+
+--- Running opencode-config.test.js ---
+  ✓ plugin paths do not duplicate the .opencode directory
+  ✓ file references are config-relative and resolve to existing files
+
+Passed: 2
+Failed: 0
+
+
+--- Running quality/confidence-gate.test.js ---
+
+Confidence Gate Tests
+=====================
+
+  ✓ normalizes compact input into arrays and threshold values
+  ✓ blocks vague tasks with weak context and missing prior-mistake handling
+  ✓ passes clear scoped work with context and prior-mistake coverage
+
+Results: Passed: 3, Failed: 0
+
+
+--- Running quality/cross-model-auditor.test.js ---
+
+Cross-Model Auditor Tests
+=========================
+
+  ✓ AUDIT_DECISION is frozen with expected values
+  ✓ buildAuditRequest creates valid request
+  ✓ buildAuditRequest defaults boundary to stop
+  ✓ buildAuditRequest truncates content to 2000 chars
+  ✓ evaluateAuditFindings returns PASS for no findings
+  ✓ evaluateAuditFindings returns BLOCK for critical findings
+  ✓ evaluateAuditFindings returns WARN for high findings
+  ✓ evaluateAuditFindings returns WARN for 3+ high findings
+  ✓ evaluateAuditFindings PASS for only medium findings
+  ✓ evaluateAuditFindings summary counts are correct
+  ✓ CONFIDENCE_RATING has 5 levels
+  ✓ HALLUCINATION_PATTERNS has 7 patterns
+  ✓ selfAudit detects large changes without test summary
+  ✓ selfAudit detects TODO markers in content
+  ✓ sourceVerification detects test failures
+  ✓ sourceVerification detects low quality score
+  ✓ adversarialReview detects deprecated references
+  ✓ evaluateAuditFindings escalates disputed confidence
+
+18 passed, 0 failed
+
+
+
+--- Running quality/policy-validators.test.js ---
+
+Policy Validators Tests
+=======================
+
+  ✓ SEVERITY is frozen with expected values
+  ✓ createFinding produces valid finding object
+  ✓ validateKISS passes for small files
+  ✓ validateKISS flags large files
+  ✓ validateKISS fails for deep nesting (HIGH severity)
+  ✓ validatePurity passes for clean files
+  ✓ validatePurity flags global mutations
+  ✓ validateSOLID flags god classes
+  ✓ validateSOLID flags too many responsibilities
+  ✓ validateLetItCrash flags empty catch blocks
+  ✓ validateLetItCrash passes for clean error handling
+  ✓ validateSecurityPolicy flags hardcoded secrets as CRITICAL
+  ✓ validateSecurityPolicy flags SQL injection as CRITICAL
+  ✓ validateContextBudgetPolicy warns at 70% utilization
+  ✓ validateContextBudgetPolicy fails at 85% utilization
+  ✓ runAllValidators runs all 6 validators
+  ✓ runAllValidators can filter by validator names
+  ✓ runAllValidators summary counts are correct
+  ✓ ALL_VALIDATORS has all expected keys
+  ✓ KISS_THRESHOLDS has correct maxComplexity from Tony363
+  ✓ SOLID_THRESHOLDS has correct values from Tony363
+  ✓ classifyFilePath identifies core paths
+  ✓ classifyFilePath identifies shell paths
+  ✓ classifyFilePath returns unknown for unmatched paths
+  ✓ CORE_PATH_PATTERNS is a frozen array of strings
+  ✓ IO_CALL_PATTERNS has expected categories
+  ✓ validateKISS checks per-function metrics
+  ✓ validatePurity distinguishes core vs shell severity
+  ✓ validateLetItCrash flags bare catch as CRITICAL
+
+29 passed, 0 failed
+
+
+
+--- Running quality/scorer.test.js ---
+
+Quality Scorer Tests
+====================
+
+  ✓ scores strong evidence as passing with a good or better band
+  ✓ applies hard caps for critical conditions
+  ✓ detects oscillation and stagnation
+  ✓ quality loop terminates when quality is met
+
+Results: Passed: 4, Failed: 0
+
+
+--- Running quality/self-review.test.js ---
+
+Self-Review Tests
+=================
+
+  ✓ CHECKLIST_ITEMS has 12 items
+  ✓ CHECKLIST_ITEMS covers all categories
+  ✓ createChecklistResult returns valid result
+  ✓ createChecklistResult throws for unknown item
+  ✓ evaluateChecklist marks unset items as failed
+  ✓ evaluateChecklist calculates passRate correctly
+  ✓ evaluateChecklist identifies critical failures
+  ✓ evaluateChecklist byCategory aggregates correctly
+  ✓ generateSelfReviewPrompt includes persona and checklist
+  ✓ buildSelfReviewReport returns proceed when all pass
+  ✓ buildSelfReviewReport returns block for critical failures
+  ✓ buildSelfReviewReport returns proceed_with_caution for rollback recommended
+  ✓ HALLUCINATION_RED_FLAGS has 7 flags
+  ✓ CONFIDENCE_WEIGHTS sum to 1.0
+  ✓ CONFIDENCE_THRESHOLDS has high and medium
+  ✓ detectHallucinations returns flags for suspicious impl
+  ✓ detectHallucinations returns empty for clean impl
+  ✓ computeWeightedConfidence returns high for all passing
+  ✓ computeWeightedConfidence returns low for all failing
+
+19 passed, 0 failed
+
+
+
+--- Running scripts/attempt-cli.test.js ---
+
+=== Testing attempt-cli.js ===
+
+  ✓ create makes an isolated attempt with worktree, state-store record, and artifacts
+  ✓ rehydrate recreates a deleted worktree for an existing attempt
+  ✓ ecc CLI exposes the attempt command
+  ✓ ecc top-level help lists the attempt command
+
+Results: Passed: 4, Failed: 0
+
+
+--- Running scripts/attempt-group-cli.test.js ---
+
+Attempt Group CLI Tests
+=======================
+
+  ✓ create generates isolated attempts and a board task
+  ✓ compare writes comparison artifacts for grouped attempts
+  ✓ feedback stores review notes for a grouped attempt
+  ✓ retry creates a new attempt from review feedback
+  ✓ ecc CLI exposes attempt-group and parallel-board commands
+
+5 passed, 0 failed
+
+
+
+--- Running scripts/claw.test.js ---
+
+=== Testing claw.js ===
+
+Storage:
+  ✓ getClawDir() returns path ending in .claude/claw
+  ✓ getSessionPath("foo") returns correct .md path
+  ✓ listSessions() returns empty array for empty dir
+  ✓ listSessions() finds .md files and strips extension
+  ✓ loadHistory() returns "" for non-existent file
+  ✓ appendTurn() writes correct markdown format
+
+Context:
+  ✓ loadECCContext() returns "" when no skills specified
+  ✓ loadECCContext() skips missing skill directories gracefully
+  ✓ loadECCContext() concatenates multiple skill files
+
+Delegation:
+  ✓ buildPrompt() constructs correct prompt structure
+  ✓ askClaude() handles subprocess error gracefully
+
+REPL/Meta:
+  ✓ module exports all required functions
+Session cleared.
+  ✓ /clear truncates session file
+  ✓ isValidSessionName rejects invalid characters
+
+NanoClaw v2:
+  ✓ getSessionMetrics returns non-zero token estimate for populated history
+  ✓ searchSessions finds query in saved session
+  ✓ branchSession copies history into new branch session
+  ✓ exportSession writes JSON export
+  ✓ compactSession reduces long histories
+
+Results: Passed: 19, Failed: 0
+
+
+--- Running scripts/doctor.test.js ---
+
+=== Testing doctor.js ===
+
+  ✓ reports a healthy install with exit code 0
+  ✓ reports issues and exits 1 for unhealthy installs
+
+Results: Passed: 2, Failed: 0
+
+
+--- Running scripts/ecc.test.js ---
+
+=== Testing ecc.js ===
+
+  ✓ shows top-level help
+  ✓ delegates explicit install command
+  ✓ routes implicit top-level args to install
+  ✓ delegates plan command
+  ✓ delegates lifecycle commands
+  ✓ delegates session-inspect command
+  ✓ delegates orchestration-dashboard command
+  ✓ supports help for a subcommand
+  ✓ fails on unknown commands instead of treating them as installs
+  ✓ fails on unknown help subcommands
+
+Results: Passed: 10, Failed: 0
+
+
+--- Running scripts/harness-audit.test.js ---
+
+=== Testing harness-audit.js ===
+
+  ✓ json output is deterministic between runs
+  ✓ report includes bounded scores and fixed categories
+  ✓ scope filtering changes max score and check list
+  ✓ text format includes summary header
+
+Results: Passed: 4, Failed: 0
+
+
+--- Running scripts/install-apply.test.js ---
+
+=== Testing install-apply.js ===
+
+  ✓ shows help with --help
+  ✓ rejects mixing legacy languages with manifest profile flags
+  ✓ installs Claude rules and writes install-state
+  ✓ installs Cursor configs and writes install-state
+  ✓ installs Antigravity configs and writes install-state
+  ✓ supports dry-run without mutating the target project
+  ✓ supports manifest profile dry-runs through the installer
+  ✓ installs manifest profiles and writes non-legacy install-state
+  ✓ installs antigravity manifest profiles while skipping incompatible modules
+  ✓ installs explicit modules for cursor using manifest operations
+  ✓ rejects unknown explicit manifest modules before resolution
+  ✓ installs from ecc-install.json and persists component selections
+
+Results: Passed: 12, Failed: 0
+
+
+--- Running scripts/install-plan.test.js ---
+
+=== Testing install-plan.js ===
+
+  ✓ shows help with no arguments
+  ✓ lists install profiles
+  ✓ lists install modules
+  ✓ lists install components
+  ✓ prints a filtered install plan for a profile and target
+  ✓ emits JSON for explicit module resolution
+  ✓ loads planning intent from ecc-install.json
+  ✓ fails on unknown arguments
+  ✓ fails on invalid install target
+
+Results: Passed: 9, Failed: 0
+
+
+--- Running scripts/install-ps1.test.js ---
+
+=== Testing install.ps1 ===
+
+  ✓ publishes ecc-install through the Node installer runtime for cross-platform npm usage
+  ✓ delegates to the Node installer and preserves dry-run output
+
+Results: Passed: 2, Failed: 0
+
+
+--- Running scripts/install-sh.test.js ---
+
+=== Testing install.sh ===
+
+  - skipped on Windows; install.ps1 covers the native wrapper path
+
+Results: Passed: 0, Failed: 0
+
+
+--- Running scripts/list-installed.test.js ---
+
+=== Testing list-installed.js ===
+
+  ✓ reports when no install-state files are present
+  ✓ emits JSON for discovered install-state records
+
+Results: Passed: 2, Failed: 0
+
+
+--- Running scripts/orchestrate-codex-worker.test.js ---
+=== Testing orchestrate-codex-worker.sh ===
+
+    (skipped - bash shell scripts are not testable on Windows)
+  ✓ fails fast for an unreadable task file and records failure artifacts
+
+=== Results: 1 passed, 0 failed ===
+
+
+--- Running scripts/orchestrate-worktrees.test.js ---
+
+Orchestrate Worktrees Tests
+===========================
+
+  ✓ write-only auto-engages the board manifest and task creation
+  ✓ dry-run preview stays non-mutating while surfacing attempt-group metadata
+
+2 passed, 0 failed
+
+
+
+--- Running scripts/orchestration-dashboard.test.js ---
+
+=== Testing orchestration-dashboard.js ===
+
+  ✓ collectAttemptGroups returns unique attempt-group ids
+  ✓ findRelatedTask selects board task linked to attempt group
+  ✓ readLogTail returns trailing non-empty lines from attempt log
+  ✓ renderDashboard includes session summary, workers, and task details
+  ✓ CLI renders dashboard for a plan-backed orchestration snapshot
+
+Results: Passed: 5, Failed: 0
+
+
+--- Running scripts/orchestration-status.test.js ---
+
+=== Testing orchestration-status.js ===
+
+  ✓ emits canonical dmux snapshots for plan files
+
+Results: Passed: 1, Failed: 0
+
+
+--- Running scripts/parallel-board-mcp.test.js ---
+
+Parallel Board MCP Tests
+========================
+
+  ✓ MCP server initializes and exposes task tools over stdio
+  ✓ MCP server creates and reads grouped attempts
+  ✓ ecc CLI exposes parallel-board-mcp command
+
+3 passed, 0 failed
+
+
+
+--- Running scripts/parallel-board-server.test.js ---
+
+Parallel Board Server Tests
+===========================
+
+  ✓ server exposes health, task APIs, and SSE task events
+  ✓ server appends and reads live attempt logs
+  ✓ server creates, compares, and reads attempt groups
+  ✓ ecc CLI exposes parallel-board-server command
+
+4 passed, 0 failed
+
+
+
+--- Running scripts/persona-route.test.js ---
+
+Persona Route Script Tests
+==========================
+
+  ✓ persona-route CLI emits JSON with explicit persona
+  ✓ ecc forwards persona flags to subcommands as inherited state
+
+2 passed, 0 failed
+
+
+
+--- Running scripts/repair.test.js ---
+
+=== Testing repair.js ===
+
+  ✓ repairs drifted files from a real install-apply state
+  ✓ repairs drifted non-copy managed operations and refreshes install-state
+  ✓ supports dry-run without mutating drifted non-copy operations
+
+Results: Passed: 3, Failed: 0
+
+
+--- Running scripts/session-inspect.test.js ---
+
+=== Testing session-inspect.js ===
+
+  ✓ shows usage when no target is provided
+  ✓ lists registered adapters
+  ✓ prints canonical JSON for claude history targets
+  ✓ supports explicit target types for structured registry routing
+  ✓ writes snapshot JSON to disk when --write is provided
+  ✓ inspects skill health from recorded observations
+  ✓ proposes skill amendments through session-inspect
+  ✓ builds skill evaluation scaffolding through session-inspect
+
+Results: Passed: 8, Failed: 0
+
+
+--- Running scripts/setup-package-manager.test.js ---
+
+=== Testing setup-package-manager.js ===
+
+--help:
+  ✓ shows help with --help flag
+  ✓ shows help with -h flag
+  ✓ shows help with no arguments
+
+--detect:
+  ✓ detects current package manager
+  ✓ shows detection sources
+  ✓ shows available managers in detection output
+
+--list:
+  ✓ lists available package managers
+
+--global:
+  ✓ rejects --global without package manager name
+  ✓ rejects --global with unknown package manager
+
+--project:
+  ✓ rejects --project without package manager name
+  ✓ rejects --project with unknown package manager
+
+positional argument:
+  ✓ rejects unknown positional argument
+
+environment variable:
+  ✓ detects env var override
+
+--detect output completeness:
+  ✓ shows all three command types in detection output
+  ✓ shows current marker for active package manager
+
+--global flag validation (Round 31):
+  ✓ rejects --global --project (flag not caught by earlier checks)
+  ✓ rejects --global --unknown-flag (arbitrary flag as PM name)
+  ✓ rejects --global -x (single-dash flag as PM name)
+  ✓ --global --list is handled by --list check first (exit 0)
+
+--project flag validation (Round 31):
+  ✓ rejects --project --global (cross-flag confusion)
+  ✓ rejects --project --unknown-flag
+  ✓ rejects --project -z (single-dash flag)
+
+--detect marker uniqueness (Round 45):
+  ✓ --detect output shows exactly one (current) marker
+
+--list output completeness (Round 45):
+  ✓ --list shows all four supported package managers
+
+--global success path (Round 62):
+  ✓ --global npm writes config and succeeds
+
+bare PM name success (Round 62):
+  ✓ bare npm sets global preference and succeeds
+
+--detect source label (Round 62):
+  ✓ --detect with env var shows source as environment
+
+--project success path (Round 68):
+  ✓ --project npm writes project config and succeeds
+
+--list (current) marker (Round 68):
+  ✓ --list output includes (current) marker for active PM
+
+Round 74: setGlobal catch (save failure):
+    (skipped — /dev/null not available on Windows)
+  ✓ --global npm fails when HOME is not a directory
+
+Round 74: setProject catch (save failure):
+    (skipped — chmod ineffective on Windows/root)
+  ✓ --project npm fails when CWD is read-only
+
+Results: Passed: 31, Failed: 0
+
+
+--- Running scripts/skill-create-output.test.js ---
+
+=== Testing skill-create-output.js ===
+
+SkillCreateOutput constructor:
+  ✓ creates instance with repo name
+  ✓ accepts custom width option
+
+header():
+  ✓ outputs header with repo name
+  ✓ header handles long repo names without crash
+
+analysisResults():
+  ✓ displays analysis data
+
+patterns():
+  ✓ displays patterns with confidence bars
+  ✓ handles patterns with missing confidence
+
+instincts():
+  ✓ displays instincts in a box
+
+output():
+  ✓ displays file paths
+
+nextSteps():
+  ✓ displays next steps with commands
+
+footer():
+  ✓ displays footer with attribution
+
+progressBar edge cases:
+  ✓ does not crash with confidence > 1.0 (percent > 100)
+  ✓ renders 0% confidence bar without crash
+  ✓ renders 100% confidence bar without crash
+
+empty array edge cases:
+  ✓ patterns() with empty array produces header but no entries
+  ✓ instincts() with empty array produces box but no entries
+
+box() crash prevention:
+  ✓ box does not crash on title longer than width
+  ✓ analysisResults does not crash with very narrow width
+
+box() alignment:
+  ✓ top, middle, and bottom lines have equal visual width
+
+box() content overflow:
+  ✓ box does not crash when content line exceeds width
+  ✓ patterns renders negative confidence without crash
+  ✓ header does not crash with very long repo name
+  ✓ stripAnsi handles nested ANSI codes with multi-digit params
+  ✓ footer produces output
+
+header() width alignment (Round 34):
+  ✓ header subtitle line matches border width
+  ✓ header all lines have consistent width for short repo name
+  ✓ header subtitle has correct content area width of 64 chars
+  ✓ header subtitle line does not truncate with medium-length repo name
+
+box() width accuracy (Round 35):
+  ✓ box lines in instincts() match the default box width of 60
+  ✓ box lines with custom width match the requested width
+  ✓ analysisResults box lines are all 60 chars wide
+  ✓ nextSteps box lines are all 60 chars wide
+
+analysisResults zero values (Round 54):
+  ✓ analysisResults handles zero values for all data fields
+
+demo export (Round 68):
+  ✓ module exports demo function alongside SkillCreateOutput
+
+Round 85: patterns() confidence=0 nullish coalescing:
+  ✓ patterns() with confidence=0 shows 0%, not 80% (nullish coalescing fix)
+
+Round 87: analyzePhase() async method:
+  ✓ analyzePhase completes without error and writes to stdout
+
+Results: Passed: 36, Failed: 0
+
+
+--- Running scripts/skill-install.test.js ---
+
+=== Testing skill-install.js CLI ===
+
+Help:
+  ✓ shows help with --help
+  ✓ shows help with -h
+
+List:
+  ✓ --list shows available skills
+  ✓ --list --json outputs valid JSON
+  ✓ --list-platforms shows all platforms
+
+Validation:
+  ✓ exits with error when no skills specified
+  ✓ exits with error for unknown skill IDs
+  ✓ exits with error for unknown platform
+
+Dry run:
+  ✓ --dry-run --all --platform claude shows plan
+  ✓ --dry-run with multiple platforms
+  ✓ --dry-run --all --platform all --json outputs valid JSON
+
+Results: 11 passed, 0 failed
+
+
+
+--- Running scripts/uninstall.test.js ---
+
+=== Testing uninstall.js ===
+
+  ✓ uninstalls files from a real install-apply state and preserves unrelated files
+  ✓ reverses non-copy operations and keeps unrelated files
+  ✓ supports dry-run without mutating managed files
+
+Results: Passed: 3, Failed: 0
+
+
+--- Running utils/embeddings.test.js ---
+
+Embeddings Tests
+================
+
+  ✓ l2Normalize returns unit vector
+  ✓ l2Normalize preserves zero vector
+  ✓ simpleEmbed produces consistent embeddings
+  ✓ simpleEmbed returns normalized vector
+  ✓ simpleEmbed returns default 384 dimensions
+  ✓ cosineSimilarity of identical vectors is 1
+  ✓ cosineSimilarity of orthogonal vectors is 0
+  ✓ cosineSimilarity handles null/mismatched lengths
+  ✓ cosineSimilarity handles zero vectors
+  ✓ isProviderReady returns false without onnxruntime
+  ✓ DEFAULT_MODEL is set
+  ✓ DEFAULT_BATCH_SIZE is positive integer
+  ✓ getProviderError returns error when @xenova/transformers not installed
+  ✓ simpleEmbed produces consistent results for same input
+  ✓ simpleEmbed handles empty string
+
+15 passed, 0 failed
+
+
+
++----------------------------------------------------------+
+|                     Final Results                        |
++----------------------------------------------------------+
+|  Total Tests: 1552                                       |
+|  Passed:      1551  ok                                   |
+|  Failed:         1  x                                    |
++----------------------------------------------------------+

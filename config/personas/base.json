@@ -1,0 +1,13 @@
+{
+  "mode": "balanced",
+  "quality": {
+    "requireSelfReview": true,
+    "requireValidators": true
+  },
+  "commandHints": {
+    "before": [],
+    "after": [
+      "verify"
+    ]
+  }
+}

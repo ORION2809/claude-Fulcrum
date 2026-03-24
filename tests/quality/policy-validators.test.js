@@ -16,7 +16,6 @@ const {
   KISS_THRESHOLDS,
   SOLID_THRESHOLDS,
   CORE_PATH_PATTERNS,
-  SHELL_PATH_PATTERNS,
   IO_CALL_PATTERNS,
   classifyFilePath,
 } = require('../../scripts/quality/policy-validators');

@@ -1,6 +1,5 @@
 ---
 description: "Knowledge-graph-powered code reviewer. Uses Tree-sitter AST parsing and persistent SQLite graph for token-efficient reviews with blast-radius analysis across 14 languages."
-mode: "agent"
 tools: ["read_file", "grep_search", "file_search", "semantic_search", "list_dir", "run_in_terminal", "get_errors"]
 ---
 

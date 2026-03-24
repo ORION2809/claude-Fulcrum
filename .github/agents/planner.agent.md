@@ -1,6 +1,5 @@
 ---
 description: "Expert planning specialist. Creates step-by-step implementation plans with risk assessment, phase breakdown, and dependency mapping. Use for complex features, architectural changes, or multi-file refactoring."
-mode: "agent"
 tools: ["read_file", "grep_search", "file_search", "semantic_search", "list_dir"]
 ---
 

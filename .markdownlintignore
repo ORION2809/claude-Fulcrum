@@ -1,0 +1,13 @@
+**/node_modules/**
+upgrade-research/**
+docs/IMPLEMENTATION_PLAN.md
+docs/GITHUB_COPILOT_INTEGRATION.md
+docs/ja-JP/**
+docs/ko-KR/**
+docs/zh-CN/**
+docs/zh-TW/**
+docs/README.zh-CN.md
+orchestration/**
+skills/**
+README.md
+README.new.md

@@ -1,6 +1,6 @@
 ---
 description: "Analyze test coverage, identify gaps in files below 80%, and generate missing tests to reach target coverage."
-mode: "agent"
+agent: "agent"
 ---
 
 # Test Coverage

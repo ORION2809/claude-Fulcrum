@@ -91,6 +91,7 @@ function runTests() {
     assert.ok(stdout.includes('opencode'));
     assert.ok(stdout.includes('copilot'));
     assert.ok(stdout.includes('antigravity'));
+    assert.ok(stdout.includes('.claude/skills/'));
   })) passed++; else failed++;
 
   // --- Validation ---

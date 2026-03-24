@@ -33,6 +33,25 @@ if (test('redacts common secret patterns before storage', () => {
   assert.ok(result.redactionReasons.includes('secret'));
 })) passed += 1; else failed += 1;
 
+if (test('redacts secrets inside structured object payloads', () => {
+  const payload = {
+    toolName: 'Bash',
+    toolResponse: 'keep this\n<private>remove this</private>\nBearer abcdefghijklmnop\nsk-proj-1234567890abcdef',
+    nested: {
+      notes: ['visible', '<private>hidden</private>'],
+    },
+  };
+
+  const result = sanitizeForMemory(payload);
+
+  assert.ok(!result.content.includes('<private>remove this</private>'));
+  assert.ok(!result.content.includes('Bearer abcdefghijklmnop'));
+  assert.ok(!result.content.includes('sk-proj-1234567890abcdef'));
+  assert.ok(result.content.includes('[redacted:Bear]'));
+  assert.ok(result.redactionReasons.includes('private'));
+  assert.ok(result.redactionReasons.includes('secret'));
+})) passed += 1; else failed += 1;
+
 if (test('skips storage when content becomes empty after stripping', () => {
   const result = sanitizeForMemory('<private>only secret</private>');
   assert.strictEqual(result.skipStorage, true);

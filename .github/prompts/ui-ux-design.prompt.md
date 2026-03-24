@@ -1,6 +1,6 @@
 ---
 description: "UI/UX design intelligence: generate design systems, search 67 styles, 96 palettes, 57 font pairings, 25 charts, 99 UX guidelines across 13 tech stacks."
-mode: "agent"
+agent: "agent"
 ---
 
 # UI/UX Pro Max — Design Intelligence

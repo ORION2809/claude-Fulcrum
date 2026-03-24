@@ -19,8 +19,7 @@ const path = require('path');
 const { spawnSync } = require('child_process');
 
 const { findProjectRoot, detectFormatter, resolveFormatterBin } = require('../lib/resolve-formatter');
-const { collectEvidence } = require('../quality/evidence-collector');
-const { computeDeterministicScore } = require('../quality/scorer');
+const { evaluateRuntimeQuality } = require('../quality/runtime-evaluator');
 const { writeQualityTelemetry } = require('../quality/telemetry-writer');
 
 const MAX_STDIN = 1024 * 1024;
@@ -134,39 +133,104 @@ function maybeRunQualityGate(filePath) {
   }
 }
 
+function extractFilePath(input) {
+  return String(
+    input?.tool_input?.file_path
+    || input?.toolInput?.file_path
+    || input?.tool_input?.path
+    || input?.toolInput?.path
+    || ''
+  );
+}
+
+function readFileIfPresent(filePath) {
+  if (!filePath) {
+    return '';
+  }
+
+  try {
+    if (!fs.existsSync(filePath)) {
+      return '';
+    }
+    return fs.readFileSync(filePath, 'utf8');
+  } catch {
+    return '';
+  }
+}
+
 /**
  * Core logic — exported so run-with-flags.js can call directly.
  *
  * @param {string} rawInput - Raw JSON string from stdin
- * @returns {string} The original input (pass-through)
+ * @returns {Promise<string>} The original input (pass-through)
  */
-function run(rawInput) {
+async function run(rawInput) {
   try {
     const input = JSON.parse(rawInput);
-    const filePath = String(input.tool_input?.file_path || '');
+    const filePath = extractFilePath(input);
+    const beforeContent = readFileIfPresent(filePath);
     maybeRunQualityGate(filePath);
-
-    const evidence = collectEvidence({
-      meaningfulFileChanges: filePath ? 1 : 0,
-      testsRun: false,
-      testsTotal: 0,
-      testsFailed: 0,
-      coverage: 0,
-      errors: 0,
-      buildBroken: false,
-      securityCriticalCount: 0,
+    const afterContent = readFileIfPresent(filePath);
+    const repoRoot = filePath ? findProjectRoot(path.dirname(path.resolve(filePath))) : process.cwd();
+    const quality = await evaluateRuntimeQuality({
+      filePath,
+      beforeContent,
+      afterContent,
+      rawInput,
+      sessionId: input.session_id || input.sessionId || null,
+      attemptId: input.attempt_id || input.attemptId || null,
+      repoRoot,
     });
-    const score = computeDeterministicScore(evidence);
+    const latestIteration = quality.loop?.iterations?.slice(-1)[0] || null;
     writeQualityTelemetry({
       timestamp: new Date().toISOString(),
       filePath,
-      score: score.score,
-      band: score.band,
-      passed: score.passed,
-      hardCaps: score.hardCaps,
-    });
-  } catch {
-    // Ignore parse errors.
+      score: latestIteration?.score ?? null,
+      band: latestIteration?.band ?? null,
+      passed: latestIteration?.passed ?? false,
+      hardCaps: latestIteration?.hardCaps ?? [],
+      terminationReason: quality.loop?.terminationReason || 'ERROR',
+      persona: quality.persona?.activePersona || null,
+      personaSource: quality.persona?.source || null,
+      validators: quality.validators?.summary || null,
+      validatorNames: (quality.validators?.validators || []).map(item => item.validator),
+      auditDecision: quality.audit?.decision || null,
+      auditSummary: quality.audit?.summary || null,
+      selfReviewVerdict: quality.selfReview?.verdict || null,
+      checklistPassRate: quality.checklist?.passRate || null,
+    }, repoRoot);
+
+    // Enforce quality gate: block edits with critical findings or audit block decisions.
+    // Exit code 2 signals Claude hooks to reject the tool use.
+    const criticalCount = quality.validators?.summary?.critical || 0;
+    const auditDecision = quality.audit?.decision || 'pass';
+    const selfVerdict = quality.selfReview?.verdict || 'pass';
+
+    if (criticalCount > 0 || auditDecision === 'block' || selfVerdict === 'block') {
+      const reasons = [];
+      if (criticalCount > 0) reasons.push(`${criticalCount} critical validator finding(s)`);
+      if (auditDecision === 'block') reasons.push(`audit decision: block`);
+      if (selfVerdict === 'block') reasons.push(`self-review: block`);
+      log(`[QualityGate] BLOCKED: ${reasons.join(', ')}`);
+      process.exit(2);
+    }
+  } catch (error) {
+    try {
+      writeQualityTelemetry({
+        timestamp: new Date().toISOString(),
+        filePath: null,
+        score: null,
+        band: null,
+        passed: false,
+        hardCaps: [],
+        terminationReason: 'ERROR',
+        auditDecision: 'error',
+        selfReviewVerdict: 'error',
+        error: error.message,
+      });
+    } catch {
+      // Ignore telemetry failures in fail-open mode.
+    }
   }
   return rawInput;
 }
@@ -183,9 +247,12 @@ if (require.main === module) {
   });
 
   process.stdin.on('end', () => {
-    const result = run(raw);
-    process.stdout.write(result);
+    Promise.resolve(run(raw)).then(result => {
+      process.stdout.write(result);
+    }).catch(() => {
+      process.stdout.write(raw);
+    });
   });
 }
 
-module.exports = { run };
+module.exports = { run, extractFilePath };

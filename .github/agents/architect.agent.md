@@ -1,6 +1,5 @@
 ---
 description: "Software architect for system design, scalability, and technical decisions. Analyzes current state, gathers requirements, proposes designs with trade-off analysis. Use for new features, large refactoring, or architectural decisions."
-mode: "agent"
 tools: ["read_file", "grep_search", "file_search", "semantic_search", "list_dir"]
 ---
 

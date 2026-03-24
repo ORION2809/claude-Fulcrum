@@ -1,6 +1,6 @@
 ---
 description: "Token-efficient delta code review using knowledge graph blast-radius analysis. Reviews only changed code and its structural impact."
-mode: "agent"
+agent: "agent"
 ---
 
 # Code Graph Review (Delta)

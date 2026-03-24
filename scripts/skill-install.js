@@ -106,7 +106,7 @@ Options:
                           Platforms: ${ALL_PLATFORMS.join(', ')}
   --project-root <path>   Project root for project-scoped platforms (cursor, antigravity, copilot)
   --home-dir <path>       Home directory for home-scoped platforms (claude, codex, opencode)
-  --no-copilot-scaffold   Skip copying .github/ scaffold files for Copilot
+  --no-copilot-scaffold   Skip copying optional .github/ scaffold files for Copilot
   --dry-run               Show plan without making changes
   --json                  Output results as JSON
   --list, -l              List all available skills
@@ -168,7 +168,7 @@ function main() {
         codex: 'Home-scoped  (~/.codex/skills/)          — OpenAI Codex',
         opencode: 'Home-scoped  (~/.opencode/skills/)       — OpenCode',
         antigravity: 'Project-scoped (.agent/skills/)           — Antigravity',
-        copilot: 'Project-scoped (.agents/skills/ + .github/) — GitHub Copilot',
+        copilot: 'Project-scoped (.claude/skills/ + optional .github/) — GitHub Copilot',
       };
       for (const platform of ALL_PLATFORMS) {
         console.log(`  ${platform.padEnd(14)} ${platformInfo[platform] || ''}`);

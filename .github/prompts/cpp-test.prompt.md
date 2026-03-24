@@ -1,6 +1,6 @@
 ---
 description: "Generate and run C++ tests: GoogleTest, CTest, matchers, parameterized tests, and coverage with gcov/llvm-cov."
-mode: "agent"
+agent: "agent"
 ---
 
 # C++ Test

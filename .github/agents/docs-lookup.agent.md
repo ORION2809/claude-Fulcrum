@@ -1,6 +1,5 @@
 ---
 description: "Documentation lookup specialist. Fetches current library/framework documentation and returns accurate answers with code examples. Use for API references, setup guides, and framework-specific questions."
-mode: "agent"
 tools: ["read_file", "grep_search", "file_search", "semantic_search", "list_dir", "run_in_terminal"]
 ---
 

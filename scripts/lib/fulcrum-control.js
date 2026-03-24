@@ -31,6 +31,13 @@ function loadControlPlane(repoRoot = getRepoRoot()) {
         maxIterations: 5,
         timeoutMs: 300000,
       },
+      crossModelAudit: {
+        enabled: true,
+        stopBoundary: {
+          minUserMessages: 3,
+          maxChangedFiles: 6,
+        },
+      },
     };
   }
 

@@ -1,6 +1,5 @@
 ---
 description: "Code quality and security reviewer. Reviews uncommitted changes for security vulnerabilities, code quality issues, and best practice violations. Use immediately after writing or modifying code."
-mode: "agent"
 tools: ["read_file", "grep_search", "file_search", "semantic_search", "list_dir", "run_in_terminal", "get_errors"]
 ---
 

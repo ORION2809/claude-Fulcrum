@@ -1,6 +1,6 @@
 ---
 description: "Run the quality pipeline: detect language/tooling, run formatter checks, lint/type checks, and produce a remediation list."
-mode: "agent"
+agent: "agent"
 ---
 
 # Quality Gate

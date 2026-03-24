@@ -1,6 +1,6 @@
 ---
 description: "Comprehensive code review for security, quality, and best practices. Reviews uncommitted changes and blocks on critical issues."
-mode: "agent"
+agent: "agent"
 ---
 
 # Code Review

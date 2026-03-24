@@ -128,6 +128,11 @@
       "url": "http://localhost:18801/mcp",
       "description": "Multi-agent orchestration — dispatch parallel Claude Code agents in isolated worktrees. Plan projects, auto-chain missions, read structured reports. Repo: https://github.com/LEC-AI/claude-devfleet"
     },
+    "parallel-board": {
+      "command": "node",
+      "args": ["scripts/parallel-board-mcp.js"],
+      "description": "Claude Fulcrum parallel execution board â€” create tasks, run grouped worktree attempts, compare diffs, and store review feedback over MCP"
+    },
     "token-optimizer": {
       "command": "npx",
       "args": ["-y", "token-optimizer-mcp"],

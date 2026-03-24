@@ -16,7 +16,6 @@ const {
   applyResetPlan,
   getQueueStats,
   killRunningActions,
-  resetGitState,
 } = require('../../scripts/lib/action-queue');
 
 function test(name, fn) {
@@ -83,7 +82,7 @@ if (test('claimNextAction claims first available queued action', () => {
   const a1 = createQueuedAction('first', { priority: 5 });
   const a2 = createQueuedAction('second', { priority: 3 });
   const queue = [a1, a2];
-  const { queue: updated, claimed } = claimNextAction(queue);
+  const { claimed } = claimNextAction(queue);
   assert.ok(claimed);
   assert.strictEqual(claimed.status, ACTION_STATUS.IN_PROGRESS);
   assert.ok(claimed.startedAt);
@@ -120,9 +119,9 @@ if (test('completeAction marks failed on success=false', () => {
 if (test('retryAction requeues and increments retryCount', () => {
   const a = createQueuedAction('test', { maxRetries: 3 });
   const queue = [{ ...a, status: ACTION_STATUS.FAILED, retryCount: 0 }];
-  const updated = retryAction(queue, a.id);
-  assert.strictEqual(updated[0].status, ACTION_STATUS.QUEUED);
-  assert.strictEqual(updated[0].retryCount, 1);
+  const retried = retryAction(queue, a.id);
+  assert.strictEqual(retried[0].status, ACTION_STATUS.QUEUED);
+  assert.strictEqual(retried[0].retryCount, 1);
 })) passed += 1; else failed += 1;
 
 if (test('retryAction skips when max retries exceeded', () => {

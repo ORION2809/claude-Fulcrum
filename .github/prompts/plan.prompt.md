@@ -1,6 +1,6 @@
 ---
 description: "Create a step-by-step implementation plan before writing any code. Restates requirements, identifies risks, breaks work into phases, and waits for confirmation."
-mode: "agent"
+agent: "agent"
 ---
 
 # Implementation Plan

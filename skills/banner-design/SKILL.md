@@ -1,7 +1,6 @@
 ---
 name: banner-design
 description: "Multi-format banner design for social media, ads, website heroes, and print. 22 art direction styles with platform-specific dimensions and safe zones."
-origin: claude-fulcrum
 ---
 
 # Banner Design - Multi-Format Creative Banner System

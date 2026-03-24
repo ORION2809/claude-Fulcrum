@@ -1,6 +1,6 @@
 ---
 description: "Generate and run Rust tests: unit tests, integration tests, doc tests, property-based tests with proptest."
-mode: "agent"
+agent: "agent"
 ---
 
 # Rust Test

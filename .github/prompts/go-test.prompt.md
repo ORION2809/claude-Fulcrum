@@ -1,6 +1,6 @@
 ---
 description: "Generate and run Go tests: table-driven tests, subtests, benchmarks, fuzzing. Follow TDD with idiomatic Go patterns."
-mode: "agent"
+agent: "agent"
 ---
 
 # Go Test

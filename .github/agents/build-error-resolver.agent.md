@@ -1,6 +1,5 @@
 ---
 description: "Build and type error resolution specialist. Fixes build failures with minimal diffs — no architectural changes. Detects build system, parses errors, fixes one at a time. Use when build fails."
-mode: "agent"
 tools: ["read_file", "grep_search", "file_search", "list_dir", "run_in_terminal", "replace_string_in_file", "create_file", "get_errors"]
 ---
 

@@ -133,12 +133,13 @@ function deploySkillAntigravity(skill, options) {
 }
 
 // --- Copilot deployer ---
-// Skills go to: <projectRoot>/.agents/skills/<skill-id>/
-// Also copies .github/copilot-instructions.md and .github/instructions/ if not present
+// Skills go to: <projectRoot>/.claude/skills/<skill-id>/
+// Copilot coding agent can read Claude-format skills directly from .claude/skills.
+// Optional .github scaffold is still copied for prompts, agents, and instruction files.
 function deploySkillCopilot(skill, options) {
   const projectRoot = options.projectRoot || process.cwd();
   const sourceRoot = options.sourceRoot;
-  const destRoot = path.join(projectRoot, '.agents', 'skills');
+  const destRoot = path.join(projectRoot, '.claude', 'skills');
   const destDir = path.join(destRoot, skill.id);
   copyRecursive(skill.absolutePath, destDir);
 

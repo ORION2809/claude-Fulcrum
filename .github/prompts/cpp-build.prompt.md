@@ -1,6 +1,6 @@
 ---
 description: "Fix C++ build errors: CMake, compilation, and linker failures. Parse errors, fix one at a time with minimal changes."
-mode: "agent"
+agent: "agent"
 ---
 
 # C++ Build Fix

@@ -1,7 +1,6 @@
 ---
 name: ui-styling
 description: "Beautiful accessible UIs with shadcn/ui (Radix UI + Tailwind), utility-first styling, and canvas-based visual designs. Covers responsive layouts, dark mode, theming, and accessible components."
-origin: claude-fulcrum
 ---
 
 # UI Styling Skill

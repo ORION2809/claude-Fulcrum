@@ -35,6 +35,16 @@ A complete GitHub Copilot customization layer that brings the Claude Fulcrum too
 | Custom Agents | 11 | `.github/agents/*.agent.md` | Specialized AI personas with restricted tool access |
 | VS Code Settings | 1 | `.vscode/settings.json` | Enables features + configures 14 MCP servers |
 
+### Skills Compatibility Update
+
+GitHub Copilot coding agent can consume Claude-style skills directly from `.claude/skills/` at the project level, and from `~/.claude/skills/` or `~/.copilot/skills/` for personal skills. That means Fulcrum skills written for Claude Code can also be surfaced to Copilot without converting them into a separate `.agents/skills/` format.
+
+In this repo:
+
+- project-scoped shared skills for Copilot are installed to `.claude/skills/`
+- optional Copilot-native prompts, agents, and instruction files still live under `.github/`
+- personal skills can still be placed in `~/.claude/skills/` and follow you across workspaces
+
 ### Design Philosophy
 
 The implementation mirrors ECC's existing agent/skill/rule architecture but uses VS Code Copilot's native customization formats:

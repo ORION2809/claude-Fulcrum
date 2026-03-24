@@ -6,7 +6,12 @@ const { spawnSync } = require('child_process');
 
 const { createStateStore } = require('../lib/state-store');
 const { createStableId, loadControlPlane } = require('../lib/fulcrum-control');
-const { simpleEmbed, cosineSimilarity } = require('../utils/embeddings');
+const {
+  buildAdjacencyIndex,
+  graphLinkedRetrieval,
+} = require('./graph-retrieval');
+const { timeAwareRetrieval } = require('./time-aware-traversal');
+const { simpleEmbed } = require('../utils/embeddings');
 
 function normalizeText(value) {
   return String(value || '').toLowerCase();
@@ -19,6 +24,17 @@ function normalizeQueryTerms(query) {
 function normalizeMode(value) {
   const mode = String(value || 'expand').toLowerCase();
   return ['search', 'expand', 'timeline', 'drill_in'].includes(mode) ? mode : 'expand';
+}
+
+function inferQueryType(query) {
+  const normalized = normalizeText(query);
+  if (/(bug|debug|fix|error|trace|crash|failure|failing|broken)/.test(normalized)) {
+    return 'debugging';
+  }
+  if (/(architecture|architect|design|system|dependency|dependencies|module|graph)/.test(normalized)) {
+    return 'architecture';
+  }
+  return 'pattern';
 }
 
 function scoreEntry(queryTerms, entry) {
@@ -352,38 +368,269 @@ function writeRetrievalDetails(coordinationDir, response) {
   return detailsPath;
 }
 
+function normalizeGraphLink(link) {
+  if (!link || !link.fromNoteId || !link.toNoteId) {
+    return null;
+  }
+
+  return {
+    id: String(link.id || `${link.fromNoteId}::${link.toNoteId}::${link.linkType || 'related_to'}`),
+    sourceId: String(link.fromNoteId),
+    targetId: String(link.toNoteId),
+    edgeType: link.linkType || 'related_to',
+    weight: Number.isFinite(Number(link.weight)) ? Number(link.weight) : 1,
+    reason: link.metadata && link.metadata.reason ? String(link.metadata.reason) : '',
+    createdAt: link.createdAt || new Date().toISOString(),
+  };
+}
+
+function collectGraphLinksFromNotes(noteIndex, linksByNoteId) {
+  const links = [];
+  const seen = new Set();
+  const safeLinksByNoteId = linksByNoteId instanceof Map ? linksByNoteId : new Map();
+  const safeNoteIndex = noteIndex instanceof Map ? noteIndex : new Map();
+
+  for (const [noteId] of safeNoteIndex.entries()) {
+    const rawLinks = Array.isArray(safeLinksByNoteId.get(noteId)) ? safeLinksByNoteId.get(noteId) : [];
+    for (const link of rawLinks) {
+      const normalized = normalizeGraphLink(link);
+      if (!normalized || seen.has(normalized.id)) {
+        continue;
+      }
+
+      if (normalized.sourceId !== String(noteId) && normalized.targetId !== String(noteId)) {
+        continue;
+      }
+
+      seen.add(normalized.id);
+      links.push(normalized);
+    }
+  }
+
+  return links;
+}
+
+function materializeGraphEntry(entry, overlay = {}) {
+  if (!entry) {
+    return null;
+  }
+
+  const nextScore = overlay.score !== undefined ? overlay.score : entry.score;
+  return {
+    ...entry,
+    ...overlay,
+    score: Number.isFinite(Number(nextScore)) ? Number(nextScore) : 0,
+    relationship: overlay.relationship || entry.relationship || 'seed',
+  };
+}
+
 function expandLinkedEntries(options = {}) {
   const entries = Array.isArray(options.entries) ? options.entries.map(entry => ({ ...entry })) : [];
   const noteIndex = options.noteIndex instanceof Map ? options.noteIndex : new Map();
   const linksByNoteId = options.linksByNoteId instanceof Map ? options.linksByNoteId : new Map();
   const maxNeighbors = Number.isFinite(Number(options.maxNeighbors)) ? Number(options.maxNeighbors) : 2;
-  const seenIds = new Set(entries.map(entry => entry.id));
-  const expanded = [...entries];
+  const graphLinks = collectGraphLinksFromNotes(noteIndex, linksByNoteId);
+  if (entries.length === 0 || graphLinks.length === 0) {
+    return entries;
+  }
 
-  for (const entry of entries) {
-    if (entry.kind !== 'note') {
+  const entryIndex = new Map(entries.map(entry => [entry.id, entry]));
+  const graphResult = graphLinkedRetrieval(entries, graphLinks, {
+    seedBudget: entries.length,
+    neighborFanout: maxNeighbors,
+    maxDepth: 2,
+  });
+
+  const expanded = [];
+
+  for (const seed of graphResult.seeds) {
+    const source = entryIndex.get(seed.id);
+    if (!source) {
       continue;
     }
 
-    const links = linksByNoteId.get(entry.id) || [];
-    for (const link of links.slice(0, maxNeighbors)) {
-      const neighborId = link.fromNoteId === entry.id ? link.toNoteId : link.fromNoteId;
-      if (!neighborId || seenIds.has(neighborId) || !noteIndex.has(neighborId)) {
-        continue;
-      }
+    expanded.push(materializeGraphEntry(source, {
+      score: seed.score,
+      relationship: 'seed',
+      traversalMethod: 'graph_seed',
+    }));
+  }
 
-      const neighbor = noteIndex.get(neighborId);
-      seenIds.add(neighborId);
-      expanded.push({
-        ...neighbor,
-        score: Math.max(1, (entry.score || 1) - 1),
-        relationship: link.linkType || 'related_to',
-        via: entry.id,
-      });
+  for (const neighbor of graphResult.neighbors) {
+    const source = entryIndex.get(neighbor.id) || noteIndex.get(neighbor.id);
+    if (!source) {
+      continue;
     }
+
+    expanded.push(materializeGraphEntry(source, {
+      score: Math.max(1, (entryIndex.get(neighbor.reachedFrom)?.score || source.score || 1) - 1),
+      relationship: neighbor.edgeType || 'related_to',
+      via: neighbor.reachedFrom,
+      traversalMethod: 'graph_neighbor',
+      graphDepth: neighbor.depth,
+    }));
   }
 
   return expanded;
+}
+
+function normalizeGraphLinks(memoryLinks) {
+  const seen = new Set();
+  const normalized = [];
+
+  for (const link of Array.isArray(memoryLinks) ? memoryLinks : []) {
+    if (!link || !link.fromNoteId || !link.toNoteId) {
+      continue;
+    }
+
+    const pairKey = [link.fromNoteId, link.toNoteId, link.linkType || 'related_to']
+      .sort()
+      .join('::');
+    if (seen.has(pairKey)) {
+      continue;
+    }
+    seen.add(pairKey);
+    normalized.push({
+      sourceId: link.fromNoteId,
+      targetId: link.toNoteId,
+      edgeType: link.linkType || 'related_to',
+      weight: Number.isFinite(Number(link.weight)) ? Number(link.weight) : 1,
+    });
+  }
+
+  return normalized;
+}
+
+function buildRetrievedEntryMap(entries) {
+  return new Map((Array.isArray(entries) ? entries : []).map(entry => [entry.id, entry]));
+}
+
+function mergeRetrievedEntries(primaryEntries, secondaryEntries, limit) {
+  const merged = new Map();
+
+  for (const entry of [...(Array.isArray(primaryEntries) ? primaryEntries : []), ...(Array.isArray(secondaryEntries) ? secondaryEntries : [])]) {
+    if (!entry || !entry.id) {
+      continue;
+    }
+    const existing = merged.get(entry.id);
+    const nextScore = entry.score || 0;
+    const existingScore = existing ? (existing.score || 0) : -Infinity;
+    const promotesGraphContext = Boolean(
+      existing
+      && (existing.relationship === 'seed' || !existing.relationship)
+      && entry.relationship
+      && entry.relationship !== 'seed'
+    );
+
+    if (!existing || nextScore > existingScore || promotesGraphContext) {
+      merged.set(entry.id, entry);
+    }
+  }
+
+  return Array.from(merged.values())
+    .sort((left, right) => {
+      return (
+        (right.score || 0) - (left.score || 0)
+        || String(right.createdAt || '').localeCompare(String(left.createdAt || ''))
+      );
+    })
+    .slice(0, limit);
+}
+
+function applyGraphAndTimeTraversal(options = {}) {
+  const scoredEntries = Array.isArray(options.scoredEntries) ? options.scoredEntries : [];
+  const noteIndex = options.noteIndex instanceof Map ? options.noteIndex : new Map();
+  const rawLinks = normalizeGraphLinks(options.memoryLinks);
+  const maxNeighbors = Number.isFinite(Number(options.maxNeighbors)) ? Number(options.maxNeighbors) : 2;
+  const limit = Number.isFinite(Number(options.limit)) ? Number(options.limit) : 5;
+  const now = options.now || new Date().toISOString();
+  const queryType = options.queryType || 'pattern';
+
+  if (scoredEntries.length === 0) {
+    return [];
+  }
+
+  const noteSeeds = scoredEntries.filter(entry => entry.kind === 'note');
+  const graphStage = rawLinks.length > 0
+    ? graphLinkedRetrieval(noteSeeds, rawLinks, {
+      seedBudget: Math.min(Math.max(limit, 3), 8),
+      neighborFanout: maxNeighbors,
+      maxDepth: Number.isFinite(Number(options.maxDepth)) ? Number(options.maxDepth) : 2,
+      edgeFilter: options.edgeFilter || null,
+    })
+    : {
+      seeds: noteSeeds.slice(0, Math.min(Math.max(limit, 3), noteSeeds.length)),
+      neighbors: [],
+    };
+
+  const graphEntries = [];
+  const seedScores = buildRetrievedEntryMap(noteSeeds);
+
+  for (const seed of graphStage.seeds || []) {
+    graphEntries.push({
+      ...seed,
+      relationship: seed.relationship || 'seed',
+    });
+  }
+
+  for (const neighbor of graphStage.neighbors || []) {
+    if (!noteIndex.has(neighbor.id)) {
+      continue;
+    }
+
+    const via = seedScores.get(neighbor.reachedFrom);
+    const baseScore = via ? via.score || 1 : 1;
+    graphEntries.push({
+      ...noteIndex.get(neighbor.id),
+      score: Number((baseScore + (neighbor.weight || 0.5)).toFixed(2)),
+      relationship: neighbor.edgeType || 'related_to',
+      via: neighbor.reachedFrom,
+      graphDepth: neighbor.depth,
+    });
+  }
+
+  const adjacencyIndex = rawLinks.length > 0 ? buildAdjacencyIndex(rawLinks) : new Map();
+  const timeAware = timeAwareRetrieval(graphEntries, adjacencyIndex, {
+    queryType,
+    bfsBudget: Math.max(limit, 4),
+    dfsBudget: Math.max(maxNeighbors + 1, 3),
+    now,
+  });
+
+  return mergeRetrievedEntries(timeAware.results, graphEntries, limit + maxNeighbors);
+}
+
+function annotateLinkedSeedRelationships(entries, memoryLinks) {
+  const normalizedLinks = normalizeGraphLinks(memoryLinks);
+  if (!Array.isArray(entries) || entries.length === 0 || normalizedLinks.length === 0) {
+    return Array.isArray(entries) ? entries : [];
+  }
+
+  return entries.map((entry, index, allEntries) => {
+    if (!entry || entry.kind !== 'note' || (entry.relationship && entry.relationship !== 'seed')) {
+      return entry;
+    }
+
+    const strongerPeers = allEntries.slice(0, index).filter(candidate => candidate && candidate.kind === 'note');
+    for (const peer of strongerPeers) {
+      const link = normalizedLinks.find(candidate => {
+        return (
+          (candidate.sourceId === peer.id && candidate.targetId === entry.id)
+          || (candidate.sourceId === entry.id && candidate.targetId === peer.id)
+        );
+      });
+
+      if (link) {
+        return {
+          ...entry,
+          relationship: link.edgeType || 'related_to',
+          via: peer.id,
+        };
+      }
+    }
+
+    return entry;
+  });
 }
 
 function buildSynthesis(query, entries, options = {}) {
@@ -438,6 +685,67 @@ function buildAwarenessHint(entries, options = {}) {
 
   const hint = `Memory available: ${synthesized.summary}`;
   return hint.length > 120 ? `${hint.slice(0, 117)}...` : hint;
+}
+
+function buildSessionStartRetrievalQuery(entries, projectInfo = {}, options = {}) {
+  const safeEntries = Array.isArray(entries) ? entries : [];
+  const maxTerms = Number.isFinite(Number(options.maxTerms)) ? Number(options.maxTerms) : 8;
+  const terms = [];
+  const seen = new Set();
+
+  function addTerm(value) {
+    if (terms.length >= maxTerms) {
+      return;
+    }
+
+    const normalized = normalizeText(value).replace(/[^a-z0-9+.#_-]+/g, ' ').trim();
+    if (!normalized) {
+      return;
+    }
+
+    for (const part of normalized.split(/\s+/)) {
+      if (!part || part.length < 3 || seen.has(part)) {
+        continue;
+      }
+      seen.add(part);
+      terms.push(part);
+      if (terms.length >= maxTerms) {
+        return;
+      }
+    }
+  }
+
+  for (const entry of safeEntries.slice(0, 4)) {
+    addTerm(entry.title);
+    addTerm(entry.summary);
+
+    for (const keyword of entry.keywords || []) {
+      addTerm(keyword);
+      if (terms.length >= maxTerms) {
+        break;
+      }
+    }
+
+    if (terms.length >= maxTerms) {
+      break;
+    }
+  }
+
+  for (const language of projectInfo.languages || []) {
+    addTerm(language);
+    if (terms.length >= maxTerms) {
+      break;
+    }
+  }
+
+  for (const framework of projectInfo.frameworks || []) {
+    addTerm(framework);
+    if (terms.length >= maxTerms) {
+      break;
+    }
+  }
+
+  return terms.join(' ').trim();
 }
 
 function formatRetrievalResponse(query, entries, options = {}) {
@@ -626,22 +934,46 @@ async function searchMemory(query, options = {}) {
     }
 
     const noteIndex = new Map(notes.map(entry => [entry.id, entry]));
+    const memoryLinks = notes.flatMap(entry => store.listMemoryLinksByNote(entry.id));
     const linksByNoteId = new Map(
       notes.map(entry => [entry.id, store.listMemoryLinksByNote(entry.id)])
     );
+    const queryType = inferQueryType(query);
 
     const scoredEntries = rankEntries(allEntries, queryTerms, { ...options, vectorScores })
       .filter(entry => entry.score > 0)
-      .slice(0, limit);
-    const expandedEntries = expandLinkedEntries({
-      entries: scoredEntries,
+      .slice(0, Math.max(limit, 1));
+    const graphAndTimeEntries = applyGraphAndTimeTraversal({
+      scoredEntries,
+      noteIndex,
+      memoryLinks,
+      maxNeighbors: options.maxNeighbors,
+      limit,
+      maxDepth: options.maxDepth,
+      edgeFilter: options.edgeFilter,
+      now: options.now,
+      queryType,
+    });
+    const fallbackExpandedEntries = expandLinkedEntries({
+      entries: scoredEntries.slice(0, limit),
       noteIndex,
       linksByNoteId,
       maxNeighbors: options.maxNeighbors,
     });
+    const topObservationSeeds = scoredEntries
+      .filter(entry => entry.kind === 'observation')
+      .slice(0, Math.min(2, limit));
+    const expandedEntries = mergeRetrievedEntries(
+      [...graphAndTimeEntries, ...topObservationSeeds],
+      fallbackExpandedEntries,
+      limit + 2
+    );
+    const displayEntries = mode === 'search'
+      ? expandedEntries
+      : annotateLinkedSeedRelationships(expandedEntries, memoryLinks);
     const formattedResponse = formatRetrievalResponse(
       query,
-      expandedEntries
+      displayEntries
         .sort((left, right) => right.score - left.score)
         .slice(0, limit + 2),
       { ...options, mode }
@@ -807,6 +1139,7 @@ module.exports = {
   buildRetrievalArtifacts,
   buildRetrievalCoordinationDir,
   buildAwarenessHint,
+  buildSessionStartRetrievalQuery,
   buildParentContextPayload,
   buildSynthesis,
   computeHybridScore,

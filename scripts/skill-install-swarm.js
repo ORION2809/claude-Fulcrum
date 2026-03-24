@@ -220,7 +220,7 @@ Options:
   --project-root <path>   Project root for project-scoped platforms
   --home-dir <path>       Home directory for home-scoped platforms
   --max-workers <n>       Max parallel workers (default: ${ALL_PLATFORMS.length})
-  --no-copilot-scaffold   Skip .github/ scaffold for Copilot
+  --no-copilot-scaffold   Skip optional .github/ scaffold for Copilot
   --dry-run               Preview without changes
   --json                  JSON output
   --help, -h              Show help
@@ -235,7 +235,7 @@ Architecture:
   ├─ Worker[cursor]     → deploys N skills to .cursor/skills/
   ├─ Worker[codex]      → deploys N skills to ~/.codex/skills/
   ├─ Worker[opencode]   → deploys N skills to ~/.opencode/skills/
-  ├─ Worker[copilot]    → deploys N skills to .agents/skills/ + .github/
+  ├─ Worker[copilot]    → deploys N skills to .claude/skills/ + optional .github/
   └─ Worker[antigravity]→ deploys N skills to .agent/skills/
 
 Examples:

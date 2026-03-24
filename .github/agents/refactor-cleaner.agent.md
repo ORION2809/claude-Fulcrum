@@ -1,6 +1,5 @@
 ---
 description: "Dead code cleanup and consolidation specialist. Uses analysis tools to identify unused code, categorizes by safety tier, and removes with test verification at every step."
-mode: "agent"
 tools: ["read_file", "grep_search", "file_search", "semantic_search", "list_dir", "run_in_terminal", "replace_string_in_file", "get_errors"]
 ---
 

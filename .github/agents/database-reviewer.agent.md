@@ -1,6 +1,5 @@
 ---
 description: "PostgreSQL and database specialist for query optimization, schema design, security, and performance. Use when writing SQL, creating migrations, or troubleshooting database issues."
-mode: "agent"
 tools: ["read_file", "grep_search", "file_search", "semantic_search", "list_dir", "run_in_terminal"]
 ---
 

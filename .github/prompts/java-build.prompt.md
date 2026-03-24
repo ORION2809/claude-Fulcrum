@@ -1,6 +1,6 @@
 ---
 description: "Fix Java/Maven/Gradle build errors: compilation, dependency, and Spring Boot startup failures."
-mode: "agent"
+agent: "agent"
 ---
 
 # Java Build Fix

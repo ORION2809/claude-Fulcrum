@@ -1,6 +1,5 @@
 ---
 description: "Security vulnerability detection and remediation specialist. Performs OWASP Top 10 audits, secrets detection, dependency scans, and input validation checks. Use for code handling user input, auth, APIs, or sensitive data."
-mode: "agent"
 tools: ["read_file", "grep_search", "file_search", "semantic_search", "list_dir", "run_in_terminal", "get_errors"]
 ---
 

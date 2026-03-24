@@ -8,7 +8,7 @@
 
 <br>
 
-**26 Agents** · **122 Skills** · **65 Commands** · **9 Language Rulesets** · **1,536 Tests** · **6 Platforms**
+**26 Agents** · **122 Skills** · **66 Commands** · **9 Language Rulesets** · **1,536 Tests** · **6 Platforms**
 
 One harness. Every AI coding tool. Unified memory. Swarm orchestration. Neural search. Design intelligence.
 
@@ -32,7 +32,7 @@ One harness. Every AI coding tool. Unified memory. Swarm orchestration. Neural s
 
 </div>
 
-> **What is this?** Claude Fulcrum is a production-grade agent harness that unifies **Claude Code, Codex CLI, Cursor, GitHub Copilot, and OpenCode** into a single development environment — with shared vector memory, 4-signal neural search, knowledge graphs, swarm orchestration, 33 lifecycle hooks, 25 specialized AI agents, and a **full UI/UX design intelligence suite** that activate automatically based on what you're doing.
+> **What is this?** Claude Fulcrum is a production-grade agent harness that unifies **Claude Code, Codex CLI, Cursor, GitHub Copilot, and OpenCode** into a single development environment — with shared vector memory, 4-signal neural search, knowledge graphs, swarm orchestration, 33 lifecycle hooks, 26 specialized AI agents, and a **full UI/UX design intelligence suite** that activate automatically based on what you're doing.
 
 <br>
 
@@ -137,6 +137,8 @@ npx claude-fulcrum skill-install --dry-run --all --platform all
 npx claude-fulcrum skill-install --list
 ```
 
+GitHub Copilot can consume Claude-format skills directly from `.claude/skills/`, so Fulcrum skills written for Claude Code can be reused in Copilot without a separate skill format conversion.
+
 | Platform | Scope | Destination |
 |----------|-------|-------------|
 | Claude | Home | `~/.claude/skills/` |
@@ -144,7 +146,7 @@ npx claude-fulcrum skill-install --list
 | Codex | Home | `~/.codex/skills/` |
 | OpenCode | Home | `~/.opencode/skills/` |
 | Antigravity | Project | `.agent/skills/` |
-| Copilot | Project | `.agents/skills/` + `.github/` scaffold |
+| Copilot | Project | `.claude/skills/` + optional `.github/` scaffold |
 
 ---
 
@@ -750,7 +752,7 @@ Skills are **deep domain knowledge** that agents draw from — patterns, idioms,
 Commands are the primary interface — type `/command` and the right agent activates with the right skills loaded.
 
 <details>
-<summary><b>Full command reference (65 commands)</b></summary>
+<summary><b>Full command reference (66 commands)</b></summary>
 
 ### Planning & Architecture (5)
 ```
@@ -894,9 +896,9 @@ Each rule set covers: **coding style**, **testing requirements**, **security pra
 
 | Capability | ECC | **Claude Fulcrum** |
 |-----------|-----|-------------------|
-| **Agents** | 21 | **25** |
+| **Agents** | 21 | **26** |
 | **Skills** | ~80 | **119** (includes 7 UI/UX design intelligence skills) |
-| **Commands** | ~40 | **62** |
+| **Commands** | ~40 | **66** |
 | **Platforms** | 4 | **6** (Claude Code, Codex, Cursor, Copilot, OpenCode, Antigravity) |
 | **Design Intelligence** | None | **7 skills** — 67 styles, 96 palettes, 57 font pairings, BM25 search |
 | **Language Rules** | 5 | **9** (each with 5 files: style, testing, security, patterns, hooks) |
@@ -998,7 +1000,7 @@ claude-fulcrum/
 │   ├── slides/          #   HTML presentations, Chart.js, copywriting
 │   ├── banner-design/   #   Multi-format banners, 22 art direction styles
 │   └── ...              #   112 more: languages, testing, security, AI, business
-├── commands/            # 62 slash commands
+├── commands/            # 66 slash commands
 ├── hooks/               # hooks.json + 33 hook scripts across 7 lifecycle phases
 ├── rules/               # 9 language rule sets (5 files each)
 │   ├── common/          #   Universal: immutability, testing, security, patterns, hooks
@@ -1238,7 +1240,7 @@ SessionEnd hooks fire (2)
 - ✅ 26 agents across 6 platforms
 - ✅ 7 UI/UX design intelligence skills with BM25 search
 - ✅ 33 lifecycle hooks across 7 phases
-- ✅ 122 skills, 65 commands, 9 language rulesets
+- ✅ 122 skills, 66 commands, 9 language rulesets
 - ✅ 1,536 tests passing
 - ✅ Cross-platform skill installer with swarm mode
 
@@ -1305,7 +1307,7 @@ npm test                              # all 1,536 tests must pass
 |--------|------:|
 | Specialized Agents | **26** |
 | Workflow Skills | **122** |
-| Slash Commands | **65** |
+| Slash Commands | **66** |
 | Language Rule Sets | **9** |
 | Rule Files (total) | **~50** |
 | Supported Platforms | **6** |

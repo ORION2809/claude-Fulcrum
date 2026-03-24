@@ -1,6 +1,6 @@
 ---
 description: "Safely identify and remove dead code using analysis tools, with test verification at every step."
-mode: "agent"
+agent: "agent"
 ---
 
 # Refactor Clean

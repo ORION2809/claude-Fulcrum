@@ -1,6 +1,6 @@
 ---
 description: "Review Go code for idiomatic patterns, error handling, concurrency safety, and performance. Checks for common Go pitfalls."
-mode: "agent"
+agent: "agent"
 ---
 
 # Go Review

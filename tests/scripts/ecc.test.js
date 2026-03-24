@@ -122,6 +122,29 @@ function main() {
       assert.strictEqual(payload.adapterId, 'claude-history');
       assert.strictEqual(payload.workers[0].branch, 'feat/ecc-cli');
     }],
+    ['delegates orchestration-dashboard command', () => {
+      const repoRoot = createTempDir('ecc-cli-dashboard-');
+      const planPath = path.join(repoRoot, 'workflow.json');
+      const coordinationDir = path.join(repoRoot, '.claude', 'orchestration', 'workflow-visual-proof', 'claude');
+
+      fs.writeFileSync(planPath, JSON.stringify({
+        sessionName: 'workflow-visual-proof',
+        repoRoot,
+        coordinationRoot: path.join(repoRoot, '.claude', 'orchestration')
+      }, null, 2));
+      fs.mkdirSync(coordinationDir, { recursive: true });
+      fs.writeFileSync(path.join(coordinationDir, 'status.md'), '# Status: claude\n\n- State: running\n');
+      fs.writeFileSync(path.join(coordinationDir, 'task.md'), '# Worker Task: claude\n\n## Objective\nImplement auth flow\n');
+      fs.writeFileSync(path.join(coordinationDir, 'handoff.md'), '# Handoff: claude\n');
+
+      const result = runCli(['orchestration-dashboard', planPath], {
+        cwd: repoRoot,
+      });
+
+      assert.strictEqual(result.status, 0, result.stderr);
+      assert.match(result.stdout, /ECC Orchestration Dashboard/);
+      assert.match(result.stdout, /workflow-visual-proof/);
+    }],
     ['supports help for a subcommand', () => {
       const result = runCli(['help', 'repair']);
       assert.strictEqual(result.status, 0, result.stderr);

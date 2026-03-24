@@ -1,6 +1,6 @@
 ---
 description: "Run comprehensive verification: build, types, lint, tests, secrets audit, console.log check, and git status. Produces pass/fail report."
-mode: "agent"
+agent: "agent"
 ---
 
 # Verification

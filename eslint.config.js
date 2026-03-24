@@ -3,10 +3,29 @@ const globals = require('globals');
 
 module.exports = [
     {
-        ignores: ['.opencode/dist/**', '.cursor/**', 'node_modules/**']
+        ignores: [
+            '.opencode/dist/**',
+            '.cursor/**',
+            'node_modules/**',
+            'upgrade-research/**',
+            'orchestration/**',
+            'scripts/ci/.tmp-validator-*.js'
+        ]
     },
     js.configs.recommended,
     {
+        files: ['**/*.mjs'],
+        languageOptions: {
+            ecmaVersion: 2022,
+            sourceType: 'module',
+            globals: {
+                ...globals.node,
+                ...globals.es2022
+            }
+        }
+    },
+    {
+        files: ['**/*.{js,cjs}'],
         languageOptions: {
             ecmaVersion: 2022,
             sourceType: 'commonjs',
@@ -23,6 +42,17 @@ module.exports = [
             }],
             'no-undef': 'error',
             'eqeqeq': 'warn'
+        }
+    },
+    {
+        files: ['**/*.mjs'],
+        languageOptions: {
+            ecmaVersion: 2022,
+            sourceType: 'module',
+            globals: {
+                ...globals.node,
+                ...globals.es2022
+            }
         }
     }
 ];

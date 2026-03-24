@@ -1,6 +1,6 @@
 ---
 description: "Build or update the code review knowledge graph for structural code analysis. Uses Tree-sitter to parse 14 languages into a persistent SQLite graph."
-mode: "agent"
+agent: "agent"
 ---
 
 # Code Graph Build

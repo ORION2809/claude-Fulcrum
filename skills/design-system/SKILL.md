@@ -1,7 +1,6 @@
 ---
 name: design-system
 description: "Design token architecture with three-layer system (primitive, semantic, component), CSS variables, spacing/typography scales, component specs, and strategic slide creation."
-origin: claude-fulcrum
 ---
 
 # Design System

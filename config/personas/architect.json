@@ -1,0 +1,21 @@
+{
+  "@include": "base.json",
+  "mode": "systems",
+  "quality": {
+    "requiredValidators": [
+      "KISS",
+      "SOLID",
+      "Purity",
+      "ContextBudgetPolicy"
+    ]
+  },
+  "commandHints": {
+    "before": [
+      "plan"
+    ],
+    "after": [
+      "code-review",
+      "verify"
+    ]
+  }
+}

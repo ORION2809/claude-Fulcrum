@@ -8,14 +8,12 @@ const os = require('os');
 
 const {
   ERROR_TYPES,
-  ERROR_CLASSIFIERS,
   PDCA_PHASES,
   WORD_OVERLAP_THRESHOLD,
   createPDCACycle,
   advancePDCA,
   classifyError,
   createReflexionStore,
-  loadEntries,
   persistEntry,
   computeWordOverlap,
   createErrorSignature,
@@ -192,8 +190,8 @@ if (test('persistEntry writes JSONL and returns updated store', () => {
   const storePath = path.join(tmpDir, 'patterns.jsonl');
   const store = createReflexionStore(storePath);
   const entry = { signature: 'test error signature', fix: 'apply fix X' };
-  const updated = persistEntry(store, entry);
-  assert.strictEqual(updated.entries.length, 1);
+  const persisted = persistEntry(store, entry);
+  assert.strictEqual(persisted.entries.length, 1);
   assert.ok(fs.existsSync(storePath));
   const content = fs.readFileSync(storePath, 'utf8').trim();
   assert.deepStrictEqual(JSON.parse(content), entry);
@@ -228,7 +226,7 @@ if (test('findMatchingPattern returns null for no match', () => {
 if (test('recordMistake adds new entry', () => {
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'reflexion-'));
   const store = createReflexionStore(path.join(tmpDir, 'patterns.jsonl'));
-  const { store: updated, entry, isNew } = recordMistake(store, { message: 'null reference error' }, 'check for null');
+  const { entry, isNew } = recordMistake(store, { message: 'null reference error' }, 'check for null');
   assert.strictEqual(isNew, true);
   assert.ok(entry.signature);
   assert.strictEqual(entry.fix, 'check for null');

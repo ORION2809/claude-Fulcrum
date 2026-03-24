@@ -21,9 +21,121 @@ const EVOLUTION_ACTIONS = Object.freeze({
   ARCHIVE: 'archive',
 });
 
+const MEMORY_EDGE_TYPES = Object.freeze({
+  RELATED_TO: 'related_to',
+  EVOLVED_FROM: 'evolved_from',
+  DEPENDS_ON: 'depends_on',
+  PREVENTS: 'prevents',
+  CONFLICTS_WITH: 'conflicts_with',
+});
+
 const DEFAULT_STALE_THRESHOLD_DAYS = 30;
 const DEFAULT_CONSOLIDATION_BATCH = 50;
 const DEFAULT_EVO_THRESHOLD = 100;
+const DEFAULT_LINK_THRESHOLD = 0.45;
+
+const DEPENDENCY_TERMS = new Set(['depends', 'dependency', 'requires', 'requires', 'needs', 'uses', 'imports', 'calls', 'build', 'module', 'service', 'worker', 'hook']);
+const PREVENTION_TERMS = new Set(['prevent', 'prevents', 'guard', 'sanitize', 'validate', 'block', 'secure', 'fix', 'patch', 'mitigate']);
+const CONFLICT_TERMS = new Set(['conflict', 'conflicts', 'instead', 'alternative', 'replace', 'replaces', 'swap', 'tradeoff', 'either-or']);
+const EVOLUTION_TERMS = new Set(['evolve', 'evolved', 'evolution', 'refactor', 'iteration', 'follow-up', 'next', 'update', 'derive']);
+
+function normalizeTerms(values) {
+  const source = Array.isArray(values) ? values : [values];
+  return source
+    .flatMap(value => String(value || '').toLowerCase().split(/[^a-z0-9+.#_-]+/g))
+    .map(value => value.trim())
+    .filter(Boolean);
+}
+
+function collectSignals(note, neighbor) {
+  const noteTerms = new Set([
+    ...normalizeTerms(note.title),
+    ...normalizeTerms(note.summary),
+    ...normalizeTerms(note.content),
+    ...normalizeTerms(note.keywords),
+    ...normalizeTerms(note.tags),
+    ...normalizeTerms(note.category ? [note.category] : []),
+  ]);
+  const neighborTerms = new Set([
+    ...normalizeTerms(neighbor.title),
+    ...normalizeTerms(neighbor.summary),
+    ...normalizeTerms(neighbor.content),
+    ...normalizeTerms(neighbor.keywords),
+    ...normalizeTerms(neighbor.tags),
+    ...normalizeTerms(neighbor.category ? [neighbor.category] : []),
+  ]);
+
+  const sharedTerms = [...noteTerms].filter(term => neighborTerms.has(term));
+  const noteHas = terms => [...terms].some(term => noteTerms.has(term));
+  const neighborHas = terms => [...terms].some(term => neighborTerms.has(term));
+
+  return {
+    sharedTerms,
+    sharedCount: sharedTerms.length,
+    noteHasDependencySignals: noteHas(DEPENDENCY_TERMS),
+    neighborHasDependencySignals: neighborHas(DEPENDENCY_TERMS),
+    noteHasPreventionSignals: noteHas(PREVENTION_TERMS),
+    noteHasIssueSignals: noteHas(new Set(['error', 'bug', 'issue', 'failure', 'vulnerability', 'leak'])),
+    neighborHasIssueSignals: neighborHas(new Set(['error', 'bug', 'issue', 'failure', 'vulnerability', 'leak'])),
+    neighborHasPreventionSignals: neighborHas(PREVENTION_TERMS),
+    noteHasConflictSignals: noteHas(CONFLICT_TERMS),
+    neighborHasConflictSignals: neighborHas(CONFLICT_TERMS),
+    noteHasEvolutionSignals: noteHas(EVOLUTION_TERMS),
+    neighborHasEvolutionSignals: neighborHas(EVOLUTION_TERMS),
+    sameCategory: String(note.category || '').toLowerCase() === String(neighbor.category || '').toLowerCase(),
+    sameSession: Boolean(note.sessionId && neighbor.sessionId && note.sessionId === neighbor.sessionId),
+  };
+}
+
+function inferMemoryEdgeType(note, neighbor) {
+  const signals = collectSignals(note, neighbor);
+  let edgeType = MEMORY_EDGE_TYPES.RELATED_TO;
+  let confidence = 0.55;
+  let reason = 'Shared context';
+
+  if (
+    signals.noteHasConflictSignals
+    || signals.neighborHasConflictSignals
+    || (signals.sharedCount >= 2 && (signals.noteHasConflictSignals || signals.neighborHasConflictSignals))
+  ) {
+    edgeType = MEMORY_EDGE_TYPES.CONFLICTS_WITH;
+    confidence = 0.82;
+    reason = 'Conflicting or alternative markers detected';
+  } else if (
+    (signals.noteHasPreventionSignals && signals.neighborHasIssueSignals)
+    || (signals.neighborHasPreventionSignals && signals.noteHasIssueSignals)
+  ) {
+    edgeType = MEMORY_EDGE_TYPES.PREVENTS;
+    confidence = 0.84;
+    reason = 'Preventive markers align with issue markers';
+  } else if (
+    signals.noteHasDependencySignals
+    || signals.neighborHasDependencySignals
+    || signals.sharedTerms.some(term => DEPENDENCY_TERMS.has(term))
+    || (signals.sharedCount >= 2 && (signals.sameSession || signals.sameCategory))
+  ) {
+    edgeType = signals.sameCategory ? MEMORY_EDGE_TYPES.EVOLVED_FROM : MEMORY_EDGE_TYPES.DEPENDS_ON;
+    confidence = signals.sameCategory ? 0.8 : 0.77;
+    reason = signals.sameCategory
+      ? 'Same-category memory evolved from a related note'
+      : 'Dependency markers indicate operational linkage';
+  } else if (signals.noteHasEvolutionSignals || signals.neighborHasEvolutionSignals) {
+    edgeType = MEMORY_EDGE_TYPES.EVOLVED_FROM;
+    confidence = 0.73;
+    reason = 'Evolution markers indicate a follow-on note';
+  } else if (signals.sharedCount >= 2 && signals.sameSession) {
+    edgeType = MEMORY_EDGE_TYPES.RELATED_TO;
+    confidence = 0.62;
+    reason = 'Shared session and overlapping terms';
+  }
+
+  return {
+    edgeType,
+    confidence,
+    reason,
+    signals,
+  };
+}
 
 function isStale(note, thresholdDays) {
   const threshold = thresholdDays || DEFAULT_STALE_THRESHOLD_DAYS;
@@ -55,13 +167,20 @@ function suggestEvolutionActions(note, neighbors) {
   for (const neighbor of neighbors) {
     const neighborKeywords = new Set((neighbor.keywords || []).map(k => k.toLowerCase()));
     const overlap = [...noteKeywords].filter(k => neighborKeywords.has(k));
+    const linkInference = inferMemoryEdgeType(note, neighbor);
 
     if (overlap.length >= 2) {
       actions.push({
         action: EVOLUTION_ACTIONS.STRENGTHEN,
         targetId: neighbor.id,
-        reason: `Shared keywords: ${overlap.join(', ')}`,
-        suggestedEdgeType: 'related_to',
+        reason: `${linkInference.reason}: ${overlap.join(', ')}`,
+        suggestedEdgeType: linkInference.edgeType,
+        confidence: linkInference.confidence,
+        linkMetadata: {
+          sharedKeywords: overlap,
+          sharedCount: overlap.length,
+          ...linkInference.signals,
+        },
       });
     }
 
@@ -71,11 +190,144 @@ function suggestEvolutionActions(note, neighbors) {
         targetId: neighbor.id,
         reason: `Same category (${note.category}) with significant keyword overlap`,
         suggestedTags: [...new Set([...(neighbor.tags || []), ...(note.tags || [])])],
+        suggestedEdgeType: MEMORY_EDGE_TYPES.EVOLVED_FROM,
+        confidence: 0.78,
       });
     }
   }
 
   return actions;
+}
+
+function scoreNeighborCandidate(note, neighbor) {
+  const currentKeywords = new Set(Array.isArray(note.keywords) ? note.keywords : []);
+  const currentTags = new Set(Array.isArray(note.tags) ? note.tags : []);
+  const candidateKeywords = new Set(Array.isArray(neighbor.keywords) ? neighbor.keywords : []);
+  const candidateTags = new Set(Array.isArray(neighbor.tags) ? neighbor.tags : []);
+  const keywordOverlap = [...currentKeywords].filter(value => candidateKeywords.has(value));
+  const tagOverlap = [...currentTags].filter(value => candidateTags.has(value));
+  const sameSessionBoost = note.sessionId && neighbor.sessionId && note.sessionId === neighbor.sessionId ? 0.1 : 0;
+  const linkInference = inferMemoryEdgeType(note, neighbor);
+  const signalBoost = linkInference.edgeType === MEMORY_EDGE_TYPES.EVOLVED_FROM
+    ? 0.15
+    : linkInference.edgeType === MEMORY_EDGE_TYPES.DEPENDS_ON
+      ? 0.12
+      : linkInference.edgeType === MEMORY_EDGE_TYPES.PREVENTS
+        ? 0.14
+        : linkInference.edgeType === MEMORY_EDGE_TYPES.CONFLICTS_WITH
+          ? 0.1
+          : 0.05;
+  const weight = Math.min(
+    0.99,
+    Number((((keywordOverlap.length * 0.25)
+      + (tagOverlap.length * 0.2)
+      + sameSessionBoost
+      + signalBoost
+    )).toFixed(2))
+  );
+
+  return {
+    candidate: neighbor,
+    keywordOverlap,
+    tagOverlap,
+    linkInference,
+    weight,
+  };
+}
+
+function buildEvolutionLinkPlan(note, neighbors, options = {}) {
+  const recentNotes = Array.isArray(neighbors) ? neighbors : [];
+  const linksByNoteId = options.linksByNoteId instanceof Map ? options.linksByNoteId : new Map();
+  const noteIndex = new Map(recentNotes.map(entry => [entry.id, entry]));
+  const maxLinks = Number.isFinite(Number(options.maxLinks)) ? Number(options.maxLinks) : 3;
+  const threshold = Number.isFinite(Number(options.threshold)) ? Number(options.threshold) : DEFAULT_LINK_THRESHOLD;
+  const planned = [];
+  const seenTargets = new Set([note.id]);
+
+  function pushPlan(entry) {
+    if (!entry || !entry.targetId || seenTargets.has(entry.targetId) || planned.length >= maxLinks) {
+      return;
+    }
+    seenTargets.add(entry.targetId);
+    planned.push(entry);
+  }
+
+  const directCandidates = recentNotes
+    .filter(candidate => candidate && candidate.id && candidate.id !== note.id)
+    .map(candidate => scoreNeighborCandidate(note, candidate))
+    .filter(entry => entry.weight >= threshold)
+    .sort((left, right) => right.weight - left.weight);
+
+  for (const entry of directCandidates) {
+    pushPlan({
+      targetId: entry.candidate.id,
+      edgeType: entry.linkInference.edgeType,
+      weight: entry.weight,
+      confidence: entry.linkInference.confidence,
+      reason: entry.linkInference.reason,
+      traversalDepth: 1,
+      metadata: {
+        keywordOverlap: entry.keywordOverlap,
+        tagOverlap: entry.tagOverlap,
+        sharedTerms: entry.linkInference.signals.sharedTerms,
+        sameSession: entry.linkInference.signals.sameSession,
+        sameCategory: entry.linkInference.signals.sameCategory,
+      },
+    });
+    if (planned.length >= maxLinks) {
+      return planned;
+    }
+  }
+
+  for (const entry of directCandidates.slice(0, Math.min(directCandidates.length, 3))) {
+    const relatedLinks = Array.isArray(linksByNoteId.get(entry.candidate.id)) ? linksByNoteId.get(entry.candidate.id) : [];
+    for (const relatedLink of relatedLinks) {
+      if (planned.length >= maxLinks) {
+        return planned;
+      }
+
+      const nextId = relatedLink.fromNoteId === entry.candidate.id
+        ? relatedLink.toNoteId
+        : relatedLink.fromNoteId;
+      const nextNote = noteIndex.get(nextId);
+      if (!nextNote || nextId === note.id || seenTargets.has(nextId)) {
+        continue;
+      }
+
+      const transitive = scoreNeighborCandidate(note, nextNote);
+      const propagatedWeight = Number(Math.min(
+        0.95,
+        ((entry.weight * 0.65) + (transitive.weight * 0.35) + 0.08)
+      ).toFixed(2));
+
+      if (propagatedWeight < threshold) {
+        continue;
+      }
+
+      pushPlan({
+        targetId: nextId,
+        edgeType: transitive.linkInference.edgeType === MEMORY_EDGE_TYPES.RELATED_TO
+          ? relatedLink.linkType || transitive.linkInference.edgeType
+          : transitive.linkInference.edgeType,
+        weight: propagatedWeight,
+        confidence: Number(((entry.linkInference.confidence + transitive.linkInference.confidence) / 2).toFixed(2)),
+        reason: `Transitively surfaced via ${entry.candidate.id}: ${transitive.linkInference.reason}`,
+        traversalDepth: 2,
+        via: entry.candidate.id,
+        metadata: {
+          keywordOverlap: transitive.keywordOverlap,
+          tagOverlap: transitive.tagOverlap,
+          sharedTerms: transitive.linkInference.signals.sharedTerms,
+          sameSession: transitive.linkInference.signals.sameSession,
+          sameCategory: transitive.linkInference.signals.sameCategory,
+          transitiveVia: entry.candidate.id,
+          sourceEdgeType: relatedLink.linkType || MEMORY_EDGE_TYPES.RELATED_TO,
+        },
+      });
+    }
+  }
+
+  return planned;
 }
 
 function identifyMergeCandidates(notes) {
@@ -178,6 +430,8 @@ function applyEvolutionAction(note, action) {
             targetId: action.targetId,
             edgeType: action.suggestedEdgeType || 'related_to',
             reason: action.reason,
+            confidence: Number.isFinite(action.confidence) ? action.confidence : null,
+            metadata: action.linkMetadata || {},
             createdAt: new Date().toISOString(),
           },
         ];
@@ -221,6 +475,8 @@ function applyEvolutionAction(note, action) {
       action: action.action,
       targetId: action.targetId,
       reason: action.reason,
+      edgeType: action.suggestedEdgeType || null,
+      confidence: Number.isFinite(action.confidence) ? action.confidence : null,
       timestamp: new Date().toISOString(),
     },
   ];
@@ -233,11 +489,16 @@ module.exports = {
   isStale,
   computeRelevanceScore,
   suggestEvolutionActions,
+  buildEvolutionLinkPlan,
   identifyMergeCandidates,
   planConsolidation,
   cloneForAttempt,
   applyEvolutionAction,
+  inferMemoryEdgeType,
+  collectSignals,
+  MEMORY_EDGE_TYPES,
   DEFAULT_STALE_THRESHOLD_DAYS,
   DEFAULT_CONSOLIDATION_BATCH,
   DEFAULT_EVO_THRESHOLD,
+  DEFAULT_LINK_THRESHOLD,
 };

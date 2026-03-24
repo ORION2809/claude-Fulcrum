@@ -1,6 +1,6 @@
 ---
 description: "Analyze a draft prompt and output an optimized version. Does NOT execute the task — produces advisory analysis only with recommended agents, skills, and workflow."
-mode: "agent"
+agent: "agent"
 ---
 
 # Prompt Optimize

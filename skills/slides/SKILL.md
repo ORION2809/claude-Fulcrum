@@ -1,7 +1,6 @@
 ---
 name: slides
 description: "Strategic HTML presentations with Chart.js, design tokens, responsive layouts, copywriting formulas, and contextual slide strategies."
-origin: claude-fulcrum
 ---
 
 # Slides

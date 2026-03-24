@@ -1,6 +1,6 @@
 ---
 description: "Analyze the blast radius of code changes using the knowledge graph. Shows all impacted files, functions, and dependency chains."
-mode: "agent"
+agent: "agent"
 ---
 
 # Code Graph Impact Analysis

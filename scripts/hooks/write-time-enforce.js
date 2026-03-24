@@ -72,6 +72,12 @@ const OPUS_CODE_PATTERNS = /unresolved-attribute|type-assertion/;
 
 /** Source: plankton — volume threshold triggers opus automatically */
 const VOLUME_THRESHOLD = 5;
+const CLAUDE_CLI_CANDIDATES = Object.freeze(
+  process.platform === 'win32'
+    ? ['claude.exe', 'claude.cmd', 'claude']
+    : ['claude']
+);
+const MAX_STDIN = 1024 * 1024;
 
 const DEFAULT_TIER_CONFIG = {
   format: {
@@ -82,6 +88,15 @@ const DEFAULT_TIER_CONFIG = {
       ts: ['prettier', 'biome format'],
       py: ['ruff format'],
       sh: ['shfmt'],
+      yaml: ['prettier --write', 'yamlfmt'],
+      yml: ['prettier --write', 'yamlfmt'],
+      json: ['prettier --write'],
+      toml: ['taplo format'],
+      md: ['prettier --write'],
+      markdown: ['prettier --write'],
+      dockerfile: ['prettier --write'],
+      css: ['prettier --write'],
+      html: ['prettier --write'],
     },
   },
   lint: {
@@ -92,6 +107,15 @@ const DEFAULT_TIER_CONFIG = {
       ts: ['biome check', 'eslint'],
       py: ['ruff check'],
       sh: ['shellcheck'],
+      yaml: ['yamllint'],
+      yml: ['yamllint'],
+      json: ['jsonlint'],
+      toml: ['taplo lint'],
+      md: ['markdownlint-cli2'],
+      markdown: ['markdownlint-cli2'],
+      dockerfile: ['hadolint'],
+      css: ['stylelint'],
+      html: ['htmlhint'],
     },
   },
   fix: {
@@ -112,6 +136,7 @@ const DEFAULT_TIER_CONFIG = {
 
 function detectFileLanguage(filePath) {
   const ext = path.extname(filePath).toLowerCase();
+  const baseName = path.basename(filePath).toLowerCase();
   const langMap = {
     '.js': 'js', '.jsx': 'js', '.mjs': 'js', '.cjs': 'js',
     '.ts': 'ts', '.tsx': 'ts', '.mts': 'ts', '.cts': 'ts',
@@ -121,7 +146,18 @@ function detectFileLanguage(filePath) {
     '.rs': 'rs',
     '.kt': 'kt', '.kts': 'kt',
     '.java': 'java',
+    '.yml': 'yaml', '.yaml': 'yaml',
+    '.json': 'json',
+    '.toml': 'toml',
+    '.md': 'md', '.markdown': 'markdown',
+    '.css': 'css',
+    '.html': 'html', '.htm': 'html',
   };
+
+  if (baseName === 'dockerfile' || baseName === 'containerfile' || baseName.endsWith('.dockerfile')) {
+    return 'dockerfile';
+  }
+
   return langMap[ext] || null;
 }
 
@@ -188,18 +224,116 @@ function runTool(tool, filePath, options = {}) {
 
 function parseViolations(lintOutput) {
   const violations = [];
-  const lines = lintOutput.split('\n').filter(Boolean);
+  const seen = new Set();
+
+  function pushViolation(rawViolation) {
+    if (!rawViolation || !rawViolation.file || !rawViolation.code) {
+      return;
+    }
+
+    const line = Number.isFinite(Number(rawViolation.line)) ? Number(rawViolation.line) : null;
+    const column = Number.isFinite(Number(rawViolation.column)) ? Number(rawViolation.column) : null;
+    const message = String(rawViolation.message || '').trim();
+    const key = [rawViolation.file, line || '', column || '', rawViolation.code, message].join('::');
+    if (seen.has(key)) {
+      return;
+    }
+
+    seen.add(key);
+    violations.push({
+      file: String(rawViolation.file),
+      line,
+      column,
+      code: String(rawViolation.code),
+      message,
+      complexity: classifyViolationComplexity(String(rawViolation.code)),
+    });
+  }
+
+  function extractFromStructuredValue(value, inherited = {}) {
+    if (!value) {
+      return;
+    }
+
+    if (Array.isArray(value)) {
+      for (const item of value) {
+        extractFromStructuredValue(item, inherited);
+      }
+      return;
+    }
+
+    if (typeof value !== 'object') {
+      return;
+    }
+
+    const file = value.file || value.path || value.filename || value.source || value.filePath || inherited.file;
+
+    if (Array.isArray(value.violations)) {
+      for (const violation of value.violations) {
+        extractFromStructuredValue(violation, inherited);
+      }
+    }
+
+    if (Array.isArray(value.results)) {
+      for (const result of value.results) {
+        extractFromStructuredValue(result, inherited);
+      }
+    }
+
+    if (Array.isArray(value.diagnostics)) {
+      for (const diagnostic of value.diagnostics) {
+        extractFromStructuredValue(diagnostic, {
+          ...inherited,
+          file: inherited.file || file,
+        });
+      }
+    }
+
+    if (Array.isArray(value.messages)) {
+      for (const message of value.messages) {
+        extractFromStructuredValue(
+          { ...message, file: value.file || value.path || value.filename || message.file },
+          { ...inherited, file: inherited.file || file }
+        );
+      }
+    }
+
+    const code = value.code || value.ruleId || value.rule || value.id || value.severity;
+    const message = value.message || value.description || value.msg || value.text || value.reason;
+    const line = value.line || value.row || value.lineno || (value.location && value.location.line) || (value.loc && value.loc.line);
+    const column = value.column || value.col || value.colno || (value.location && value.location.column) || (value.loc && value.loc.column);
+
+    if (file && code) {
+      pushViolation({
+        file,
+        code,
+        message: message || '',
+        line,
+        column,
+      });
+    }
+  }
+
+  try {
+    const trimmed = String(lintOutput || '').trim();
+    if (trimmed.startsWith('{') || trimmed.startsWith('[')) {
+      extractFromStructuredValue(JSON.parse(trimmed));
+    }
+  } catch {
+    // Fall back to line-based parsing below.
+  }
+
+  const lines = String(lintOutput || '').split('\n').filter(Boolean);
 
   for (const line of lines) {
     const match = line.match(/^(.+):(\d+):(\d+):\s*(\w+)\s*(.*)$/);
     if (match) {
-      violations.push({
+      pushViolation({
         file: match[1],
         line: parseInt(match[2], 10),
         column: parseInt(match[3], 10),
         code: match[4],
         message: match[5],
-        complexity: classifyViolationComplexity(match[4]),
       });
     }
   }
@@ -239,6 +373,15 @@ function hashFile(filePath) {
   }
 }
 
+function resolveClaudeCommand(options = {}) {
+  if (options.claudeCommand) {
+    return options.claudeCommand;
+  }
+
+  const commandFinder = options.commandFinder || findAvailableTool;
+  return commandFinder(CLAUDE_CLI_CANDIDATES);
+}
+
 /**
  * Source: plankton multi_linter.sh Phase 3 — subprocess delegation.
  * Spawns `claude -p` with violation context, model routing, and tool permissions.
@@ -249,16 +392,13 @@ function hashFile(filePath) {
  */
 function delegateFixToSubprocess(filePath, violations, tier, options = {}) {
   const repoRoot = options.repoRoot || process.cwd();
-
-  // Check for claude CLI availability
-  const claudeCmd = process.platform === 'win32' ? 'claude.exe' : 'claude';
-  const which = spawnSync(
-    process.platform === 'win32' ? 'where' : 'which',
-    [claudeCmd],
-    { encoding: 'utf8', timeout: 5000 }
-  );
-  if (which.status !== 0) {
-    return { delegated: false, reason: 'claude CLI not found' };
+  const spawnSyncImpl = options.spawnSyncImpl || spawnSync;
+  const claudeCmd = resolveClaudeCommand({
+    claudeCommand: options.claudeCommand,
+    commandFinder: options.commandFinder,
+  });
+  if (!claudeCmd) {
+    return { delegated: false, reason: 'claude CLI not found', failOpen: true };
   }
 
   // Source: plankton — build violation JSON for prompt
@@ -297,7 +437,7 @@ function delegateFixToSubprocess(filePath, violations, tier, options = {}) {
   args.push(filePath);
 
   try {
-    const result = spawnSync(claudeCmd, args, {
+    const result = spawnSyncImpl(claudeCmd, args, {
       encoding: 'utf8',
       timeout: tier.timeout,
       cwd: repoRoot,
@@ -316,6 +456,7 @@ function delegateFixToSubprocess(filePath, violations, tier, options = {}) {
       hashBefore,
       hashAfter,
       timedOut: result.error?.code === 'ETIMEDOUT',
+      failOpen: result.status !== 0,
     };
   } catch (err) {
     return {
@@ -324,8 +465,25 @@ function delegateFixToSubprocess(filePath, violations, tier, options = {}) {
       exitCode: -1,
       fileModified: false,
       error: err.message,
+      failOpen: true,
     };
   }
+}
+
+function shouldFailOpenForDelegation(delegateResult, options = {}) {
+  if (!delegateResult) {
+    return true;
+  }
+
+  if (delegateResult.failOpen) {
+    return true;
+  }
+
+  if (options.delegateEnabled && delegateResult.delegated === false) {
+    return true;
+  }
+
+  return false;
 }
 
 async function runWriteTimePipeline(filePath, options = {}) {
@@ -345,6 +503,7 @@ async function runWriteTimePipeline(filePath, options = {}) {
     steps: [],
     violations: [],
     success: true,
+    failOpen: false,
     startedAt: new Date().toISOString(),
   };
 
@@ -395,9 +554,22 @@ async function runWriteTimePipeline(filePath, options = {}) {
     // Source: plankton Phase 3 — delegate to subprocess if enabled
     if (delegateEnabled || options.delegateEnabled) {
       const tier = selectModelTier(pipelineResult.violations);
-      const delegateResult = delegateFixToSubprocess(filePath, pipelineResult.violations, tier, { repoRoot });
+      const delegateResult = delegateFixToSubprocess(filePath, pipelineResult.violations, tier, {
+        repoRoot,
+        spawnSyncImpl: options.spawnSyncImpl,
+        commandFinder: options.commandFinder,
+        claudeCommand: options.claudeCommand,
+      });
       pipelineResult.steps.push({ tier: TIERS.FIX, ...delegateResult });
       pipelineResult.delegation = delegateResult;
+      pipelineResult.failOpen = shouldFailOpenForDelegation(delegateResult, { delegateEnabled: true });
+      if (delegateResult.delegated === false && delegateResult.failOpen) {
+        pipelineResult.delegation = {
+          ...delegateResult,
+          delegated: false,
+          failOpen: true,
+        };
+      }
     }
   }
 
@@ -449,6 +621,53 @@ async function runWriteTimePipeline(filePath, options = {}) {
   return pipelineResult;
 }
 
+function extractFilePathFromHookInput(input) {
+  return input?.tool_input?.file_path
+    || input?.tool_input?.path
+    || input?.tool_input?.target_file
+    || input?.file_path
+    || null;
+}
+
+async function run(rawInput) {
+  try {
+    const input = JSON.parse(rawInput || '{}');
+    const filePath = extractFilePathFromHookInput(input);
+    if (!filePath) {
+      return rawInput;
+    }
+
+    await runWriteTimePipeline(filePath, {
+      repoRoot: process.cwd(),
+    });
+  } catch {
+    // Fail open for hook execution.
+  }
+
+  return rawInput;
+}
+
+if (require.main === module) {
+  let raw = '';
+  process.stdin.setEncoding('utf8');
+  process.stdin.on('data', chunk => {
+    if (raw.length < MAX_STDIN) {
+      raw += chunk.slice(0, MAX_STDIN - raw.length);
+    }
+  });
+  process.stdin.on('end', () => {
+    run(raw)
+      .then(output => {
+        process.stdout.write(output);
+        process.exit(0);
+      })
+      .catch(() => {
+        process.stdout.write(raw);
+        process.exit(0);
+      });
+  });
+}
+
 module.exports = {
   TIERS,
   FIX_COMPLEXITY,
@@ -457,12 +676,17 @@ module.exports = {
   OPUS_CODE_PATTERNS,
   VOLUME_THRESHOLD,
   DEFAULT_TIER_CONFIG,
+  CLAUDE_CLI_CANDIDATES,
   detectFileLanguage,
   findAvailableTool,
   classifyViolationComplexity,
   selectModelTier,
   hashFile,
+  resolveClaudeCommand,
   delegateFixToSubprocess,
+  shouldFailOpenForDelegation,
   parseViolations,
   runWriteTimePipeline,
+  extractFilePathFromHookInput,
+  run,
 };

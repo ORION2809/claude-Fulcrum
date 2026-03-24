@@ -1,6 +1,6 @@
 ---
 description: "Review C++ code for memory safety, modern idioms, concurrency, and performance following C++ Core Guidelines."
-mode: "agent"
+agent: "agent"
 ---
 
 # C++ Review

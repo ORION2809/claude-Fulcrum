@@ -9,10 +9,16 @@ const {
   getPlatformName,
   hashValue,
   loadControlPlane,
+  getGovernanceDir,
 } = require('../lib/fulcrum-control');
 const { sanitizeForMemory } = require('../utils/privacy-gate');
 const { compressObservation } = require('./compress-observation');
 const { rebuildViews } = require('../memory/rebuild-views');
+const {
+  buildEvolutionLinkPlan,
+  MEMORY_EDGE_TYPES,
+} = require('../memory/memory-evolution');
+const { parsePersonaArgs } = require('../lib/persona-runtime');
 
 const MAX_STDIN = 1024 * 1024;
 
@@ -118,18 +124,25 @@ function buildPendingMessageRecord(eventName, sessionContext, sanitized, sourceP
 
 function createMemoryNoteRecord(eventName, sessionContext, sanitizedPayload, observation) {
   const timestamp = new Date().toISOString();
-  const keywords = [...new Set(String(sanitizedPayload || '')
+  const rawContent = String(sanitizedPayload || '');
+  const keywords = [...new Set(rawContent
     .split(/\s+/)
     .map(value => value.trim().toLowerCase())
     .filter(value => value && value.length >= 3)
     .slice(0, 12))];
+
+  // Apply claude-mem style compression: keep semantic density high while reducing storage.
+  // Use 1000-char limit for content (vs 220 for summary) to maintain retrievability.
+  const compressedContent = rawContent.length > 1200
+    ? compressObservation(rawContent, { maxChars: 1000 })
+    : rawContent;
 
   return {
     id: createStableId('note', `${observation.contentHash}:${eventName}`),
     sessionId: sessionContext.sessionId,
     attemptId: sessionContext.attemptId,
     category: eventName === 'summary_checkpoint' ? 'checkpoint' : 'observation',
-    content: String(sanitizedPayload || ''),
+    content: compressedContent || rawContent,
     summary: observation.summary,
     tags: [...new Set([eventName, getPlatformName(), observation.title ? 'titled' : null].filter(Boolean))],
     keywords,
@@ -155,44 +168,27 @@ function buildCandidateMemoryLinks(options = {}) {
   const note = options.note || {};
   const recentNotes = Array.isArray(options.recentNotes) ? options.recentNotes : [];
   const maxLinks = Number.isFinite(Number(options.maxLinks)) ? Number(options.maxLinks) : 3;
-  const currentKeywords = new Set(Array.isArray(note.keywords) ? note.keywords : []);
-  const currentTags = new Set(Array.isArray(note.tags) ? note.tags : []);
+  const linksByNoteId = options.linksByNoteId instanceof Map ? options.linksByNoteId : new Map();
+  const plans = buildEvolutionLinkPlan(note, recentNotes, {
+    maxLinks,
+    linksByNoteId,
+  });
 
-  return recentNotes
-    .filter(candidate => candidate && candidate.id && candidate.id !== note.id)
-    .map(candidate => {
-      const candidateKeywords = new Set(Array.isArray(candidate.keywords) ? candidate.keywords : []);
-      const candidateTags = new Set(Array.isArray(candidate.tags) ? candidate.tags : []);
-      const keywordOverlap = [...currentKeywords].filter(value => candidateKeywords.has(value));
-      const tagOverlap = [...currentTags].filter(value => candidateTags.has(value));
-      const sameSessionBoost = note.sessionId && candidate.sessionId && note.sessionId === candidate.sessionId ? 0.1 : 0;
-      const weight = Math.min(
-        0.95,
-        Number((((keywordOverlap.length * 0.25) + (tagOverlap.length * 0.2) + sameSessionBoost)).toFixed(2))
-      );
-
-      return {
-        candidate,
-        keywordOverlap,
-        tagOverlap,
-        weight,
-      };
-    })
-    .filter(entry => entry.weight >= 0.45)
-    .sort((left, right) => right.weight - left.weight)
-    .slice(0, maxLinks)
-    .map(entry => ({
-      id: createStableId('link', `${note.id}:${entry.candidate.id}:related_to`),
-      fromNoteId: note.id,
-      toNoteId: entry.candidate.id,
-      linkType: 'related_to',
-      weight: entry.weight,
-      metadata: {
-        keywordOverlap: entry.keywordOverlap,
-        tagOverlap: entry.tagOverlap,
-      },
-      createdAt: new Date().toISOString(),
-    }));
+  return plans.map(plan => ({
+    id: createStableId('link', `${note.id}:${plan.targetId}:${plan.edgeType}:${plan.traversalDepth || 1}`),
+    fromNoteId: note.id,
+    toNoteId: plan.targetId,
+    linkType: plan.edgeType || MEMORY_EDGE_TYPES.RELATED_TO,
+    weight: plan.weight,
+    metadata: {
+      ...plan.metadata,
+      confidence: plan.confidence,
+      reason: plan.reason,
+      traversalDepth: plan.traversalDepth || 1,
+      via: plan.via || null,
+    },
+    createdAt: new Date().toISOString(),
+  }));
 }
 
 async function persistLifecycleEvent(rawInput, explicitEventName) {
@@ -204,6 +200,26 @@ async function persistLifecycleEvent(rawInput, explicitEventName) {
   const controlPlane = loadControlPlane();
 
   ensureControlPlaneDirs();
+
+  // Extract --persona-* flags from user prompts and persist for quality-gate reads.
+  if (eventName === 'user_prompt_submit' && typeof sourcePayload === 'string') {
+    try {
+      const promptArgs = sourcePayload.split(/\s+/).filter(Boolean);
+      const { explicitPersonas } = parsePersonaArgs(promptArgs);
+      if (explicitPersonas.length > 0) {
+        const personaPath = require('path').join(getGovernanceDir(), 'active-persona.json');
+        const fs = require('fs');
+        fs.writeFileSync(personaPath, JSON.stringify({
+          activePersona: explicitPersonas[0],
+          personaStack: explicitPersonas,
+          source: 'user_prompt',
+          updatedAt: new Date().toISOString(),
+        }, null, 2), 'utf8');
+      }
+    } catch {
+      // Persona extraction is best-effort; never block the write path.
+    }
+  }
 
   const store = await createStateStore({
     homeDir: process.env.HOME,
@@ -281,11 +297,15 @@ async function persistLifecycleEvent(rawInput, explicitEventName) {
               // Embedding computation is best-effort; never block the write path
             }
 
+            const recentNotes = store
+              .listRecentMemoryNotes({ limit: 25 })
+              .filter(candidate => candidate.id !== memoryNote.id);
             const candidateLinks = buildCandidateMemoryLinks({
               note: memoryNote,
-              recentNotes: store
-                .listRecentMemoryNotes({ limit: 25 })
-                .filter(candidate => candidate.id !== memoryNote.id),
+              recentNotes,
+              linksByNoteId: new Map(
+                recentNotes.map(candidate => [candidate.id, store.listMemoryLinksByNote(candidate.id)])
+              ),
             });
 
             for (const link of candidateLinks) {

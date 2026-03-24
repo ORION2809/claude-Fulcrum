@@ -1,6 +1,5 @@
 ---
 description: "Test-driven development specialist. Enforces write-tests-first methodology with Red-Green-Refactor cycle. Use for new features, bug fixes, and refactoring to ensure 80%+ coverage."
-mode: "agent"
 tools: ["read_file", "grep_search", "file_search", "semantic_search", "list_dir", "run_in_terminal", "replace_string_in_file", "create_file", "get_errors"]
 ---
 

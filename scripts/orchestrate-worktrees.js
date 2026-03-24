@@ -9,6 +9,15 @@ const {
   executePlan,
   materializePlan
 } = require('./lib/tmux-worktree-orchestrator');
+const {
+  createTask,
+  loadBoard,
+  saveBoard,
+  upsertTask,
+  attachAttempt,
+} = require('./lib/parallel-board');
+const { ensureDir } = require('./lib/utils');
+const { getGroupArtifactPaths } = require('./attempt-group-cli');
 
 function usage() {
   console.log([
@@ -42,14 +51,93 @@ function loadPlanConfig(planPath) {
   return { absolutePath, config };
 }
 
+function deriveTaskTitle(config, plan) {
+  return String(config.title || config.sessionName || plan.sessionName || 'Parallel Orchestration').trim();
+}
+
+function deriveTaskObjective(config, plan) {
+  if (typeof config.task === 'string' && config.task.trim().length > 0) {
+    return config.task.trim();
+  }
+
+  if (typeof config.objective === 'string' && config.objective.trim().length > 0) {
+    return config.objective.trim();
+  }
+
+  return plan.workerPlans.map(worker => `${worker.workerName}: ${worker.task}`).join(' | ');
+}
+
+function buildGroupManifest(config, plan, taskId) {
+  return {
+    groupId: plan.attemptGroupId,
+    name: deriveTaskTitle(config, plan),
+    task: deriveTaskObjective(config, plan),
+    taskId,
+    agents: plan.workerPlans.map(worker => worker.workerSlug),
+    attempts: plan.workerPlans.map(worker => ({
+      id: worker.attemptId,
+      branchName: worker.branchName,
+      worktreePath: worker.worktreePath,
+      agentName: worker.workerName,
+    })),
+    createdAt: new Date().toISOString(),
+  };
+}
+
+function syncParallelControlPlane(config, plan) {
+  const repoRoot = path.resolve(plan.repoRoot);
+  const existingBoard = loadBoard(repoRoot);
+  const existingTask = existingBoard.tasks.find(task =>
+    task.metadata?.attemptGroupId === plan.attemptGroupId
+  );
+
+  let board = existingBoard;
+  const task = existingTask || createTask({
+    title: deriveTaskTitle(config, plan),
+    description: deriveTaskObjective(config, plan),
+    objective: deriveTaskObjective(config, plan),
+    preferredAgents: plan.workerPlans.map(worker => worker.workerSlug),
+    metadata: {
+      createdBy: 'orchestrate-worktrees',
+      attemptGroupId: plan.attemptGroupId,
+      sessionName: plan.sessionName,
+    },
+  });
+
+  board = upsertTask(board, task);
+  for (const worker of plan.workerPlans) {
+    board = attachAttempt(board, task.id, {
+      attemptId: worker.attemptId,
+      agentName: worker.workerName,
+      groupId: plan.attemptGroupId,
+      attachedAt: new Date().toISOString(),
+    });
+  }
+  saveBoard(board, repoRoot);
+
+  const manifest = buildGroupManifest(config, plan, task.id);
+  const artifactPaths = getGroupArtifactPaths(repoRoot, plan.attemptGroupId);
+  ensureDir(artifactPaths.groupDir);
+  fs.writeFileSync(artifactPaths.manifestPath, `${JSON.stringify(manifest, null, 2)}\n`, 'utf8');
+
+  return {
+    taskId: task.id,
+    manifestPath: artifactPaths.manifestPath,
+  };
+}
+
 function printDryRun(plan, absolutePath) {
+  const artifactPaths = getGroupArtifactPaths(plan.repoRoot, plan.attemptGroupId);
   const preview = {
     planFile: absolutePath,
     sessionName: plan.sessionName,
     repoRoot: plan.repoRoot,
     coordinationDir: plan.coordinationDir,
+    attemptGroupId: plan.attemptGroupId,
+    manifestPath: artifactPaths.manifestPath,
     workers: plan.workerPlans.map(worker => ({
       workerName: worker.workerName,
+      attemptId: worker.attemptId,
       branchName: worker.branchName,
       worktreePath: worker.worktreePath,
       seedPaths: worker.seedPaths,
@@ -78,8 +166,11 @@ function main() {
   const plan = buildOrchestrationPlan(config);
 
   if (writeOnly) {
+    const controlPlane = syncParallelControlPlane(config, plan);
     materializePlan(plan);
     console.log(`Wrote orchestration files to ${plan.coordinationDir}`);
+    console.log(`Parallel manifest: ${controlPlane.manifestPath}`);
+    console.log(`Board task: ${controlPlane.taskId}`);
     return;
   }
 
@@ -88,10 +179,13 @@ function main() {
     return;
   }
 
+  const controlPlane = syncParallelControlPlane(config, plan);
   const result = executePlan(plan);
   console.log([
     `Started tmux session '${result.sessionName}' with ${result.workerCount} worker panes.`,
     `Coordination files: ${result.coordinationDir}`,
+    `Parallel manifest: ${controlPlane.manifestPath}`,
+    `Board task: ${controlPlane.taskId}`,
     `Attach with: tmux attach -t ${result.sessionName}`
   ].join('\n'));
 }
@@ -105,4 +199,10 @@ if (require.main === module) {
   }
 }
 
-module.exports = { main };
+module.exports = {
+  buildGroupManifest,
+  deriveTaskObjective,
+  deriveTaskTitle,
+  main,
+  syncParallelControlPlane,
+};

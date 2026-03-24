@@ -1,6 +1,6 @@
 ---
 description: "System architecture design: analyze current state, gather requirements, propose designs with trade-off analysis, and recommend patterns."
-mode: "agent"
+agent: "agent"
 ---
 
 # Architect

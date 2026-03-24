@@ -22,7 +22,21 @@ const { getPackageManager, getSelectionPrompt } = require('../lib/package-manage
 const { listAliases } = require('../lib/session-aliases');
 const { detectProjectType } = require('../lib/project-detect');
 const { createStateStore } = require('../lib/state-store');
-const { buildAwarenessHint } = require('../memory/search-orchestrator');
+const {
+  buildAwarenessHint,
+  buildSessionStartRetrievalQuery,
+  executeRetrievalRequest,
+} = require('../memory/search-orchestrator');
+
+function buildSessionStartAwarenessHint(retrievalSummary, fallbackEntries, options = {}) {
+  const summary = String(retrievalSummary || '').trim();
+  if (summary) {
+    const hint = `Memory available: ${summary}`;
+    return hint.length > 120 ? `${hint.slice(0, 117)}...` : hint;
+  }
+
+  return buildAwarenessHint(fallbackEntries, options);
+}
 
 async function main() {
   const sessionsDir = getSessionsDir();
@@ -94,12 +108,22 @@ async function main() {
     homeDir: process.env.HOME,
   });
 
+  let storeClosed = false;
+  const closeStore = () => {
+    if (!storeClosed) {
+      store.close();
+      storeClosed = true;
+    }
+  };
+
   try {
+    const dbPath = store.dbPath;
     const recentNotes = store.listRecentMemoryNotes({ limit: 2 }).map(note => ({
       kind: 'note',
       id: note.id,
       title: note.category,
       summary: note.summary,
+      keywords: note.keywords || [],
       relationship: 'seed',
       score: 2,
     }));
@@ -111,15 +135,42 @@ async function main() {
       relationship: 'seed',
       score: 1,
     }));
-    const awarenessHint = buildAwarenessHint([...recentNotes, ...recentObservations], {
-      parentTokenBudget: 30,
-    });
+    const recentEntries = [...recentNotes, ...recentObservations];
+    const retrievalQuery = buildSessionStartRetrievalQuery(recentEntries, projectInfo);
+    closeStore();
+    let awarenessHint = '';
+
+    if (retrievalQuery) {
+      try {
+        const retrieval = await executeRetrievalRequest({
+          query: retrievalQuery,
+          dbPath,
+          mode: 'search',
+          preferIsolated: true,
+          parentTokenBudget: 30,
+        }, {
+          allowSubprocess: true,
+        });
+
+        awarenessHint = buildSessionStartAwarenessHint(retrieval.summary, recentEntries, {
+          parentTokenBudget: 30,
+        });
+      } catch (_retrievalError) {
+        awarenessHint = '';
+      }
+    }
+
+    if (!awarenessHint) {
+      awarenessHint = buildAwarenessHint(recentEntries, {
+        parentTokenBudget: 30,
+      });
+    }
 
     if (awarenessHint) {
       output(awarenessHint);
     }
   } finally {
-    store.close();
+    closeStore();
   }
 
   process.exit(0);

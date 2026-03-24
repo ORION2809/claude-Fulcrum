@@ -11,6 +11,7 @@ const {
   buildRetrievalCoordinationDir,
   buildRetrievalRequest,
   buildAwarenessHint,
+  buildSessionStartRetrievalQuery,
   buildParentContextPayload,
   buildSynthesis,
   computeHybridScore,
@@ -247,6 +248,130 @@ if (test('formats search-stage retrieval without expanding neighbors', () => {
   assert.strictEqual(response.results[0].id, 'note-a');
 })) passed += 1; else failed += 1;
 
+async function verifyGraphExpansionInSearchMemory() {
+  const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ecc-search-memory-'));
+  const store = await createStateStore({ homeDir });
+
+  try {
+    store.insertMemoryNote({
+      id: 'note-seed',
+      sessionId: 'session-graph',
+      attemptId: null,
+      category: 'auth-debug',
+      content: 'Refresh token bug in auth flow',
+      summary: 'Debugged refresh token failure in auth flow.',
+      tags: ['auth', 'debug'],
+      keywords: ['refresh', 'token', 'auth', 'bug'],
+      links: [],
+      retrievalMetadata: {},
+      evolutionHistory: [],
+      createdAt: '2026-03-24T11:50:00.000Z',
+      accessedAt: '2026-03-24T11:50:00.000Z',
+    });
+    store.insertMemoryNote({
+      id: 'note-neighbor',
+      sessionId: 'session-graph',
+      attemptId: null,
+      category: 'auth-architecture',
+      content: 'Rotation settings captured in a later review.',
+      summary: 'Follow-up note about rotation settings.',
+      tags: ['ops', 'architecture'],
+      keywords: ['rotation', 'settings', 'review'],
+      links: [],
+      retrievalMetadata: {},
+      evolutionHistory: [],
+      createdAt: '2026-03-20T11:50:00.000Z',
+      accessedAt: '2026-03-20T11:50:00.000Z',
+    });
+    store.insertMemoryLink({
+      id: 'link-seed-neighbor',
+      fromNoteId: 'note-seed',
+      toNoteId: 'note-neighbor',
+      linkType: 'depends_on',
+      weight: 0.95,
+      metadata: { reason: 'Refresh flow depends on rotation settings.' },
+      createdAt: '2026-03-24T11:55:00.000Z',
+    });
+
+    const response = await searchMemory('auth refresh dependency', {
+      dbPath: store.dbPath,
+      mode: 'expand',
+      limit: 1,
+      maxNeighbors: 2,
+      now: '2026-03-24T12:00:00.000Z',
+    });
+
+    assert.ok(response.results.some(entry => entry.id === 'note-seed'));
+    assert.ok(response.results.some(entry => entry.id === 'note-neighbor'));
+    const neighbor = response.results.find(entry => entry.id === 'note-neighbor');
+    assert.strictEqual(neighbor.relationship, 'depends_on');
+  } finally {
+    store.close();
+    fs.rmSync(homeDir, { recursive: true, force: true });
+  }
+}
+
+async function verifyBoundedSearchModeInSearchMemory() {
+  const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ecc-search-mode-'));
+  const store = await createStateStore({ homeDir });
+
+  try {
+    store.insertMemoryNote({
+      id: 'note-seed',
+      sessionId: 'session-search',
+      attemptId: null,
+      category: 'memory-recall',
+      content: 'Retrieval budget for memory search',
+      summary: 'Bound retrieval payload in parent context.',
+      tags: ['memory'],
+      keywords: ['retrieval', 'budget', 'memory'],
+      links: [],
+      retrievalMetadata: {},
+      evolutionHistory: [],
+      createdAt: '2026-03-24T11:58:00.000Z',
+      accessedAt: '2026-03-24T11:58:00.000Z',
+    });
+    store.insertMemoryNote({
+      id: 'note-neighbor',
+      sessionId: 'session-search',
+      attemptId: null,
+      category: 'memory-graph',
+      content: 'Linked note for graph expansion',
+      summary: 'Neighbor note should stay out of search-only parent payload.',
+      tags: ['graph'],
+      keywords: ['expansion', 'neighbor'],
+      links: [],
+      retrievalMetadata: {},
+      evolutionHistory: [],
+      createdAt: '2026-03-24T11:40:00.000Z',
+      accessedAt: '2026-03-24T11:40:00.000Z',
+    });
+    store.insertMemoryLink({
+      id: 'link-search-mode',
+      fromNoteId: 'note-seed',
+      toNoteId: 'note-neighbor',
+      linkType: 'related_to',
+      weight: 0.9,
+      metadata: {},
+      createdAt: '2026-03-24T11:59:00.000Z',
+    });
+
+    const response = await searchMemory('retrieval budget memory', {
+      dbPath: store.dbPath,
+      mode: 'search',
+      limit: 1,
+      maxNeighbors: 2,
+      now: '2026-03-24T12:00:00.000Z',
+    });
+
+    assert.ok(response.results.some(entry => entry.id === 'note-seed'));
+    assert.ok(response.results.every(entry => (entry.relationship || 'seed') === 'seed'));
+  } finally {
+    store.close();
+    fs.rmSync(homeDir, { recursive: true, force: true });
+  }
+}
+
 if (test('builds a compact awareness hint for session start', () => {
   const hint = buildAwarenessHint([
     {
@@ -270,6 +395,34 @@ if (test('builds a compact awareness hint for session start', () => {
   assert.ok(hint.startsWith('Memory available: '));
   assert.ok(hint.includes('Retrieval budget'));
   assert.ok(hint.length <= 120);
+})) passed += 1; else failed += 1;
+
+if (test('builds a bounded retrieval query for session-start memory recall', () => {
+  const query = buildSessionStartRetrievalQuery([
+    {
+      kind: 'note',
+      id: 'note-a',
+      title: 'memory-recall',
+      summary: 'Bound retrieval payload for TypeScript memory search.',
+      keywords: ['retrieval', 'payload', 'memory'],
+    },
+    {
+      kind: 'observation',
+      id: 'obs-a',
+      title: 'search orchestrator',
+      summary: 'Use isolated worker execution when available.',
+      keywords: [],
+    },
+  ], {
+    languages: ['TypeScript'],
+    frameworks: ['Node.js'],
+  }, {
+    maxTerms: 6,
+  });
+
+  assert.ok(query.includes('retrieval'));
+  assert.ok(query.includes('typescript'));
+  assert.ok(query.split(/\s+/).length <= 6);
 })) passed += 1; else failed += 1;
 
 if (test('builds a retrieval request envelope for future isolated workers', () => {
@@ -311,6 +464,10 @@ if (test('builds orchestration-style retrieval artifact files', () => {
 })) passed += 1; else failed += 1;
 
 async function main() {
+  if (await asyncTest('searchMemory expands graph-linked notes in expand mode', verifyGraphExpansionInSearchMemory)) passed += 1; else failed += 1;
+
+  if (await asyncTest('searchMemory keeps parent search mode bounded to seed entries', verifyBoundedSearchModeInSearchMemory)) passed += 1; else failed += 1;
+
   if (await asyncTest('supports timeline and drill-in retrieval against the state store', async () => {
     const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ecc-memory-search-'));
     const store = await createStateStore({ homeDir });
@@ -387,6 +544,117 @@ async function main() {
       assert.strictEqual(drillIn.mode, 'drill_in');
       assert.strictEqual(drillIn.focus.id, 'note-memory');
       assert.ok(drillIn.timeline.some(entry => entry.id === 'obs-memory'));
+    } finally {
+      store.close();
+      fs.rmSync(homeDir, { recursive: true, force: true });
+    }
+  })) passed += 1; else failed += 1;
+
+  if (await asyncTest('surfaces graph-linked and time-aware notes during expand retrieval', async () => {
+    const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ecc-memory-graph-'));
+    const store = await createStateStore({ homeDir });
+    const dbPath = store.dbPath;
+
+    try {
+      store.upsertSession({
+        id: 'session-graph',
+        adapterId: 'local',
+        harness: 'local',
+        state: 'active',
+        repoRoot: process.cwd(),
+        startedAt: '2026-03-18T00:00:00.000Z',
+        endedAt: null,
+        snapshot: { workers: [] },
+      });
+      store.upsertAttempt({
+        id: 'attempt-graph',
+        sessionId: 'session-graph',
+        parentAttemptId: null,
+        branchName: 'attempt/graph',
+        worktreePath: process.cwd(),
+        status: 'running',
+        metadata: {},
+        createdAt: '2026-03-18T00:00:00.000Z',
+        updatedAt: '2026-03-18T00:00:00.000Z',
+      });
+      store.insertMemoryNote({
+        id: 'note-seed',
+        sessionId: 'session-graph',
+        attemptId: 'attempt-graph',
+        category: 'memory-recall',
+        content: 'Memory budget retrieval seed.',
+        summary: 'Memory budget retrieval seed.',
+        tags: ['memory', 'budget'],
+        keywords: ['memory', 'budget', 'retrieval'],
+        links: [],
+        retrievalMetadata: {},
+        evolutionHistory: [],
+        createdAt: '2026-03-18T00:00:01.000Z',
+        accessedAt: '2026-03-18T00:00:01.000Z',
+      });
+      store.insertMemoryNote({
+        id: 'note-linked',
+        sessionId: 'session-graph',
+        attemptId: 'attempt-graph',
+        category: 'memory-link',
+        content: 'Linked operational note that should surface through graph expansion.',
+        summary: 'Linked operational note.',
+        tags: ['ops'],
+        keywords: ['linked', 'operational'],
+        links: [],
+        retrievalMetadata: {},
+        evolutionHistory: [],
+        createdAt: '2026-03-18T00:00:02.000Z',
+        accessedAt: '2026-03-18T00:00:02.000Z',
+      });
+      store.insertMemoryNote({
+        id: 'note-deep',
+        sessionId: 'session-graph',
+        attemptId: 'attempt-graph',
+        category: 'memory-deep',
+        content: 'Deep evolved note that should surface through time-aware traversal.',
+        summary: 'Deep evolved note.',
+        tags: ['ops'],
+        keywords: ['deep', 'evolved'],
+        links: [],
+        retrievalMetadata: {},
+        evolutionHistory: [],
+        createdAt: '2026-03-18T00:00:03.000Z',
+        accessedAt: '2026-03-18T00:00:03.000Z',
+      });
+      store.insertMemoryLink({
+        id: 'link-seed-linked',
+        fromNoteId: 'note-seed',
+        toNoteId: 'note-linked',
+        linkType: 'depends_on',
+        weight: 1,
+        metadata: {},
+        createdAt: '2026-03-18T00:00:04.000Z',
+      });
+      store.insertMemoryLink({
+        id: 'link-linked-deep',
+        fromNoteId: 'note-linked',
+        toNoteId: 'note-deep',
+        linkType: 'evolved_from',
+        weight: 1,
+        metadata: {},
+        createdAt: '2026-03-18T00:00:05.000Z',
+      });
+
+      const response = await searchMemory('memory budget retrieval', {
+        dbPath,
+        mode: 'expand',
+        sessionId: 'session-graph',
+        limit: 1,
+        maxNeighbors: 2,
+        maxDepth: 2,
+      });
+
+      assert.ok(response.results.some(entry => entry.id === 'note-seed'));
+      assert.ok(response.results.some(entry => entry.id === 'note-linked'));
+      assert.ok(response.results.some(entry => entry.id === 'note-deep'));
+      assert.ok(response.results.some(entry => entry.relationship === 'depends_on'));
+      assert.ok(response.results.some(entry => entry.relationship === 'evolved_from'));
     } finally {
       store.close();
       fs.rmSync(homeDir, { recursive: true, force: true });

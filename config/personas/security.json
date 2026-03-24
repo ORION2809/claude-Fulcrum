@@ -1,0 +1,21 @@
+{
+  "@include": "base.json",
+  "mode": "defensive",
+  "quality": {
+    "minimumAuditDecision": "warn",
+    "requiredValidators": [
+      "SecurityPolicy",
+      "Purity",
+      "LetItCrash",
+      "KISS"
+    ]
+  },
+  "commandHints": {
+    "before": [
+      "code-review"
+    ],
+    "after": [
+      "verify"
+    ]
+  }
+}

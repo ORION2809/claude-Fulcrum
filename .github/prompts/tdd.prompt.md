@@ -1,6 +1,6 @@
 ---
 description: "Enforce test-driven development: scaffold interfaces, write failing tests first (RED), implement minimal code (GREEN), refactor, verify 80%+ coverage."
-mode: "agent"
+agent: "agent"
 ---
 
 # Test-Driven Development

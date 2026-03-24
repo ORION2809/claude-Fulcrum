@@ -80,7 +80,6 @@ function loadModuleSkillMapping(sourceRoot) {
       continue;
     }
 
-    const skillsDir = path.join(sourceRoot, 'skills');
     const modulePaths = Array.isArray(module.paths) ? module.paths : [];
 
     for (const modulePath of modulePaths) {

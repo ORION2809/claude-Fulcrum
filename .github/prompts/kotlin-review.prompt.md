@@ -1,6 +1,6 @@
 ---
 description: "Review Kotlin code for idiomatic patterns, coroutine safety, Compose best practices, and Android/KMP conventions."
-mode: "agent"
+agent: "agent"
 ---
 
 # Kotlin Review

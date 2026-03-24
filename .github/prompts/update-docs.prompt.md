@@ -1,6 +1,6 @@
 ---
 description: "Sync documentation with codebase: generate script references, environment variable docs, API docs, and README updates from source-of-truth files."
-mode: "agent"
+agent: "agent"
 ---
 
 # Update Docs

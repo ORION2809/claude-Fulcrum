@@ -9,24 +9,17 @@ const SECRET_PATTERNS = [
   /\bBearer\s+[A-Za-z0-9._-]{12,}\b/g,
 ];
 
-function normalizeInput(input) {
-  if (typeof input === 'string') {
-    return input;
+function isPlainObject(value) {
+  if (value === null || typeof value !== 'object' || Array.isArray(value)) {
+    return false;
   }
 
-  if (input === null || input === undefined) {
-    return '';
-  }
-
-  try {
-    return JSON.stringify(input, null, 2);
-  } catch {
-    return String(input);
-  }
+  const prototype = Object.getPrototypeOf(value);
+  return prototype === Object.prototype || prototype === null;
 }
 
-function sanitizeForMemory(input, options = {}) {
-  const raw = normalizeInput(input);
+function sanitizeText(input, options = {}) {
+  const raw = String(input || '');
   const stripped = stripTaggedContent(raw, options);
 
   let sanitized = stripped.content;
@@ -47,9 +40,82 @@ function sanitizeForMemory(input, options = {}) {
 
   return {
     content: sanitized,
-    isEmpty: sanitized.length === 0,
-    skipStorage: sanitized.length === 0,
+    redactionReasons,
     strippedTagCount: stripped.strippedTagCount,
+  };
+}
+
+function sanitizeStructuredValue(input, options = {}, metadata = { redactionReasons: [], strippedTagCount: 0 }) {
+  if (typeof input === 'string') {
+    const sanitized = sanitizeText(input, options);
+    metadata.redactionReasons.push(...sanitized.redactionReasons);
+    metadata.strippedTagCount += sanitized.strippedTagCount;
+    return sanitized.content;
+  }
+
+  if (Array.isArray(input)) {
+    return input.map(value => sanitizeStructuredValue(value, options, metadata));
+  }
+
+  if (isPlainObject(input)) {
+    return Object.fromEntries(
+      Object.entries(input).map(([key, value]) => {
+        return [key, sanitizeStructuredValue(value, options, metadata)];
+      })
+    );
+  }
+
+  return input;
+}
+
+function normalizeInput(input, options = {}) {
+  if (typeof input === 'string') {
+    return {
+      content: input,
+      redactionReasons: [],
+      strippedTagCount: 0,
+    };
+  }
+
+  if (input === null || input === undefined) {
+    return {
+      content: '',
+      redactionReasons: [],
+      strippedTagCount: 0,
+    };
+  }
+
+  try {
+    const metadata = {
+      redactionReasons: [],
+      strippedTagCount: 0,
+    };
+    const sanitized = sanitizeStructuredValue(input, options, metadata);
+    return {
+      content: JSON.stringify(sanitized, null, 2),
+      redactionReasons: metadata.redactionReasons,
+      strippedTagCount: metadata.strippedTagCount,
+    };
+  } catch {
+    return {
+      content: String(input),
+      redactionReasons: [],
+      strippedTagCount: 0,
+    };
+  }
+}
+
+function sanitizeForMemory(input, options = {}) {
+  const normalized = normalizeInput(input, options);
+  const sanitized = sanitizeText(normalized.content, options);
+  const redactionReasons = [...normalized.redactionReasons, ...sanitized.redactionReasons];
+  const strippedTagCount = normalized.strippedTagCount + sanitized.strippedTagCount;
+
+  return {
+    content: sanitized.content,
+    isEmpty: sanitized.content.length === 0,
+    skipStorage: sanitized.content.length === 0,
+    strippedTagCount,
     redactionReasons,
   };
 }

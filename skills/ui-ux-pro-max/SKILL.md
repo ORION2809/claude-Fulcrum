@@ -1,7 +1,6 @@
 ---
 name: ui-ux-pro-max
 description: "UI/UX design intelligence with 67 styles, 96 palettes, 57 font pairings, 25 charts, 99 UX guidelines across 13 tech stacks. Searchable design database with BM25 ranking, design system generation, and priority-based recommendations."
-origin: claude-fulcrum
 ---
 # UI/UX Pro Max - Design Intelligence
 

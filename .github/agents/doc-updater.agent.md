@@ -1,6 +1,5 @@
 ---
 description: "Documentation and codemap specialist. Syncs documentation with codebase by generating script references, environment docs, API references, and README updates from source-of-truth files."
-mode: "agent"
 tools: ["read_file", "grep_search", "file_search", "semantic_search", "list_dir", "run_in_terminal", "replace_string_in_file", "create_file"]
 ---
 

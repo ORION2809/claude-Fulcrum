@@ -1,6 +1,6 @@
 ---
 description: "Generate and run end-to-end Playwright tests for critical user flows. Creates Page Object Model tests, runs across browsers, captures artifacts."
-mode: "agent"
+agent: "agent"
 ---
 
 # E2E Testing

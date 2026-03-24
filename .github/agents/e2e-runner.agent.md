@@ -1,6 +1,5 @@
 ---
 description: "End-to-end testing specialist using Playwright. Generates Page Object Model tests, runs across browsers, captures screenshots/videos/traces on failure, and quarantines flaky tests."
-mode: "agent"
 tools: ["read_file", "grep_search", "file_search", "list_dir", "run_in_terminal", "replace_string_in_file", "create_file", "get_errors"]
 ---
 

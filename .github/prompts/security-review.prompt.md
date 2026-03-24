@@ -1,6 +1,6 @@
 ---
 description: "Security audit: OWASP Top 10 review, secrets detection, dependency audit, input validation check. Flags vulnerabilities with severity ratings."
-mode: "agent"
+agent: "agent"
 ---
 
 # Security Review

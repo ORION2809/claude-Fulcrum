@@ -274,7 +274,7 @@ function runTests() {
   // --- Copilot deployer ---
   console.log('\nCopilot deployer:');
 
-  if (test('deploys skill to <projectRoot>/.agents/skills/<id>/', () => {
+  if (test('deploys skill to <projectRoot>/.claude/skills/<id>/', () => {
     const sourceDir = createTempDir();
     const projectRoot = createTempDir();
     try {
@@ -282,7 +282,7 @@ function runTests() {
       const result = deploySkillCopilot(skill, { projectRoot });
 
       assert.strictEqual(result.platform, 'copilot');
-      assert.ok(result.destination.includes(path.join('.agents', 'skills', 'cop-skill')));
+      assert.ok(result.destination.includes(path.join('.claude', 'skills', 'cop-skill')));
       assert.strictEqual(result.fileCount, 3);
     } finally {
       cleanup(sourceDir);

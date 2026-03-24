@@ -54,6 +54,14 @@ function buildSessionBannerCommand(sessionName, coordinationDir) {
   return `printf '%s\\n' ${shellQuote(`Session: ${sessionName}`)} ${shellQuote(`Coordination: ${coordinationDir}`)}`;
 }
 
+function buildAttemptLogPath(repoRoot, attemptId) {
+  return path.join(repoRoot, '.orchestration', 'attempts', attemptId, 'attempt.log');
+}
+
+function buildLoggedLaunchCommand(workerPlan) {
+  return `(${workerPlan.launchCommand}) 2>&1 | tee -a ${shellQuote(workerPlan.logFilePath)}`;
+}
+
 function normalizeSeedPaths(seedPaths, repoRoot) {
   const resolvedRepoRoot = path.resolve(repoRoot);
   const entries = Array.isArray(seedPaths) ? seedPaths : [];
@@ -134,6 +142,7 @@ function buildWorkerArtifacts(workerPlan) {
           `- Branch: \`${workerPlan.branchName}\``,
           `- Launcher status file: \`${workerPlan.statusFilePath}\``,
           `- Launcher handoff file: \`${workerPlan.handoffFilePath}\``,
+          `- Launcher log file: \`${workerPlan.logFilePath}\``,
           ...seededPathsSection,
           '',
           '## Objective',
@@ -175,6 +184,10 @@ function buildWorkerArtifacts(workerPlan) {
           `- Worktree: \`${workerPlan.worktreePath}\``,
           `- Branch: \`${workerPlan.branchName}\``
         ].join('\n')
+      },
+      {
+        path: workerPlan.logFilePath,
+        content: ''
       }
     ]
   };
@@ -214,6 +227,7 @@ function buildOrchestrationPlan(config = {}) {
     const branchName = `orchestrator-${sessionName}-${workerSlug}`;
     const worktreePath = path.join(worktreeRoot, `${repoName}-${sessionName}-${workerSlug}`);
     const attemptId = buildAttemptId(sessionName, workerSlug);
+    const logFilePath = buildAttemptLogPath(repoRoot, attemptId);
     const workerCoordinationDir = path.join(coordinationDir, workerSlug);
     const taskFilePath = path.join(workerCoordinationDir, 'task.md');
     const handoffFilePath = path.join(workerCoordinationDir, 'handoff.md');
@@ -250,6 +264,7 @@ function buildOrchestrationPlan(config = {}) {
       gitCommand: formatCommand('git', gitArgs),
       handoffFilePath,
       launchCommand: renderTemplate(launcherCommand, templateVariables),
+      logFilePath,
       repoRoot,
       sessionName,
       seedPaths,
@@ -304,7 +319,7 @@ function buildOrchestrationPlan(config = {}) {
           'send-keys',
           '-t',
           '<pane-id>',
-          `cd ${shellQuote(workerPlan.worktreePath)} && ${workerPlan.launchCommand}`,
+          `cd ${shellQuote(workerPlan.worktreePath)} && ${buildLoggedLaunchCommand(workerPlan)}`,
           'C-m'
         ],
         description: `Launch worker ${workerPlan.workerName}`
@@ -329,6 +344,7 @@ function materializePlan(plan) {
     const artifacts = buildWorkerArtifacts(workerPlan);
     fs.mkdirSync(artifacts.dir, { recursive: true });
     for (const file of artifacts.files) {
+      fs.mkdirSync(path.dirname(file.path), { recursive: true });
       fs.writeFileSync(file.path, file.content + '\n', 'utf8');
     }
   }
@@ -605,6 +621,8 @@ module.exports = {
   materializePlan,
   normalizeSeedPaths,
   overlaySeedPaths,
+  buildAttemptLogPath,
+  buildLoggedLaunchCommand,
   rollbackCreatedResources,
   renderTemplate,
   slugify

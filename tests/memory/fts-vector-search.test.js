@@ -8,18 +8,6 @@ const path = require('path');
 const { createStateStore } = require('../../scripts/lib/state-store');
 const { simpleEmbed, cosineSimilarity } = require('../../scripts/utils/embeddings');
 
-function test(name, fn) {
-  try {
-    fn();
-    console.log(`  \u2713 ${name}`);
-    return true;
-  } catch (error) {
-    console.log(`  \u2717 ${name}`);
-    console.log(`    Error: ${error.message}`);
-    return false;
-  }
-}
-
 async function asyncTest(name, fn) {
   try {
     await fn();

@@ -3,6 +3,7 @@
 const { spawnSync } = require('child_process');
 const path = require('path');
 const { listAvailableLanguages } = require('./lib/install-executor');
+const { buildPersonaSelection, buildPersonaEnv } = require('./lib/persona-runtime');
 
 const COMMANDS = {
   install: {
@@ -33,6 +34,34 @@ const COMMANDS = {
     script: 'status.js',
     description: 'Query the Claude Fulcrum SQLite state store status summary',
   },
+  'persona-route': {
+    script: 'persona-route.js',
+    description: 'Route a task into a persona stack and inherited command flow',
+  },
+  attempt: {
+    script: 'attempt-cli.js',
+    description: 'Create, inspect, and rehydrate isolated branch/worktree attempts',
+  },
+  'attempt-group': {
+    script: 'attempt-group-cli.js',
+    description: 'Create same-task parallel attempt groups and compare their diffs',
+  },
+  'parallel-board': {
+    script: 'parallel-board-cli.js',
+    description: 'Create and manage the lightweight parallel execution task board',
+  },
+  'parallel-board-server': {
+    script: 'parallel-board-server.js',
+    description: 'Run the lightweight parallel execution HTTP control plane and live event stream',
+  },
+  'parallel-board-mcp': {
+    script: 'parallel-board-mcp.js',
+    description: 'Run the lightweight parallel execution MCP server over stdio',
+  },
+  'orchestration-dashboard': {
+    script: 'orchestration-dashboard.js',
+    description: 'Render a live terminal dashboard for tmux/worktree orchestration sessions',
+  },
   sessions: {
     script: 'sessions-cli.js',
     description: 'List or inspect ECC sessions from the SQLite state store',
@@ -62,6 +91,13 @@ const PRIMARY_COMMANDS = [
   'doctor',
   'repair',
   'status',
+  'persona-route',
+  'attempt',
+  'attempt-group',
+  'parallel-board',
+  'parallel-board-server',
+  'parallel-board-mcp',
+  'orchestration-dashboard',
   'sessions',
   'session-inspect',
   'uninstall',
@@ -93,6 +129,13 @@ Examples:
   ecc doctor --target cursor
   ecc repair --dry-run
   ecc status --json
+  ecc attempt create feature-spike
+  ecc attempt status --json
+  ecc attempt-group create auth-spike --task "Implement auth flow" --agents claude,codex,gemini
+  ecc parallel-board list
+  ecc parallel-board-server --port 3017
+  ecc parallel-board-mcp
+  ecc orchestration-dashboard workflow-visual-proof --watch
   ecc sessions
   ecc sessions session-active --json
   ecc session-inspect claude:latest
@@ -153,12 +196,18 @@ function runCommand(commandName, args) {
     throw new Error(`Unknown command: ${commandName}`);
   }
 
+  const personaSelection = buildPersonaSelection(args, `${commandName} ${args.join(' ')}`.trim());
+  const personaEnv = buildPersonaEnv(personaSelection);
+
   const result = spawnSync(
     process.execPath,
-    [path.join(__dirname, command.script), ...args],
+    [path.join(__dirname, command.script), ...personaSelection.sanitizedArgs],
     {
       cwd: process.cwd(),
-      env: process.env,
+      env: {
+        ...process.env,
+        ...personaEnv,
+      },
       encoding: 'utf8',
       maxBuffer: 10 * 1024 * 1024,
     }

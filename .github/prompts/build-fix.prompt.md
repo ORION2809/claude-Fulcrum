@@ -1,6 +1,6 @@
 ---
 description: "Incrementally fix build and type errors with minimal, safe changes. Detects build system, parses errors, fixes one at a time."
-mode: "agent"
+agent: "agent"
 ---
 
 # Build Fix

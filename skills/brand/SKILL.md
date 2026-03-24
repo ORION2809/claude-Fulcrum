@@ -1,7 +1,6 @@
 ---
 name: brand
 description: "Brand voice, visual identity, messaging frameworks, asset management, and brand consistency. Covers branded content, tone of voice, marketing assets, and style guides."
-origin: claude-fulcrum
 ---
 
 # Brand

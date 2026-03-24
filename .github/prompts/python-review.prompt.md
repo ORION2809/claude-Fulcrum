@@ -1,6 +1,6 @@
 ---
 description: "Review Python code for PEP 8 compliance, Pythonic idioms, type hints, security, and performance."
-mode: "agent"
+agent: "agent"
 ---
 
 # Python Review
