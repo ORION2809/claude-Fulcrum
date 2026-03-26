@@ -22,8 +22,17 @@ function test(name, fn) {
 
 const repoRoot = path.join(__dirname, '..');
 const configPath = path.join(repoRoot, '.codex', 'config.toml');
-const config = fs.readFileSync(configPath, 'utf8');
 const codexAgentsDir = path.join(repoRoot, '.codex', 'agents');
+
+// .codex/ is gitignored — skip the entire suite when it is absent (e.g. in CI).
+if (!fs.existsSync(configPath)) {
+  console.log('  (skipped — .codex/config.toml not present, directory is gitignored)');
+  console.log('\nPassed: 0');
+  console.log('Failed: 0');
+  process.exit(0);
+}
+
+const config = fs.readFileSync(configPath, 'utf8');
 
 let passed = 0;
 let failed = 0;
@@ -49,6 +58,9 @@ else failed++;
 
 if (
   test('sample Codex role configs do not use o4-mini', () => {
+    if (!fs.existsSync(codexAgentsDir)) {
+      assert.fail('Expected `.codex/agents` directory to exist alongside config.toml');
+    }
     const roleFiles = fs.readdirSync(codexAgentsDir).filter(file => file.endsWith('.toml'));
     assert.ok(roleFiles.length > 0, 'Expected sample role config files under `.codex/agents`');
 

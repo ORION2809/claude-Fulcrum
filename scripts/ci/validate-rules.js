@@ -27,7 +27,9 @@ function collectRuleFiles(dir) {
   for (const entry of entries) {
     const absolute = path.join(dir, entry.name);
 
-    if (entry.isDirectory()) {
+    // Only recurse into real directories — skip symlinks so broken ones
+    // are collected as files and validated via statSync (which will throw).
+    if (entry.isDirectory() && !entry.isSymbolicLink()) {
       files.push(...collectRuleFiles(absolute));
       continue;
     }

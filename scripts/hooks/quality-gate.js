@@ -171,6 +171,13 @@ async function run(rawInput) {
     const beforeContent = readFileIfPresent(filePath);
     maybeRunQualityGate(filePath);
     const afterContent = readFileIfPresent(filePath);
+
+    // Skip the heavy evaluation pipeline when there is no file content to
+    // analyze (e.g. nonexistent file, non-file tool_input, or empty content).
+    if (!afterContent && !beforeContent) {
+      return { output: rawInput, blocked: false };
+    }
+
     const repoRoot = filePath ? findProjectRoot(path.dirname(path.resolve(filePath))) : process.cwd();
     const quality = await evaluateRuntimeQuality({
       filePath,
@@ -212,7 +219,9 @@ async function run(rawInput) {
       if (auditDecision === 'block') reasons.push(`audit decision: block`);
       if (selfVerdict === 'block') reasons.push(`self-review: block`);
       log(`[QualityGate] BLOCKED: ${reasons.join(', ')}`);
-      process.exit(2);
+      // Signal the caller that the gate blocked; the stdin entry point
+      // translates this into process.exit(2).
+      return { output: rawInput, blocked: true };
     }
   } catch (error) {
     try {
@@ -232,7 +241,7 @@ async function run(rawInput) {
       // Ignore telemetry failures in fail-open mode.
     }
   }
-  return rawInput;
+  return { output: rawInput, blocked: false };
 }
 
 // ── stdin entry point (backwards-compatible) ────────────────────
@@ -248,7 +257,10 @@ if (require.main === module) {
 
   process.stdin.on('end', () => {
     Promise.resolve(run(raw)).then(result => {
-      process.stdout.write(result);
+      process.stdout.write(result.output);
+      if (result.blocked) {
+        process.exit(2);
+      }
     }).catch(() => {
       process.stdout.write(raw);
     });

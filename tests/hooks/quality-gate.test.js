@@ -37,19 +37,22 @@ async function run() {
   if (await test('returns original input for valid JSON with file_path', async () => {
     const input = JSON.stringify({ tool_input: { file_path: '/tmp/nonexistent-file.js' } });
     const result = await qualityGate.run(input);
-    assert.strictEqual(result, input, 'Should return original input unchanged');
+    assert.strictEqual(result.output, input, 'Should return original input unchanged');
+    assert.strictEqual(result.blocked, false, 'Should not block for nonexistent file');
   })) passed++; else failed++;
 
   if (await test('returns original input for valid JSON without file_path', async () => {
     const input = JSON.stringify({ tool_input: { command: 'ls' } });
     const result = await qualityGate.run(input);
-    assert.strictEqual(result, input, 'Should return original input unchanged');
+    assert.strictEqual(result.output, input, 'Should return original input unchanged');
+    assert.strictEqual(result.blocked, false, 'Should not block for non-file input');
   })) passed++; else failed++;
 
   if (await test('returns original input for invalid JSON (no crash)', async () => {
     const input = 'this is not json at all {{{';
     const result = await qualityGate.run(input);
-    assert.strictEqual(result, input, 'Should return original input unchanged');
+    assert.strictEqual(result.output, input, 'Should return original input unchanged');
+    assert.strictEqual(result.blocked, false, 'Should not block for invalid JSON');
   })) passed++; else failed++;
 
   console.log('\nFile path extraction:');
@@ -92,7 +95,8 @@ async function run() {
       });
 
       const result = await qualityGate.run(input);
-      assert.strictEqual(result, input, 'Should return original input unchanged');
+      assert.strictEqual(result.output, input, 'Should return original input unchanged');
+      assert.strictEqual(result.blocked, true, 'Should block for file with critical security issues');
       assert.ok(fs.existsSync(telemetryPath), 'Telemetry log should exist');
 
       const entries = fs.readFileSync(telemetryPath, 'utf8')

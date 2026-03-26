@@ -90,7 +90,16 @@ async function main() {
   if (hookModule && typeof hookModule.run === 'function') {
     try {
       const output = await hookModule.run(raw);
-      if (output !== null && output !== undefined) process.stdout.write(output);
+      // Support hooks that return { output, blocked } (e.g. quality-gate)
+      // as well as plain string returns.
+      if (output !== null && output !== undefined) {
+        if (typeof output === 'object' && output.output !== undefined) {
+          process.stdout.write(output.output);
+          if (output.blocked) process.exit(2);
+        } else {
+          process.stdout.write(output);
+        }
+      }
     } catch (runErr) {
       process.stderr.write(`[Hook] run() error for ${hookId}: ${runErr.message}\n`);
       process.stdout.write(raw);
