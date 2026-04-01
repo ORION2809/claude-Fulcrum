@@ -188,6 +188,23 @@ function deploySkillCopilot(skill, options) {
   return result;
 }
 
+// --- Crush deployer ---
+// Skills go to: <projectRoot>/.crush/skills/<skill-id>/
+// Crush (successor to OpenCode) uses NVIDIA NIM models with project-scoped skills.
+function deploySkillCrush(skill, options) {
+  const projectRoot = options.projectRoot || process.cwd();
+  const destRoot = path.join(projectRoot, '.crush', 'skills');
+  const destDir = path.join(destRoot, skill.id);
+  copyRecursive(skill.absolutePath, destDir);
+
+  return {
+    platform: 'crush',
+    skillId: skill.id,
+    destination: destDir,
+    fileCount: countFiles(destDir),
+  };
+}
+
 const DEPLOYERS = Object.freeze({
   claude: deploySkillClaude,
   cursor: deploySkillCursor,
@@ -195,6 +212,7 @@ const DEPLOYERS = Object.freeze({
   opencode: deploySkillOpenCode,
   antigravity: deploySkillAntigravity,
   copilot: deploySkillCopilot,
+  crush: deploySkillCrush,
 });
 
 function getDeployer(platform) {
@@ -214,8 +232,94 @@ function deploySkills(skills, platform, options) {
   return skills.map(skill => deploySkill(skill, platform, options));
 }
 
+// --- Scaffold: copy full platform dot-directories ---
+// Mapping of dot-directory names to their scope and destination.
+const SCAFFOLD_DIRS = [
+  // Project-scoped — copied to projectRoot
+  { dir: '.github', scope: 'project' },
+  { dir: '.cursor', scope: 'project' },
+  { dir: '.agents', scope: 'project' },
+  { dir: '.claude', scope: 'project' },
+  { dir: '.claude-plugin', scope: 'project' },
+  { dir: '.kilo', scope: 'project' },
+  { dir: '.kilocode', scope: 'project' },
+  { dir: '.orchestration', scope: 'project' },
+  // Home-scoped — copied to homeDir
+  { dir: '.codex', scope: 'home' },
+  { dir: '.crush', scope: 'project' },
+  { dir: '.opencode', scope: 'home' },
+];
+
+// Individual files to scaffold to project root.
+const SCAFFOLD_FILES = [
+  '.mcp.json',       // Claude Code project-level MCP servers (code-review-graph, etc.)
+  '.claude.json',    // Claude Code project hooks + MCP config
+  'AGENTS.md',       // Agent routing instructions
+  'CLAUDE.md',       // Claude Code project instructions
+];
+
+/**
+ * Copy all platform dot-directories from the package source to the
+ * project root (project-scoped) or home directory (home-scoped).
+ * Also copies individual scaffold files to the project root.
+ *
+ * Uses merge-copy: existing files are overwritten, but existing
+ * directories are preserved and merged into (not deleted).
+ *
+ * @param {object} options
+ * @param {string} options.sourceRoot  — package root containing dot-dirs
+ * @param {string} options.projectRoot — target project folder
+ * @param {string} options.homeDir     — user home directory
+ * @param {boolean} [options.dryRun]
+ * @returns {{ copied: string[], skipped: string[], fileCount: number }}
+ */
+function scaffoldPlatformDirs(options) {
+  const { sourceRoot, projectRoot, homeDir, dryRun } = options;
+  const result = { copied: [], skipped: [], fileCount: 0 };
+
+  for (const entry of SCAFFOLD_DIRS) {
+    const src = path.join(sourceRoot, entry.dir);
+    if (!fs.existsSync(src)) {
+      result.skipped.push(entry.dir);
+      continue;
+    }
+
+    const dest = entry.scope === 'home'
+      ? path.join(homeDir, entry.dir)
+      : path.join(projectRoot, entry.dir);
+
+    if (!dryRun) {
+      copyRecursive(src, dest);
+    }
+
+    const count = dryRun ? countFiles(src) : countFiles(dest);
+    result.copied.push(entry.dir);
+    result.fileCount += count;
+  }
+
+  // Copy individual scaffold files to project root
+  for (const fileName of SCAFFOLD_FILES) {
+    const src = path.join(sourceRoot, fileName);
+    if (!fs.existsSync(src)) {
+      result.skipped.push(fileName);
+      continue;
+    }
+
+    const dest = path.join(projectRoot, fileName);
+    if (!dryRun) {
+      fs.copyFileSync(src, dest);
+    }
+    result.copied.push(fileName);
+    result.fileCount += 1;
+  }
+
+  return result;
+}
+
 module.exports = {
   DEPLOYERS,
+  SCAFFOLD_DIRS,
+  SCAFFOLD_FILES,
   copyRecursive,
   countFiles,
   deploySkill,
@@ -228,4 +332,5 @@ module.exports = {
   deploySkills,
   ensureDir,
   getDeployer,
+  scaffoldPlatformDirs,
 };

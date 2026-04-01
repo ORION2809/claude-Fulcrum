@@ -1,0 +1,473 @@
+{
+  "$schema": "https://charm.land/crush.json",
+  "providers": {
+    "nvidia": {
+      "name": "NVIDIA NIM",
+      "type": "openai-compat",
+      "base_url": "https://integrate.api.nvidia.com/v1",
+      "api_key": "$NVIDIA_API_KEY",
+      "models": [
+        {
+          "id": "moonshotai/kimi-k2-instruct",
+          "name": "Kimi K2 Instruct",
+          "context_window": 128000,
+          "default_max_tokens": 8192
+        },
+        {
+          "id": "deepseek-ai/deepseek-v3.2",
+          "name": "DeepSeek V3.2",
+          "context_window": 128000,
+          "default_max_tokens": 8192
+        },
+        {
+          "id": "meta/llama-4-maverick-17b-128e-instruct",
+          "name": "Llama 4 Maverick",
+          "context_window": 128000,
+          "default_max_tokens": 8192
+        },
+        {
+          "id": "qwen/qwen3.5-397b-a17b",
+          "name": "Qwen 3.5 397B",
+          "context_window": 128000,
+          "default_max_tokens": 8192,
+          "can_reason": true
+        }
+      ]
+    }
+  },
+  "agents": {
+    "coder": {
+      "model": "nvidia.moonshotai/kimi-k2-instruct",
+      "maxTokens": 8192
+    },
+    "task": {
+      "model": "nvidia.moonshotai/kimi-k2-instruct",
+      "maxTokens": 8192
+    },
+    "title": {
+      "model": "nvidia.moonshotai/kimi-k2-instruct",
+      "maxTokens": 80
+    }
+  },
+  "options": {
+    "initialize_as": "AGENTS.md",
+    "skills_paths": [
+      ".claude/skills",
+      ".crush/skills",
+      ".agents/skills",
+      ".cursor/skills"
+    ],
+    "disable_notifications": false,
+    "attribution": {
+      "trailer_style": "assisted-by",
+      "generated_with": true
+    }
+  },
+  "instructions": [
+    "AGENTS.md",
+    "skills/coding-standards/SKILL.md",
+    "skills/verification-loop/SKILL.md",
+    "skills/strategic-compact/SKILL.md"
+  ],
+  "lsp": {
+    "typescript": {
+      "command": "typescript-language-server",
+      "args": ["--stdio"]
+    }
+  },
+  "agent": {
+    "planner": {
+      "description": "Expert planning specialist for complex features and refactoring",
+      "model": "nvidia.moonshotai/kimi-k2-instruct",
+      "prompt": "{file:prompts/agents/planner.txt}",
+      "tools": {
+        "read": true,
+        "bash": true,
+        "write": false,
+        "edit": false
+      }
+    },
+    "architect": {
+      "description": "Software architecture specialist for system design and scalability",
+      "model": "nvidia.qwen/qwen3.5-397b-a17b",
+      "prompt": "{file:prompts/agents/architect.txt}",
+      "tools": {
+        "read": true,
+        "bash": true,
+        "write": false,
+        "edit": false
+      }
+    },
+    "code-reviewer": {
+      "description": "Expert code quality and security reviewer",
+      "model": "nvidia.moonshotai/kimi-k2-instruct",
+      "prompt": "{file:prompts/agents/code-reviewer.txt}",
+      "tools": {
+        "read": true,
+        "bash": true,
+        "write": false,
+        "edit": false
+      }
+    },
+    "security-reviewer": {
+      "description": "Security vulnerability detection and OWASP Top 10 remediation",
+      "model": "nvidia.moonshotai/kimi-k2-instruct",
+      "prompt": "{file:prompts/agents/security-reviewer.txt}",
+      "tools": {
+        "read": true,
+        "bash": true,
+        "write": true,
+        "edit": true
+      }
+    },
+    "tdd-guide": {
+      "description": "Test-Driven Development specialist enforcing 80%+ coverage",
+      "model": "nvidia.moonshotai/kimi-k2-instruct",
+      "prompt": "{file:prompts/agents/tdd-guide.txt}",
+      "tools": {
+        "read": true,
+        "write": true,
+        "edit": true,
+        "bash": true
+      }
+    },
+    "build-error-resolver": {
+      "description": "Build and compilation error resolution with minimal diffs",
+      "model": "nvidia.deepseek-ai/deepseek-v3.2",
+      "prompt": "{file:prompts/agents/build-error-resolver.txt}",
+      "tools": {
+        "read": true,
+        "write": true,
+        "edit": true,
+        "bash": true
+      }
+    },
+    "e2e-runner": {
+      "description": "End-to-end Playwright testing specialist with artifact management",
+      "model": "nvidia.moonshotai/kimi-k2-instruct",
+      "prompt": "{file:prompts/agents/e2e-runner.txt}",
+      "tools": {
+        "read": true,
+        "write": true,
+        "edit": true,
+        "bash": true
+      }
+    },
+    "doc-updater": {
+      "description": "Documentation and codemap generation specialist",
+      "model": "nvidia.meta/llama-4-maverick-17b-128e-instruct",
+      "prompt": "{file:prompts/agents/doc-updater.txt}",
+      "tools": {
+        "read": true,
+        "write": true,
+        "edit": true,
+        "bash": true
+      }
+    },
+    "refactor-cleaner": {
+      "description": "Dead code cleanup and consolidation via knip/depcheck/ts-prune",
+      "model": "nvidia.moonshotai/kimi-k2-instruct",
+      "prompt": "{file:prompts/agents/refactor-cleaner.txt}",
+      "tools": {
+        "read": true,
+        "write": true,
+        "edit": true,
+        "bash": true
+      }
+    },
+    "go-reviewer": {
+      "description": "Go code reviewer for idiomatic Go, concurrency, and error handling",
+      "model": "nvidia.moonshotai/kimi-k2-instruct",
+      "prompt": "{file:prompts/agents/go-reviewer.txt}",
+      "tools": {
+        "read": true,
+        "bash": true,
+        "write": false,
+        "edit": false
+      }
+    },
+    "go-build-resolver": {
+      "description": "Go build, vet, and compilation error resolution",
+      "model": "nvidia.deepseek-ai/deepseek-v3.2",
+      "prompt": "{file:prompts/agents/go-build-resolver.txt}",
+      "tools": {
+        "read": true,
+        "write": true,
+        "edit": true,
+        "bash": true
+      }
+    },
+    "rust-reviewer": {
+      "description": "Rust ownership, lifetimes, and safety reviewer",
+      "model": "nvidia.moonshotai/kimi-k2-instruct",
+      "prompt": "{file:prompts/agents/rust-reviewer.txt}",
+      "tools": {
+        "read": true,
+        "bash": true,
+        "write": false,
+        "edit": false
+      }
+    },
+    "rust-build-resolver": {
+      "description": "Rust cargo build and borrow checker error resolution",
+      "model": "nvidia.deepseek-ai/deepseek-v3.2",
+      "prompt": "{file:prompts/agents/rust-build-resolver.txt}",
+      "tools": {
+        "read": true,
+        "write": true,
+        "edit": true,
+        "bash": true
+      }
+    },
+    "database-reviewer": {
+      "description": "PostgreSQL/Supabase query optimization and schema design",
+      "model": "nvidia.moonshotai/kimi-k2-instruct",
+      "prompt": "{file:prompts/agents/database-reviewer.txt}",
+      "tools": {
+        "read": true,
+        "write": true,
+        "edit": true,
+        "bash": true
+      }
+    },
+    "code-graph-reviewer": {
+      "description": "Knowledge-graph-powered code review with blast-radius analysis across 14 languages",
+      "model": "nvidia.moonshotai/kimi-k2-instruct",
+      "prompt": "{file:prompts/agents/code-graph-reviewer.txt}",
+      "tools": {
+        "read": true,
+        "bash": true,
+        "write": false,
+        "edit": false
+      }
+    }
+  },
+  "command": {
+    "plan": {
+      "description": "Create a detailed implementation plan for complex features",
+      "template": "{file:../commands/plan.md}\n\n$ARGUMENTS",
+      "agent": "planner",
+      "subtask": true
+    },
+    "tdd": {
+      "description": "Enforce TDD workflow with 80%+ test coverage",
+      "template": "{file:../commands/tdd.md}\n\n$ARGUMENTS",
+      "agent": "tdd-guide",
+      "subtask": true
+    },
+    "code-review": {
+      "description": "Review code for quality, security, and maintainability",
+      "template": "{file:../commands/code-review.md}\n\n$ARGUMENTS",
+      "agent": "code-reviewer",
+      "subtask": true
+    },
+    "security": {
+      "description": "Run comprehensive security review",
+      "template": "{file:../commands/security-scan.md}\n\n$ARGUMENTS",
+      "agent": "security-reviewer",
+      "subtask": true
+    },
+    "build-fix": {
+      "description": "Fix build and TypeScript errors with minimal changes",
+      "template": "{file:../commands/build-fix.md}\n\n$ARGUMENTS",
+      "agent": "build-error-resolver",
+      "subtask": true
+    },
+    "e2e": {
+      "description": "Generate and run E2E tests with Playwright",
+      "template": "{file:../commands/e2e.md}\n\n$ARGUMENTS",
+      "agent": "e2e-runner",
+      "subtask": true
+    },
+    "refactor-clean": {
+      "description": "Remove dead code and consolidate duplicates",
+      "template": "{file:../commands/refactor-clean.md}\n\n$ARGUMENTS",
+      "agent": "refactor-cleaner",
+      "subtask": true
+    },
+    "orchestrate": {
+      "description": "Orchestrate multiple agents for complex tasks",
+      "template": "{file:../commands/orchestrate.md}\n\n$ARGUMENTS",
+      "agent": "planner",
+      "subtask": true
+    },
+    "learn": {
+      "description": "Extract patterns and learnings from session",
+      "template": "{file:../commands/learn.md}\n\n$ARGUMENTS"
+    },
+    "checkpoint": {
+      "description": "Save verification state and progress",
+      "template": "{file:../commands/checkpoint.md}\n\n$ARGUMENTS"
+    },
+    "verify": {
+      "description": "Run full verification loop",
+      "template": "{file:../commands/verify.md}\n\n$ARGUMENTS"
+    },
+    "eval": {
+      "description": "Run evaluation against criteria",
+      "template": "{file:../commands/eval.md}\n\n$ARGUMENTS"
+    },
+    "update-docs": {
+      "description": "Update documentation",
+      "template": "{file:../commands/update-docs.md}\n\n$ARGUMENTS",
+      "agent": "doc-updater",
+      "subtask": true
+    },
+    "update-codemaps": {
+      "description": "Update codemaps",
+      "template": "{file:../commands/update-codemaps.md}\n\n$ARGUMENTS",
+      "agent": "doc-updater",
+      "subtask": true
+    },
+    "test-coverage": {
+      "description": "Analyze test coverage",
+      "template": "{file:../commands/test-coverage.md}\n\n$ARGUMENTS",
+      "agent": "tdd-guide",
+      "subtask": true
+    },
+    "go-review": {
+      "description": "Go code review",
+      "template": "{file:../commands/go-review.md}\n\n$ARGUMENTS",
+      "agent": "go-reviewer",
+      "subtask": true
+    },
+    "go-test": {
+      "description": "Go TDD workflow",
+      "template": "{file:../commands/go-test.md}\n\n$ARGUMENTS",
+      "agent": "tdd-guide",
+      "subtask": true
+    },
+    "go-build": {
+      "description": "Fix Go build errors",
+      "template": "{file:../commands/go-build.md}\n\n$ARGUMENTS",
+      "agent": "go-build-resolver",
+      "subtask": true
+    },
+    "rust-review": {
+      "description": "Rust code review",
+      "template": "{file:../commands/rust-review.md}\n\n$ARGUMENTS",
+      "agent": "rust-reviewer",
+      "subtask": true
+    },
+    "rust-build": {
+      "description": "Fix Rust build errors",
+      "template": "{file:../commands/rust-build.md}\n\n$ARGUMENTS",
+      "agent": "rust-build-resolver",
+      "subtask": true
+    },
+    "rust-test": {
+      "description": "Rust TDD workflow",
+      "template": "{file:../commands/rust-test.md}\n\n$ARGUMENTS",
+      "agent": "tdd-guide",
+      "subtask": true
+    },
+    "code-graph-build": {
+      "description": "Build or update the code review knowledge graph",
+      "template": "{file:../commands/code-graph-build.md}\n\n$ARGUMENTS",
+      "agent": "code-graph-reviewer",
+      "subtask": true
+    },
+    "code-graph-review": {
+      "description": "Token-efficient delta review using knowledge graph",
+      "template": "{file:../commands/code-graph-review.md}\n\n$ARGUMENTS",
+      "agent": "code-graph-reviewer",
+      "subtask": true
+    },
+    "code-graph-impact": {
+      "description": "Analyze blast radius of code changes",
+      "template": "{file:../commands/code-graph-impact.md}\n\n$ARGUMENTS",
+      "agent": "code-graph-reviewer",
+      "subtask": true
+    },
+    "skill-create": {
+      "description": "Generate skills from git history",
+      "template": "{file:../commands/skill-create.md}\n\n$ARGUMENTS"
+    },
+    "instinct-status": {
+      "description": "View learned instincts",
+      "template": "{file:../commands/instinct-status.md}\n\n$ARGUMENTS"
+    },
+    "evolve": {
+      "description": "Cluster instincts into skills",
+      "template": "{file:../commands/evolve.md}\n\n$ARGUMENTS"
+    },
+    "quality-loop": {
+      "description": "Iterative quality improvement with scoring",
+      "template": "{file:../commands/quality-loop.md}\n\n$ARGUMENTS"
+    },
+    "quality-gate": {
+      "description": "Enforce quality standards before commit",
+      "template": "{file:../commands/quality-gate.md}\n\n$ARGUMENTS"
+    },
+    "memory-search": {
+      "description": "4-signal hybrid search across persistent memory",
+      "template": "{file:../commands/memory-search.md}\n\n$ARGUMENTS"
+    },
+    "confidence-check": {
+      "description": "3-factor confidence scoring before proceeding",
+      "template": "{file:../commands/confidence-check.md}\n\n$ARGUMENTS"
+    },
+    "prompt-optimize": {
+      "description": "Optimize prompts for better AI responses",
+      "template": "{file:../commands/prompt-optimize.md}\n\n$ARGUMENTS"
+    }
+  },
+  "mcp": {
+    "code-review-graph": {
+      "type": "stdio",
+      "command": "uvx",
+      "args": ["code-review-graph", "serve"]
+    },
+    "context7": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@upstash/context7-mcp@latest"]
+    },
+    "playwright": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@playwright/mcp", "--browser", "chrome"]
+    },
+    "sequential-thinking": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"]
+    },
+    "memory": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-memory"]
+    },
+    "claude-flow": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "claude-flow@alpha", "mcp", "start"]
+    },
+    "cloudflare-docs": {
+      "type": "http",
+      "url": "https://docs.mcp.cloudflare.com/mcp"
+    },
+    "vercel": {
+      "type": "http",
+      "url": "https://mcp.vercel.com"
+    }
+  },
+  "permissions": {
+    "allowed_tools": [
+      "view",
+      "ls",
+      "grep",
+      "glob",
+      "diagnostics",
+      "mcp_context7_resolve-library-id",
+      "mcp_context7_get-library-docs",
+      "mcp_memory_read_graph",
+      "mcp_sequential-thinking_sequentialthinking",
+      "mcp_code-review-graph_list_graph_stats_tool",
+      "mcp_code-review-graph_query_graph_tool"
+    ]
+  },
+  "permission": {
+    "mcp_*": "ask"
+  }
+}
