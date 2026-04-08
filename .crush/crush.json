@@ -12,25 +12,6 @@
           "name": "Kimi K2 Instruct",
           "context_window": 128000,
           "default_max_tokens": 8192
-        },
-        {
-          "id": "deepseek-ai/deepseek-v3.2",
-          "name": "DeepSeek V3.2",
-          "context_window": 128000,
-          "default_max_tokens": 8192
-        },
-        {
-          "id": "meta/llama-4-maverick-17b-128e-instruct",
-          "name": "Llama 4 Maverick",
-          "context_window": 128000,
-          "default_max_tokens": 8192
-        },
-        {
-          "id": "qwen/qwen3.5-397b-a17b",
-          "name": "Qwen 3.5 397B",
-          "context_window": 128000,
-          "default_max_tokens": 8192,
-          "can_reason": true
         }
       ]
     }
@@ -89,7 +70,7 @@
     },
     "architect": {
       "description": "Software architecture specialist for system design and scalability",
-      "model": "nvidia.qwen/qwen3.5-397b-a17b",
+      "model": "nvidia.moonshotai/kimi-k2-instruct",
       "prompt": "{file:prompts/agents/architect.txt}",
       "tools": {
         "read": true,
@@ -133,7 +114,7 @@
     },
     "build-error-resolver": {
       "description": "Build and compilation error resolution with minimal diffs",
-      "model": "nvidia.deepseek-ai/deepseek-v3.2",
+      "model": "nvidia.moonshotai/kimi-k2-instruct",
       "prompt": "{file:prompts/agents/build-error-resolver.txt}",
       "tools": {
         "read": true,
@@ -155,7 +136,7 @@
     },
     "doc-updater": {
       "description": "Documentation and codemap generation specialist",
-      "model": "nvidia.meta/llama-4-maverick-17b-128e-instruct",
+      "model": "nvidia.moonshotai/kimi-k2-instruct",
       "prompt": "{file:prompts/agents/doc-updater.txt}",
       "tools": {
         "read": true,
@@ -188,7 +169,7 @@
     },
     "go-build-resolver": {
       "description": "Go build, vet, and compilation error resolution",
-      "model": "nvidia.deepseek-ai/deepseek-v3.2",
+      "model": "nvidia.moonshotai/kimi-k2-instruct",
       "prompt": "{file:prompts/agents/go-build-resolver.txt}",
       "tools": {
         "read": true,
@@ -210,7 +191,7 @@
     },
     "rust-build-resolver": {
       "description": "Rust cargo build and borrow checker error resolution",
-      "model": "nvidia.deepseek-ai/deepseek-v3.2",
+      "model": "nvidia.moonshotai/kimi-k2-instruct",
       "prompt": "{file:prompts/agents/rust-build-resolver.txt}",
       "tools": {
         "read": true,
