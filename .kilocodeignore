@@ -1,0 +1,55 @@
+# Kilo Code Ignore File
+# Patterns here prevent Kilo Code from reading/writing these files
+
+# ─── Secrets & Credentials ──────────────────────────────
+.env
+.env.*
+!.env.example
+**/*.pem
+**/*.key
+**/secrets/
+**/credentials.json
+
+# ─── Build & Output ─────────────────────────────────────
+dist/
+build/
+out/
+coverage/
+.next/
+.nuxt/
+*.tsbuildinfo
+
+# ─── Dependencies ───────────────────────────────────────
+node_modules/
+vendor/
+.pnpm-store/
+__pycache__/
+*.pyc
+target/
+
+# ─── IDE & System ───────────────────────────────────────
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# ─── Test Artifacts & Logs ──────────────────────────────
+*.log
+test-output.txt
+test-run-output.txt
+ci-test-output.txt
+latest-test-output.txt
+full-test.txt
+output.txt
+testout.txt
+oc-*.txt
+qg-*.txt
+sd-test.txt
+si-test.txt
+sr-test.txt
+ci-*.txt
+
+# ─── Large/Binary Files ─────────────────────────────────
+**/*.sqlite
+**/*.db
+**/*.wasm

@@ -1,0 +1,18 @@
+{
+  "$schema": "https://app.kilo.ai/config.json",
+  "preferredLanguage": "en",
+  "agent": {
+    "explore": {
+      "model": "anthropic/claude-haiku-4-20250514"
+    },
+    "orchestrator": {
+      "mode": "primary",
+      "description": "Orchestrates complex multi-step workflows by delegating to specialized subagents",
+      "permission": {
+        "task": {
+          "*": "allow"
+        }
+      }
+    }
+  }
+}

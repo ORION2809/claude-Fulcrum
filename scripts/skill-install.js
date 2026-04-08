@@ -17,7 +17,7 @@
 const path = require('path');
 
 const { buildSkillRegistry, validateSkillIds, PLATFORM_TARGETS } = require('./lib/skill-registry');
-const { deploySkill } = require('./lib/skill-deployers');
+const { deploySkill, scaffoldPlatformDirs } = require('./lib/skill-deployers');
 
 const ALL_PLATFORMS = PLATFORM_TARGETS;
 
@@ -36,6 +36,7 @@ function parseArgs(argv) {
     homeDir: process.env.HOME || process.env.USERPROFILE || require('os').homedir(),
     help: false,
     includeCopilotScaffold: true,
+    scaffold: true,
   };
 
   for (let i = 0; i < args.length; i++) {
@@ -55,6 +56,8 @@ function parseArgs(argv) {
       parsed.json = true;
     } else if (arg === '--no-copilot-scaffold') {
       parsed.includeCopilotScaffold = false;
+    } else if (arg === '--no-scaffold') {
+      parsed.scaffold = false;
     } else if (arg === '--skills' || arg === '-s') {
       const value = args[i + 1];
       if (value) {
@@ -107,6 +110,7 @@ Options:
   --project-root <path>   Project root for project-scoped platforms (cursor, antigravity, copilot)
   --home-dir <path>       Home directory for home-scoped platforms (claude, codex, opencode)
   --no-copilot-scaffold   Skip copying optional .github/ scaffold files for Copilot
+  --no-scaffold           Skip copying platform dot-directories (.github, .cursor, .kilo, etc.)
   --dry-run               Show plan without making changes
   --json                  Output results as JSON
   --list, -l              List all available skills
@@ -208,21 +212,47 @@ function main() {
 
   console.log(`Skills:     ${skillsToInstall.length} ${options.all ? '(all)' : `(${skillsToInstall.map(s => s.id).join(', ')})`}`);
   console.log(`Platforms:  ${options.platforms.join(', ')}${options.allPlatforms ? ' (all)' : ''}`);
+  console.log(`Scaffold:   ${options.scaffold ? 'yes (copy platform dot-directories)' : 'no'}`);
   console.log(`Project:    ${options.projectRoot}`);
   console.log(`Home:       ${options.homeDir}`);
   console.log('');
 
   if (options.dryRun) {
     const plan = buildDryRunPlan(skillsToInstall, options);
+    if (options.scaffold) {
+      const scaffoldResult = scaffoldPlatformDirs({
+        sourceRoot,
+        projectRoot: options.projectRoot,
+        homeDir: options.homeDir,
+        dryRun: true,
+      });
+      plan.scaffold = scaffoldResult;
+    }
     if (options.json) {
       console.log(JSON.stringify(plan, null, 2));
     } else {
       printDryRunPlan(plan);
+      if (plan.scaffold) {
+        console.log(`\nScaffold: ${plan.scaffold.copied.length} platform directories would be copied (${plan.scaffold.fileCount} files)`);
+        for (const dir of plan.scaffold.copied) {
+          console.log(`  → ${dir}`);
+        }
+      }
     }
     process.exit(0);
   }
 
   const results = executeInstall(skillsToInstall, options, sourceRoot);
+
+  if (options.scaffold) {
+    const scaffoldResult = scaffoldPlatformDirs({
+      sourceRoot,
+      projectRoot: options.projectRoot,
+      homeDir: options.homeDir,
+      dryRun: false,
+    });
+    results.scaffold = scaffoldResult;
+  }
 
   if (options.json) {
     console.log(JSON.stringify(results, null, 2));
@@ -313,6 +343,16 @@ function printResults(results) {
   }
 
   console.log(`Done: ${results.successes} succeeded, ${results.failures} failed`);
+
+  if (results.scaffold) {
+    console.log(`\nScaffold: ${results.scaffold.copied.length} platform directories copied (${results.scaffold.fileCount} files)`);
+    for (const dir of results.scaffold.copied) {
+      console.log(`  ✓ ${dir}`);
+    }
+    if (results.scaffold.skipped.length > 0) {
+      console.log(`  Skipped (not found in package): ${results.scaffold.skipped.join(', ')}`);
+    }
+  }
 
   if (results.errors.length > 0) {
     console.log('\nErrors:');
