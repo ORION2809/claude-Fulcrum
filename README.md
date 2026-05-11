@@ -8,7 +8,7 @@
 
 <br>
 
-**26 Agents** · **122 Skills** · **66 Commands** · **9 Language Rulesets** · **1,536 Tests** · **7 Platforms**
+**26 Agents** · **122 Skills** · **66 Commands** · **9 Language Rulesets** · **1,536 Tests** · **8 Platforms**
 
 One harness. Every AI coding tool. Unified memory. Swarm orchestration. Neural search. Design intelligence. NVIDIA NIM.
 
@@ -20,6 +20,7 @@ One harness. Every AI coding tool. Unified memory. Swarm orchestration. Neural s
 
 [![Claude Code](https://img.shields.io/badge/Claude_Code-Ready-6C47FF?style=flat-square&logo=anthropic&logoColor=white)](#-supported-platforms)
 [![Codex CLI](https://img.shields.io/badge/Codex_CLI-Ready-000000?style=flat-square&logo=openai&logoColor=white)](#-supported-platforms)
+[![Kimi Code](https://img.shields.io/badge/Kimi_Code-Ready-1F7AFF?style=flat-square)](#-supported-platforms)
 [![Cursor](https://img.shields.io/badge/Cursor-Ready-00D4AA?style=flat-square&logo=cursor&logoColor=white)](#-supported-platforms)
 [![GitHub Copilot](https://img.shields.io/badge/Copilot-Ready-000000?style=flat-square&logo=github&logoColor=white)](#-supported-platforms)
 [![OpenCode](https://img.shields.io/badge/OpenCode-Ready-333333?style=flat-square)](#-supported-platforms)
@@ -33,7 +34,7 @@ One harness. Every AI coding tool. Unified memory. Swarm orchestration. Neural s
 
 </div>
 
-> **What is this?** Claude Fulcrum is a production-grade agent harness that unifies **Claude Code, Codex CLI, Cursor, GitHub Copilot, OpenCode, and Crush** into a single development environment — with shared vector memory, 4-signal neural search, knowledge graphs, swarm orchestration, 33 lifecycle hooks, 26 specialized AI agents, **NVIDIA NIM multi-model orchestration**, and a **full UI/UX design intelligence suite** that activate automatically based on what you're doing.
+> **What is this?** Claude Fulcrum is a production-grade agent harness that unifies **Claude Code, Codex CLI, Kimi Code, Cursor, GitHub Copilot, OpenCode, and Crush** into a single development environment — with shared vector memory, 4-signal neural search, knowledge graphs, swarm orchestration, 33 lifecycle hooks, 26 specialized AI agents, **NVIDIA NIM multi-model orchestration**, and a **full UI/UX design intelligence suite** that activate automatically based on what you're doing.
 
 <br>
 
@@ -45,7 +46,7 @@ One harness. Every AI coding tool. Unified memory. Swarm orchestration. Neural s
 
 None of them share memory. None of them learn from each other. Every session, every tool, starts from zero.
 
-Fulcrum fixes this with one shared memory layer — FTS5 + vector embeddings + knowledge graph — that all 7 platforms read from and write to simultaneously. Patterns learned yesterday are available today. Plans made in one tool execute in another.
+Fulcrum fixes this with one shared memory layer — FTS5 + vector embeddings + knowledge graph — that all 8 platforms read from and write to simultaneously. Patterns learned yesterday are available today. Plans made in one tool execute in another.
 
 ```
 You write code in Cursor  →  Fulcrum's agents review it automatically
@@ -122,7 +123,7 @@ npx claude-fulcrum typescript
 Install any skill (or all of them) to any platform — sequentially or in parallel via swarm:
 
 ```bash
-# Install all skills to all 7 platforms (sequential)
+# Install all skills to all 8 platforms (sequential)
 npx claude-fulcrum skill-install --all --platform all
 
 # Install specific skills to specific platforms
@@ -145,6 +146,7 @@ GitHub Copilot can consume Claude-format skills directly from `.claude/skills/`,
 | Claude | Home | `~/.claude/skills/` |
 | Cursor | Project | `.cursor/skills/` |
 | Codex | Home | `~/.codex/skills/` |
+| Kimi Code | Project | `.agents/skills/` + `.kimi/skills/` wrappers |
 | OpenCode | Home | `~/.opencode/skills/` |
 | Crush | Project | `.crush/skills/` |
 | Antigravity | Project | `.agent/skills/` |
@@ -159,6 +161,7 @@ graph TB
     subgraph PLATFORMS["🖥️ Platform Layer"]
         CC[Claude Code]
         CX[Codex CLI]
+        KC[Kimi Code]
         CU[Cursor]
         CP[Copilot]
         OC[OpenCode]
@@ -190,11 +193,11 @@ graph TB
         UI["ui-styling · brand<br/>shadcn · Tailwind · 65+ fonts"]
     end
 
-    CC & CX & CU & CP & OC & CR --> ENGINE
+    CC & CX & KC & CU & CP & OC & CR --> ENGINE
     ENGINE --> MEMORY
     ENGINE --> AGENTS
     ENGINE --> DESIGN
-    MEMORY --> CC & CX & CU & CP & OC & CR
+    MEMORY --> CC & CX & KC & CU & CP & OC & CR
 ```
 
 **Every platform reads from and writes to the same shared context:**
@@ -203,6 +206,7 @@ graph TB
 |----------|------|-------|--------|
 | **Claude Code** | Deep workflows — TDD, planning, security | Everything | Patterns → memory |
 | **Codex CLI** | Fast parallel execution | Plans, tasks | Results, code |
+| **Kimi Code** | Long-context terminal and IDE agent | AGENTS, skills, MCPs | Code, docs, reviews |
 | **Cursor** | Visual IDE integration | Agents, skills | Code changes |
 | **GitHub Copilot** | Inline completions + chat | Standards, patterns | — |
 | **OpenCode** | Open-source alternative | Full agent/skill library | Code, docs |
@@ -903,7 +907,7 @@ Each rule set covers: **coding style**, **testing requirements**, **security pra
 | **Agents** | 21 | **26** |
 | **Skills** | ~80 | **119** (includes 7 UI/UX design intelligence skills) |
 | **Commands** | ~40 | **66** |
-| **Platforms** | 4 | **7** (Claude Code, Codex, Cursor, Copilot, OpenCode, Antigravity, Crush) |
+| **Platforms** | 4 | **8** (Claude Code, Codex, Kimi Code, Cursor, Copilot, OpenCode, Antigravity, Crush) |
 | **Design Intelligence** | None | **7 skills** — 67 styles, 96 palettes, 57 font pairings, BM25 search |
 | **Language Rules** | 5 | **9** (each with 5 files: style, testing, security, patterns, hooks) |
 | **Memory** | Per-platform | **Unified hybrid** (FTS5 + vector + knowledge graph + 50+ API methods) |
@@ -928,7 +932,7 @@ The four directions dominating AI tooling in 2026:
 | Direction | What It Means | How Fulcrum Addresses It |
 |-----------|--------------|--------------------------|
 | **Agentic execution** | AI that acts autonomously, not just suggests | 25 auto-activating agents, quality loop, autonomous loops |
-| **Workflow orchestration** | Coordinating multiple AI tools and models | 7-platform unified layer, swarm coordination, 3-tier routing, NVIDIA NIM multi-model |
+| **Workflow orchestration** | Coordinating multiple AI tools and models | 8-platform unified layer, swarm coordination, 3-tier routing, NVIDIA NIM multi-model |
 | **Data and context** | AI that remembers and learns from your history | 4-signal hybrid memory, knowledge graph, institutional memory |
 | **Multimodal generation** | Code + design + content in one flow | 7 design skills, BM25 search, 96 palettes, 57 font pairings |
 
@@ -942,6 +946,7 @@ Fulcrum is the only developer harness that addresses all four simultaneously.
 |----------|----------------|------------|----------|
 | **Claude Code** | `~/.claude/` | Full 26 agents, 122 skills, 9 rulesets, 33 hooks | Deep workflows, TDD, planning, security |
 | **Codex CLI** | `~/.codex/` | Core agents + rules | Fast parallel execution, batch tasks |
+| **Kimi Code** | `.kimi/` | Fulcrum agent, 6 subagents, command skills, MCP baseline | Long-context terminal and IDE agent workflows |
 | **Cursor** | `.cursor/` | 11 agents, full rules | Visual IDE, real-time coding |
 | **GitHub Copilot** | `.github/` | 11 agents, 30 prompts, 8 language instructions | Inline completions, chat |
 | **OpenCode** | `.opencode/` | Core agents + skills | Open-source, extensible |
@@ -949,6 +954,28 @@ Fulcrum is the only developer harness that addresses all four simultaneously.
 | **Antigravity** | `.agent/` | Agents, skills, flattened rules | Workflow-native agent IDE |
 
 **Shared context:** All platforms read from and write to the same memory layer. Patterns learned in Claude Code are available in Copilot completions. Plans created in one tool execute in another.
+
+### Kimi Code
+
+Run Fulcrum in Kimi Code from this repository with:
+
+```powershell
+kimi --agent-file .kimi/agents/fulcrum.yaml --mcp-config-file .kimi/mcp.json
+```
+
+To make Fulcrum skills available to Kimi Code across the whole laptop, install
+the shared skills into Kimi's global skill root:
+
+```powershell
+$repo = (Get-Location).Path
+$targetRoot = "$env:USERPROFILE\.kimi\skills"
+New-Item -ItemType Directory -Force -Path $targetRoot | Out-Null
+Copy-Item "$repo\.agents\skills\*" $targetRoot -Recurse -Force
+Copy-Item "$repo\.kimi\skills\*" $targetRoot -Recurse -Force
+```
+
+Then use Kimi skill commands such as `/skill:tdd-workflow`,
+`/skill:verification-loop`, or `/skill:command-code-review` from any project.
 
 ### Cross-Platform Skill Deployment
 
@@ -978,7 +1005,7 @@ Swarm architecture: Coordinator spawns one `worker_threads` worker per platform.
 | Guide | Description |
 |-------|-------------|
 | [**Complete Architecture**](docs/ARCHITECTURE.md) | Full technical reference for every subsystem — memory, quality, hooks, orchestration, install |
-| [**Cross-Platform Integration**](docs/CROSS_PLATFORM_INTEGRATION.md) | How all 6 platforms share one orchestration layer |
+| [**Cross-Platform Integration**](docs/CROSS_PLATFORM_INTEGRATION.md) | How all supported platforms share one orchestration layer |
 | [**Extreme Dev Playbook**](docs/EXTREME_DEV_PLAYBOOK.md) | Daily workflow for all platforms working together |
 | [**Shortform Guide**](docs/the-shortform-guide.md) | Setup, foundations, philosophy |
 | [**Longform Guide**](docs/the-longform-guide.md) | Token optimization, memory persistence, evals |
@@ -1037,6 +1064,7 @@ claude-fulcrum/
 │   └── ...              #   Cross-platform, security, playbooks, i18n (ja, ko, zh)
 ├── .github/             # GitHub + Copilot config (11 agents, 30 prompts, 8 instructions)
 ├── .codex/              # Codex CLI config
+├── .kimi/               # Kimi Code config (agent, subagents, MCP, hooks)
 ├── .cursor/             # Cursor config
 ├── .opencode/           # OpenCode config
 ├── .crush/              # Crush + NVIDIA NIM config (15 agents, 31 commands, 8 MCPs)
@@ -1268,12 +1296,13 @@ SessionEnd hooks fire (2)
 
 ### Now — v3.1 (Current)
 - ✅ 4-signal hybrid memory (FTS5 + vector + graph + recency)
-- ✅ 26 agents across 7 platforms
+- ✅ 26 agents across 8 platforms
 - ✅ 7 UI/UX design intelligence skills with BM25 search
 - ✅ 33 lifecycle hooks across 7 phases
 - ✅ 122 skills, 66 commands, 9 language rulesets
 - ✅ 1,536 tests passing
 - ✅ Cross-platform skill installer with swarm mode
+- ✅ **Kimi Code integration** — Fulcrum agent, 6 subagents, MCP baseline, command skills
 - ✅ **Crush + NVIDIA NIM integration** — 4 open-weight models, 15 agents, 31 commands, 8 MCPs
 
 ### Next — v3.2 (Q2 2026)

@@ -9,6 +9,7 @@
         "commands-core",
         "hooks-runtime",
         "platform-configs",
+        "kimi-platform",
         "workflow-quality"
       ]
     },
@@ -20,6 +21,7 @@
         "commands-core",
         "hooks-runtime",
         "platform-configs",
+        "kimi-platform",
         "workflow-quality",
         "framework-language",
         "database",
@@ -35,6 +37,7 @@
         "commands-core",
         "hooks-runtime",
         "platform-configs",
+        "kimi-platform",
         "workflow-quality",
         "security"
       ]
@@ -47,6 +50,7 @@
         "commands-core",
         "hooks-runtime",
         "platform-configs",
+        "kimi-platform",
         "workflow-quality",
         "research-apis",
         "business-content",
@@ -61,6 +65,7 @@
         "commands-core",
         "hooks-runtime",
         "platform-configs",
+        "kimi-platform",
         "framework-language",
         "database",
         "workflow-quality",

@@ -1,7 +1,7 @@
 {
   "name": "claude-fulcrum",
   "version": "2.0.7",
-"description": "The operating system for AI-powered development — 26 agents, 122 skills, 66 commands, 4-signal hybrid memory, knowledge graphs, NVIDIA NIM, and cross-platform support for Claude Code, Codex, Cursor, Copilot, OpenCode & Crush",
+  "description": "The operating system for AI-powered development — 26 agents, 122 skills, 66 commands, 4-signal hybrid memory, knowledge graphs, NVIDIA NIM, and cross-platform support for Claude Code, Codex, Kimi Code, Cursor, Copilot, OpenCode & Crush",
   "keywords": [
     "claude-fulcrum",
     "claude-code",
@@ -32,7 +32,10 @@
     "developer-tools",
     "devtools",
     "coding-assistant",
-    "code-generation"
+    "code-generation",
+    "kimi",
+    "kimi-code",
+    "moonshot"
   ],
   "author": {
     "name": "Shreyas Suvarna",
@@ -57,6 +60,7 @@
     ".github/",
     ".kilo/",
     ".kilocode/",
+    ".kimi/",
     ".opencode/",
     ".orchestration/",
     ".mcp.json",
@@ -89,7 +93,7 @@
     "postinstall": "echo '\\n  Claude Fulcrum installed!\\n  Run: npx claude-fulcrum typescript\\n  Docs: https://github.com/ORION2809/claude-Fulcrum\\n'",
     "lint": "eslint . && markdownlint \"**/*.md\" --ignore node_modules",
     "harness:audit": "node scripts/harness-audit.js",
-    "test": "node scripts/ci/validate-agents.js && node scripts/ci/validate-commands.js && node scripts/ci/validate-rules.js && node scripts/ci/validate-skills.js && node scripts/ci/validate-hooks.js && node scripts/ci/validate-install-manifests.js && node scripts/ci/validate-no-personal-paths.js && node scripts/ci/catalog.js --text && node tests/run-all.js",
+    "test": "node scripts/ci/validate-agents.js && node scripts/ci/validate-commands.js && node scripts/ci/validate-rules.js && node scripts/ci/validate-skills.js && node scripts/ci/validate-hooks.js && node scripts/ci/validate-install-manifests.js && node scripts/ci/validate-kimi.js && node scripts/ci/validate-no-personal-paths.js && node scripts/ci/catalog.js --text && node tests/run-all.js",
     "coverage": "c8 --all --include=\"scripts/**/*.js\" --check-coverage --lines 80 --functions 80 --branches 80 --statements 80 --reporter=text --reporter=lcov node tests/run-all.js"
   },
   "dependencies": {

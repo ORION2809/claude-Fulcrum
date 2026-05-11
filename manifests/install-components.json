@@ -42,6 +42,14 @@
       ]
     },
     {
+      "id": "baseline:kimi-platform",
+      "family": "baseline",
+      "description": "Kimi Code project adapter, agents, MCP config, hooks, and command wrappers.",
+      "modules": [
+        "kimi-platform"
+      ]
+    },
+    {
       "id": "baseline:workflow",
       "family": "baseline",
       "description": "Evaluation, TDD, verification, and compaction workflow support.",

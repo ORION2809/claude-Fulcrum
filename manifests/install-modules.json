@@ -99,6 +99,21 @@
       "stability": "stable"
     },
     {
+      "id": "kimi-platform",
+      "kind": "platform",
+      "description": "Kimi Code project adapter with Fulcrum agent, subagents, MCP config, hooks, and command-skill wrappers.",
+      "paths": [
+        ".kimi"
+      ],
+      "targets": [
+        "kimi"
+      ],
+      "dependencies": [],
+      "defaultInstall": true,
+      "cost": "light",
+      "stability": "stable"
+    },
+    {
       "id": "framework-language",
       "kind": "skills",
       "description": "Core framework, language, and application-engineering skills.",

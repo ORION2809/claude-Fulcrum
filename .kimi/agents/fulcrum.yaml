@@ -1,0 +1,24 @@
+version: 1
+agent:
+  extend: default
+  name: fulcrum
+  system_prompt_path: ./fulcrum.md
+  subagents:
+    planner:
+      path: ./planner.yaml
+      description: "Implementation planning and architecture analysis"
+    reviewer:
+      path: ./reviewer.yaml
+      description: "Correctness, maintainability, and regression review"
+    security-reviewer:
+      path: ./security-reviewer.yaml
+      description: "Security review and vulnerability detection"
+    tdd-guide:
+      path: ./tdd-guide.yaml
+      description: "Test-driven implementation for features and bugs"
+    docs-researcher:
+      path: ./docs-researcher.yaml
+      description: "Current API and framework documentation research"
+    build-error-resolver:
+      path: ./build-error-resolver.yaml
+      description: "Minimal fixes for build, type, and test failures"
